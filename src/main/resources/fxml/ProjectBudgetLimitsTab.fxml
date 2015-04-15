@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectBudgetLimitsTabController">
+  <children>
+    <Button text="%ProjectBudgetLimitAddButtonLabel" onAction="#createButtonAction" />    
+    <TableView editable="true" fx:id="table" >
+      <columns>
+        <TableColumn prefWidth="150" >
+          <cellFactory>
+            <EditButtonTableCellFactory />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="state" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ExpenseType" prefWidth="150">
+          <cellFactory>
+            <ExpenseTypeTableCellFactory property="expenseType" />  
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="expenseType" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn prefWidth="200" fx:id="valueColumn" styleClass="numColumn">
+          <cellFactory>
+            <DoubleTableCellFactory property="budget" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="budget" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn prefWidth="200" fx:id="spentColumn" styleClass="numColumn" editable="false">
+          <cellFactory>
+            <DoubleTableCellFactory property="spent" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="spent" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn prefWidth="200" fx:id="remainingColumn" styleClass="numColumn" editable="false">
+          <cellFactory>
+            <DoubleTableCellFactory property="remaining" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="remaining" />
+          </cellValueFactory>
+        </TableColumn>        
+      </columns>
+    </TableView>
+  </children> 
+</VBox>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectTabController">
+  <stylesheets>
+    <URL value="@/styles/projecttab.css"/>
+  </stylesheets>
+  <children>
+    <TabPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="40">
+      <tabs>
+        <Tab text="%SourcesTabName">
+          <fx:include source="ProjectSourceTab.fxml" fx:id="projectSourceTab" />
+        </Tab>
+        <Tab text="%ProjectBudgetLimitsTabName">
+          <fx:include source="ProjectBudgetLimitsTab.fxml" fx:id="projectBudgetLimitsTab" />
+        </Tab>
+        <Tab text="%ProjectExpensesTabName">
+          <fx:include source="ProjectExpenseTab.fxml" fx:id="projectExpenseTab" />
+        </Tab>
+      </tabs>
+    </TabPane>
+  </children>
+</AnchorPane>

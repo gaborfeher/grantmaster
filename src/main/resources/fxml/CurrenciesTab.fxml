@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.CurrenciesTabController">
+  <children>
+    <GridPane>
+      <Label text="%CurrencyNameEntry" GridPane.rowIndex="0" GridPane.columnIndex="0"  /> 
+      <TextField fx:id="codeEntry" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+      <Button text="%CurrencyAddButton" onAction="#handleAddButtonAction" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
+    </GridPane>
+    <TableView fx:id="table">
+      <columns>
+        <TableColumn text="%CurrencyNameColumn" prefWidth="150">
+          <cellValueFactory>
+            <PropertyValueFactory property="code" /> 
+          </cellValueFactory>
+        </TableColumn>
+      </columns>
+    </TableView>                
+  </children>
+</VBox>

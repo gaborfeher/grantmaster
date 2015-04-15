@@ -1,0 +1,102 @@
+package com.github.gaborfeher.grantmaster.ui.cells;
+
+import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.util.StringConverter;
+
+/**
+ *
+ * @author gabor
+ */
+public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
+  final String property;
+  final TextField editTextField;
+  final StringConverter<T> stringConverter;
+  
+  // true if the last editing session was cancelled by user (currently esc key)
+  // This disables later spurious commit messages.
+  boolean userCancelled;
+  
+  public TextFieldTableCell(String property, StringConverter<T> stringConverter0) {
+    //super(new DefaultStringConverter());
+    this.property = property;
+    this.stringConverter = stringConverter0;
+    
+    editTextField = new TextField();
+    editTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent event) {
+          if (event.getCode().equals(KeyCode.ENTER)) {
+            commitEdit(stringConverter.fromString(editTextField.getText()));
+          } else if (event.getCode().equals(KeyCode.ESCAPE)) {
+            userCancelled = true;
+            cancelEdit();
+          }
+        }
+    });
+    editTextField.focusedProperty().addListener(
+        new ChangeListener<Boolean>() {
+          @Override
+          public void changed(ObservableValue<? extends Boolean> ov, Boolean t1, Boolean t2) {
+            if (!t2 && t1) {
+              commitEdit(stringConverter.fromString(editTextField.getText()));
+            }
+          }
+    });
+  }
+   
+  private EntityWrapper getEntityWrapper() {
+    return (EntityWrapper) getTableRow().getItem();
+  }
+
+  @Override  
+  public void commitEdit(T val) {
+    if (userCancelled) {
+      return;  // User cancel was before this commit message, ignore this.
+    }
+    if (getEntityWrapper().setPropeprty(property, val)) {
+      super.commitEdit(val);
+      updateItem(val, false);
+    }
+  }
+
+  @Override
+  public void startEdit() {
+    userCancelled = false;
+    if (getEntityWrapper().canEdit()) {
+      super.startEdit();
+      updateItem(getItem(), false);
+      editTextField.requestFocus();
+    }
+  }
+
+  @Override
+  public void cancelEdit() {
+    super.cancelEdit();
+    updateItem(getItem(), false);
+  }
+  
+  @Override
+  public void updateItem(final T item, final boolean empty) {
+    super.updateItem(item, empty);
+    if (empty) {
+      setText(null);
+      setGraphic(null);
+    } else {
+      if (isEditing()) {
+        editTextField.setText(stringConverter.toString(item));
+        setGraphic(editTextField);
+        setText(null);
+      } else {
+        setGraphic(null);
+        setText(stringConverter.toString(item));
+      }
+    }
+  }
+}

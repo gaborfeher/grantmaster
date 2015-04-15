@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="480" prefWidth="640" fx:controller="com.github.gaborfeher.grantmaster.ui.MainPageController">
+  <children>
+    <HBox>
+      <children>
+        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" fx:id="openButton" />  
+        <Label fx:id="pathLabel" />
+      </children>
+    </HBox>
+    <TabPane AnchorPane.topAnchor="50" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" fx:id="mainTabs">
+      <tabs>
+        <Tab text="%ProjectsTabName" closable="false">
+          <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
+        </Tab>
+        <Tab text="%ExpenseTypesTabName" closable="false">
+          <fx:include source="ExpenseTypesTab.fxml" fx:id="expenseTypesTab" />
+        </Tab>
+        <Tab text="%CurrenciesTabName" closable="false">
+          <fx:include source="CurrenciesTab.fxml" fx:id="currenciesTab" />
+        </Tab>
+      </tabs>
+    </TabPane>      
+  </children>
+</AnchorPane>
