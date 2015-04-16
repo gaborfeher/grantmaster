@@ -24,8 +24,9 @@ public class ProjectBudgetLimit implements Serializable {
   @GeneratedValue
   private int id;
   
-  @Column(nullable = false)
-  private double budget;
+  private Double budget;
+  
+  private Double budgetPercentage;
   
   @ManyToOne
   @JoinColumn(nullable = false)
@@ -39,11 +40,11 @@ public class ProjectBudgetLimit implements Serializable {
   public ProjectBudgetLimit() {
   }
 
-  public double getBudget() {
+  public Double getBudget() {
     return budget;
   }
 
-  public void setBudget(double budget) {
+  public void setBudget(Double budget) {
     this.budget = budget;
   }
 
@@ -64,5 +65,18 @@ public class ProjectBudgetLimit implements Serializable {
     this.project = project;
   }
 
+  /**
+   * @return the budgetPercentage
+   */
+  public Double getBudgetPercentage() {
+    return budgetPercentage;
+  }
+
+  /**
+   * @param budgetPercentage the budgetPercentage to set
+   */
+  public void setBudgetPercentage(Double budgetPercentage) {
+    this.budgetPercentage = budgetPercentage;
+  }
 
 }

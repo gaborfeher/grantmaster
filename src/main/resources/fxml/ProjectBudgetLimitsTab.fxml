@@ -13,7 +13,7 @@
     <Button text="%ProjectBudgetLimitAddButtonLabel" onAction="#createButtonAction" />    
     <TableView editable="true" fx:id="table" >
       <columns>
-        <TableColumn prefWidth="150" >
+        <TableColumn prefWidth="150" sortable="false">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>
@@ -21,7 +21,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseType" prefWidth="150">
+        <TableColumn text="%ExpenseType" prefWidth="150" sortable="false">
           <cellFactory>
             <ExpenseTypeTableCellFactory property="expenseType" />  
           </cellFactory>
@@ -29,7 +29,15 @@
             <PropertyValueFactory property="expenseType" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="200" fx:id="valueColumn" styleClass="numColumn">
+        <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">
+          <cellFactory>
+            <DoubleTableCellFactory property="budgetPercentage" />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="budgetPercentage" /> 
+          </cellValueFactory>
+        </TableColumn> 
+        <TableColumn prefWidth="200" fx:id="budgetColumn" styleClass="numColumn" sortable="false">
           <cellFactory>
             <DoubleTableCellFactory property="budget" /> 
           </cellFactory>
@@ -37,7 +45,7 @@
             <PropertyValueFactory property="budget" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="200" fx:id="spentColumn" styleClass="numColumn" editable="false">
+        <TableColumn prefWidth="200" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
           <cellFactory>
             <DoubleTableCellFactory property="spent" /> 
           </cellFactory>
@@ -45,7 +53,7 @@
             <PropertyValueFactory property="spent" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="200" fx:id="remainingColumn" styleClass="numColumn" editable="false">
+        <TableColumn prefWidth="200" fx:id="remainingColumn" styleClass="numColumn" editable="false" sortable="false">
           <cellFactory>
             <DoubleTableCellFactory property="remaining" /> 
           </cellFactory>

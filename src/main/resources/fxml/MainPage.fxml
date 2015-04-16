@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="480" prefWidth="640" fx:controller="com.github.gaborfeher.grantmaster.ui.MainPageController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="768" prefWidth="1024" fx:controller="com.github.gaborfeher.grantmaster.ui.MainPageController">
   <children>
     <HBox>
       <children>

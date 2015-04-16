@@ -22,7 +22,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrappe
  */
 public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.MessageObserver implements Initializable {  
   @FXML TableView<ProjectBudgetLimitWrapper> table;
-  @FXML TableColumn<ProjectBudgetLimitWrapper, Float> valueColumn;
+  @FXML TableColumn<ProjectBudgetLimitWrapper, Float> budgetColumn;
   @FXML TableColumn<ProjectBudgetLimitWrapper, Float> spentColumn;
   @FXML TableColumn<ProjectBudgetLimitWrapper, Float> remainingColumn;
   
@@ -32,7 +32,7 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
   public void createButtonAction(ActionEvent event) {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
-    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(limit, 0.0);
+    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(limit, 0.0, 0.0 /* TODO */);
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
     table.getItems().add(wrapper);
   }
@@ -57,7 +57,7 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     List<ProjectBudgetLimitWrapper> projectResources = ProjectBudgetLimitWrapper.getProjectBudgetLimits(project);
     table.getItems().setAll(projectResources);
     
-    valueColumn.setText(
+    budgetColumn.setText(
         resourceBundle.getString("BudgetLimitValueColumn") + " (" + project.getGrantCurrency().getCode() + ")");
     spentColumn.setText(
         resourceBundle.getString("BudgetLimitSpentColumn") + " (" + project.getGrantCurrency().getCode() + ")");

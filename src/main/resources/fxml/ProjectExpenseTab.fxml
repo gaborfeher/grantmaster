@@ -14,7 +14,7 @@
             GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.columnSpan="3" />
     <TableView editable="true" fx:id="projectExpensesTable" >
       <columns>
-        <TableColumn prefWidth="150">
+        <TableColumn prefWidth="150" sortable="false">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>
@@ -22,7 +22,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesDate">
+        <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false">
           <cellFactory>
             <DateTableCellFactory property="paymentDate" /> 
           </cellFactory>
@@ -30,7 +30,7 @@
             <PropertyValueFactory property="paymentDate" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesAccountNo" prefWidth="120">
+        <TableColumn text="%ProjectExpensesAccountNo" prefWidth="120" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="accountNo" />
           </cellFactory>
@@ -38,7 +38,7 @@
             <PropertyValueFactory property="accountNo" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesPartnerName">
+        <TableColumn text="%ProjectExpensesPartnerName" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="partnerName" />
           </cellFactory>
@@ -46,7 +46,7 @@
             <PropertyValueFactory property="partnerName" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseType">
+        <TableColumn text="%ExpenseType" sortable="false" prefWidth="150">
           <cellFactory>
             <ExpenseTypeTableCellFactory property="expenseType" />
           </cellFactory>
@@ -54,7 +54,7 @@
             <PropertyValueFactory property="expenseType" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn">
+        <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">
           <cellFactory>
             <DoubleTableCellFactory property="originalAmount" />
           </cellFactory>
@@ -62,7 +62,7 @@
             <PropertyValueFactory property="originalAmount" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesOriginalCurrency">
+        <TableColumn text="%ProjectExpensesOriginalCurrency" sortable="false">
           <cellFactory>
             <CurrencyTableCellFactory property="originalCurrency" />
           </cellFactory>
@@ -72,7 +72,7 @@
         </TableColumn>
         <TableColumn text="%ProjectExpensesAmount">
           <columns>
-            <TableColumn fx:id="projectExpensesAccountingCurrencyAmountColumn" styleClass="numColumn">
+            <TableColumn fx:id="projectExpensesAccountingCurrencyAmountColumn" styleClass="numColumn" sortable="false">
               <cellFactory>
                 <DoubleTableCellFactory property="accountingCurrencyAmount" />
               </cellFactory>
@@ -80,7 +80,7 @@
                 <PropertyValueFactory property="accountingCurrencyAmount" /> 
               </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="projectExpensesGrantCurrencyAmountColumn" editable="false" styleClass="numColumn">
+            <TableColumn fx:id="projectExpensesGrantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false">
               <cellFactory>
                 <DoubleTableCellFactory property="grantCurrencyAmount"  />
               </cellFactory>
@@ -90,7 +90,7 @@
             </TableColumn>
           </columns>
         </TableColumn> 
-        <TableColumn text="%ProjectExpensesExchangeRate" editable="false" styleClass="numColumn">
+        <TableColumn text="%ProjectExpensesExchangeRate" editable="false" styleClass="numColumn" sortable="false">
           <cellFactory>
             <DoubleTableCellFactory property="exchangeRate" /> 
           </cellFactory>
