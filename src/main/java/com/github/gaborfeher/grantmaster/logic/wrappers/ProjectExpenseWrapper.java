@@ -11,10 +11,13 @@ import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import org.eclipse.persistence.exceptions.DatabaseException;
 
 public class ProjectExpenseWrapper extends EntityWrapper {
   ProjectExpense expense;
@@ -29,7 +32,6 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     this.expense = expense;
     this.accountingCurrencyAmount = accountingCurrencyAmount;
     this.grantCurrencyAmount = new SimpleDoubleProperty(grantCurrencyAmount);
-//    System.out.printf("exchangeRate= %.2f / %.2f\n", grantCurrencyAmount, accountingCurrencyAmount);
     this.exchangeRate = new SimpleDoubleProperty(accountingCurrencyAmount / grantCurrencyAmount);
     this.editedAccountingCurrencyAmount = accountingCurrencyAmount;
   }
@@ -140,22 +142,27 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   @Override
   public void persist() {
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.getTransaction().begin();
-    double newGrantCurrencyAmount = grantCurrencyAmount.get();
-    if (editedAccountingCurrencyAmount != accountingCurrencyAmount) {
-      newGrantCurrencyAmount = updateExpenseAllocations();
-    }
-    if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
+    try {
+      em.getTransaction().begin();
+      double newGrantCurrencyAmount = grantCurrencyAmount.get();
+      if (editedAccountingCurrencyAmount != accountingCurrencyAmount) {
+        newGrantCurrencyAmount = updateExpenseAllocations();
+      }
+      if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
+        em.getTransaction().rollback();
+        System.out.println("persist failed, missing allocation");
+        return;
+      }
+      em.persist(expense);
+      em.getTransaction().commit();
+
+      accountingCurrencyAmount = editedAccountingCurrencyAmount;
+      grantCurrencyAmount.set(newGrantCurrencyAmount);
+      exchangeRate.set(accountingCurrencyAmount / newGrantCurrencyAmount);
+    } catch (DatabaseException ex) {
+      Logger.getLogger(ProjectExpenseWrapper.class.getName()).log(Level.SEVERE, null, ex);
       em.getTransaction().rollback();
-      System.out.println("persist failed, missing allocation");
-      return;
     }
-    em.persist(expense);
-    em.getTransaction().commit();
-    
-    accountingCurrencyAmount = editedAccountingCurrencyAmount;
-    grantCurrencyAmount.set(newGrantCurrencyAmount);
-    exchangeRate.set(accountingCurrencyAmount / newGrantCurrencyAmount);
     
     RefreshControlSingleton.getInstance().broadcastRefresh(
         new RefreshMessage(expense.getProject()));

@@ -34,9 +34,7 @@ public class MainPageController implements Initializable {
   Stage stage;
   File path = null;
   
-  @FXML CurrenciesTabController currenciesTabController;
   @FXML ProjectListTabController projectListTabController;
-  @FXML ExpenseTypesTabController expenseTypesTabController;
   
   public void stop() {
     System.out.println("STOPPING: closing database connection");

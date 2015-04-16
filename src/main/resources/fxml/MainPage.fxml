@@ -20,10 +20,16 @@
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>
         <Tab text="%ExpenseTypesTabName" closable="false">
-          <fx:include source="ExpenseTypesTab.fxml" fx:id="expenseTypesTab" />
+          <fx:include source="ExpenseTypesTab.fxml" />
         </Tab>
         <Tab text="%CurrenciesTabName" closable="false">
-          <fx:include source="CurrenciesTab.fxml" fx:id="currenciesTab" />
+          <fx:include source="CurrenciesTab.fxml" />
+        </Tab>
+        <Tab text="%SummaryTabName" closable="false">
+          <fx:include source="SummaryTab.fxml" />
+        </Tab>
+        <Tab text="%SearchTabName" closable="false">
+          <fx:include source="SearchTab.fxml" />
         </Tab>
       </tabs>
     </TabPane>      

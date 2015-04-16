@@ -30,7 +30,7 @@
             <PropertyValueFactory property="paymentDate" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectExpensesAccountNo">
+        <TableColumn text="%ProjectExpensesAccountNo" prefWidth="120">
           <cellFactory>
             <StringTableCellFactory property="accountNo" />
           </cellFactory>

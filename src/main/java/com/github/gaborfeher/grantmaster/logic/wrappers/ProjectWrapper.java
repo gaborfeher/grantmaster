@@ -5,7 +5,10 @@ import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import org.eclipse.persistence.exceptions.DatabaseException;
 
 public class ProjectWrapper extends EntityWrapper {
   Project project;
@@ -51,12 +54,18 @@ public class ProjectWrapper extends EntityWrapper {
   @Override
   public void delete() {
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.getTransaction().begin();
-    ProjectExpenseWrapper.removeProjectExpenses(project);
-    ProjectSourceWrapper.removeProjectSources(project);
-    ProjectBudgetLimitWrapper.removeProjectBudgetLimits(project);
-    em.remove(project);
-    em.getTransaction().commit();
+    try {
+      em.getTransaction().begin();
+      ProjectExpenseWrapper.removeProjectExpenses(project);
+      ProjectSourceWrapper.removeProjectSources(project);
+      ProjectBudgetLimitWrapper.removeProjectBudgetLimits(project);
+      em.remove(project);
+      em.getTransaction().commit();
+    } catch (Throwable t) {
+      Logger.getLogger(ProjectWrapper.class.getName()).log(Level.SEVERE, null, t);
+      DatabaseConnectionSingleton.getInstance().hardReset();
+      return;
+    }
     RefreshControlSingleton.getInstance().broadcastRefresh(null);
   }
 

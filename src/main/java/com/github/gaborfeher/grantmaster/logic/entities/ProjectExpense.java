@@ -23,7 +23,6 @@ public class ProjectExpense implements Serializable {
   
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
-  @CascadeOnDelete
   private Project project;
   
   @Column(nullable = false)

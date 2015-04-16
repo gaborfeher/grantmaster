@@ -5,11 +5,16 @@
  */
 package com.github.gaborfeher.grantmaster.core;
 
+import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import org.eclipse.persistence.exceptions.DatabaseException;
 
 /**
  *
@@ -44,7 +49,6 @@ public class DatabaseConnectionSingleton {
   }
   
   public void connectTo(String pathString) {
-       
     Map<String, String> properties = new HashMap<>();
     properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + pathString);
     entityManagerFactory = Persistence.createEntityManagerFactory(
@@ -54,15 +58,32 @@ public class DatabaseConnectionSingleton {
   }
   
   public void persist(Object obj) {
-    entityManager.getTransaction().begin();
-    entityManager.persist(obj);
-    entityManager.getTransaction().commit();
+  //  try {
+      entityManager.getTransaction().begin();
+      entityManager.persist(obj);
+      entityManager.getTransaction().commit();
+  //  } catch (Throwable t) {
+  //    Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
+  //    cleanup();
+  //  }
   }
 
   public void remove(Object obj) {
-    entityManager.getTransaction().begin();
-    entityManager.remove(obj);
-    entityManager.getTransaction().commit();
+    EntityTransaction transaction = entityManager.getTransaction();
+    try {
+      transaction.begin();
+      entityManager.remove(obj);
+      transaction.commit();
+    } catch (Throwable t) {
+      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
+      hardReset();
+    }
+  }
+  
+  public void hardReset() {
+    entityManager.close();
+    entityManager = entityManagerFactory.createEntityManager();
+    RefreshControlSingleton.getInstance().broadcastRefresh(null);
   }
   
   public EntityManager em() {
