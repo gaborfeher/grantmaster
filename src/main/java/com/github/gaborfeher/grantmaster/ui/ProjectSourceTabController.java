@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
@@ -20,11 +15,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 
-/**
- * FXML Controller class
- *
- * @author gabor
- */
 public class ProjectSourceTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
   @FXML TableView table;
   
@@ -63,9 +53,6 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
 
   @Override
   public void refresh(RefreshMessage message) {
-    System.out.println("refresh " + this);
-
-    
     List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project);
     table.getItems().setAll(projectTransfers);
     

@@ -38,8 +38,6 @@ public class ProjectExpenseTabController extends RefreshControlSingleton.Message
   
   @Override
   public void refresh(RefreshMessage message) {
-    System.out.println("refresh " + this);
-    
     List<ProjectExpenseWrapper> projectExpenses = ProjectExpenseWrapper.getProjectExpenseList(project);
     list.setAll(projectExpenses);
     

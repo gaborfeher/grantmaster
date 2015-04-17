@@ -71,8 +71,12 @@ public abstract class EntityWrapper {
   }
   
   public void discardEdits() {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.refresh(getEntity());
+    if (state == State.EDITING) {
+      EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+      em.refresh(getEntity());
+    } else if (state == State.EDITING_NEW) {
+      // This thing will just go away at next refresh.
+    }
     RefreshControlSingleton.getInstance().broadcastRefresh(null);  // TODO: narrower refresh
   }
   
