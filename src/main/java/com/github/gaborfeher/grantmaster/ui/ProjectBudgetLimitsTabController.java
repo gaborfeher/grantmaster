@@ -33,7 +33,9 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
   public void createButtonAction(ActionEvent event) {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
-    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(project, limit.getExpenseType(), limit, 0.0, 0.0 /* TODO */);
+    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(limit.getExpenseType(), 0.0);
+    wrapper.setProject(project);
+    wrapper.setLimit(0.0, limit);
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
     table.getItems().add(wrapper);
   }

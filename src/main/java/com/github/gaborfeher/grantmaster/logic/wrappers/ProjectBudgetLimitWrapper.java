@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -14,17 +15,23 @@ import javax.persistence.TypedQuery;
  */
 public class ProjectBudgetLimitWrapper extends EntityWrapper {
   private ProjectBudgetLimit limit;
-  final private double spent;
+  final private Double spent;
   private Double remaining;
   private ExpenseType expenseType;
   private Project project;
   
-  public ProjectBudgetLimitWrapper(Project project, ExpenseType expenseType, ProjectBudgetLimit limit, double spent, double total) {
-    this.limit = limit;
+  public ProjectBudgetLimitWrapper(ExpenseType expenseType, Double spent) {
     this.spent = spent;
     this.expenseType = expenseType;
     this.remaining = null;
+  }
+  
+  public void setProject(Project project) {
     this.project = project;
+  }
+  
+  public void setLimit(double total, ProjectBudgetLimit limit) {
+    this.limit = limit;
     if (limit == null) {
       return;
     }
@@ -37,11 +44,15 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     }
     
     if (limit.getBudgetPercentage() != null) {
-      limit.setBudget((Double)total * limit.getBudgetPercentage() / 100.0);
+      limit.setBudget(total * limit.getBudgetPercentage() / 100.0);
     }
     if (limit.getBudget() != null) {
-      this.remaining = limit.getBudget() - spent;
+      this.remaining = limit.getBudget();
+      if (spent != null) {
+        this.remaining -= spent;
+      }
     }
+
   }
   
   public Double getBudget() {
@@ -53,10 +64,13 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
   
   public void setBudget(Double budget) {
     limit.setBudget(budget);
-    remaining = limit.getBudget() - spent;
+    remaining = limit.getBudget();
+    if (spent != null) {
+      remaining -= spent;
+    }
   }
   
-  public double getSpent() {
+  public Double getSpent() {
     return spent;
   }
   
@@ -99,17 +113,43 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
 //        ProjectBudgetLimitWrapper.class);
     
     
+    
+    
     TypedQuery<ProjectBudgetLimitWrapper> query = em.createQuery(
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(s.project, et, l, COALESCE(SUM(a.accountingCurrencyAmount / s.exchangeRate), 0.0), " + total + ") " +
-        "FROM ExpenseType et INNER JOIN ProjectExpense e ON e.expenseType = et INNER JOIN ExpenseSourceAllocation a ON a.expense = e INNER JOIN ProjectSource s ON a.source = s LEFT OUTER JOIN ProjectBudgetLimit l ON l.expenseType = et AND l.project = :project " +
-            "WHERE s.project = :project " +
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
+        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project  " +
             "GROUP BY et " +
             "ORDER BY et.name",
         ProjectBudgetLimitWrapper.class);    
-    
-    
     query.setParameter("project", project);
-    return query.getResultList();
+    List<ProjectBudgetLimitWrapper> list = query.getResultList();
+    
+    Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
+    while (iterator.hasNext()) {
+      ProjectBudgetLimitWrapper limitWrapper = iterator.next();
+      limitWrapper.setProject(project);
+      ProjectBudgetLimit limit = null;
+      List<ProjectBudgetLimit> limits = em.createQuery(
+          "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.expenseType = :expenseType",
+          ProjectBudgetLimit.class).
+          setParameter("project", project).
+          setParameter("expenseType", limitWrapper.getExpenseType()).
+          getResultList();
+      if (limits.size() >= 1) {
+        // TODO
+        if (limits.size() > 1) {
+          System.out.println("strange limit size");
+        }
+        limit = limits.get(0);
+      }
+      limitWrapper.setLimit(total, limit);
+      if (limitWrapper.getEntity() == null && limitWrapper.getSpent() == null) {
+        iterator.remove();
+      }
+    }
+    
+
+    return list;
   }
   
   static void removeProjectBudgetLimits(Project project) {

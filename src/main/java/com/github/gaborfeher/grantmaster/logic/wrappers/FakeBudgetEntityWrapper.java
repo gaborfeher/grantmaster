@@ -67,10 +67,9 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
   }
 
   public void add(ProjectBudgetLimitWrapper budgetLine) {
-   // if (budgetLine.getEntity() == null) {
-   //   return;
-   // }
-    spent += budgetLine.getSpent();
+    if (budgetLine.getSpent() != null) {
+      spent += budgetLine.getSpent();
+    }
     if (budgetLine.getRemaining() != null) {
       remaining += budgetLine.getRemaining();
     }
