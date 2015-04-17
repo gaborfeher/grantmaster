@@ -6,25 +6,13 @@ import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
 
-public class StringTableCellFactory<S extends EntityWrapper> implements Callback<TableColumn<S, String>, TableCell<S, String>> {
-  private String property;
+public class StringTableCellFactory<S extends EntityWrapper>
+    extends PropertyTableCellFactoryBase
+    implements Callback<TableColumn<S, String>, TableCell<S, String>> {
   
   @Override  
   public TableCell<S, String> call(TableColumn<S, String> param) {  
     return new TextFieldTableCell<>(property, new DefaultStringConverter());  
   }        
 
-  /**
-   * @return the property
-   */
-  public String getProperty() {
-    return property;
-  }
-
-  /**
-   * @param property the property to set
-   */
-  public void setProperty(String property) {
-    this.property = property;
-  }
 }

@@ -29,6 +29,25 @@
             <PropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
+        
+        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="150" editable="true">
+          <cellFactory>
+            <ExpenseTypeDirectionTableCellFactory property="direction" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="direction" />
+          </cellValueFactory>
+        </TableColumn>
+        
+        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="150" editable="true">
+          <cellFactory>
+            <StringTableCellFactory property="groupName" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="groupName" />
+          </cellValueFactory>
+        </TableColumn>
+        
       </columns>
     </TableView>                
   </children>

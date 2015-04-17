@@ -3,6 +3,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -36,6 +37,10 @@ public abstract class EntityWrapper {
     return state == State.EDITING || state == State.EDITING_NEW;
   }
   
+  public boolean isFake() {
+    return false;
+  }
+  
   public boolean setPropeprty(String name, Object value) {
     try {
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
@@ -45,6 +50,14 @@ public abstract class EntityWrapper {
       Logger.getLogger(EntityWrapper.class.getName()).log(Level.SEVERE, null, ex);
       return false;
     }
+  }
+  
+  /**
+   * Possible values for enum-like entities. Otherwise null.
+   * @return 
+   */
+  public List<EntityWrapper> getPossibleValues() {
+    return null;
   }
   
   public void persist() {

@@ -51,18 +51,20 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   @Override
   protected void updateItem(EntityWrapper.State state, boolean empty) {
     super.updateItem(state, empty);
-    if (!empty && state != null && getEntityWrapper() != null) {
-      switch (state) {
-        case EDITING:
-        case EDITING_NEW:
-          setGraphic(saveDiscardBox);
-          break;
-        case SAVED:
-          setGraphic(editDeleteBox);
-          break;
-      }
-    } else {
+    EntityWrapper e = getEntityWrapper();
+    if (empty || e == null || e.isFake() || state == null) {
       setGraphic(null);
+      setText(null);
+      return;
+    }
+    switch (state) {
+      case EDITING:
+      case EDITING_NEW:
+        setGraphic(saveDiscardBox);
+        break;
+      case SAVED:
+        setGraphic(editDeleteBox);
+        break;
     }
   }
   

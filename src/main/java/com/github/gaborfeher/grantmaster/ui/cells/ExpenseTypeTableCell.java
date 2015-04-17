@@ -5,7 +5,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
 
-class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, ExpenseType> {
+class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, Object> {
   String property;
 
   public ExpenseTypeTableCell(String property) {
@@ -18,8 +18,8 @@ class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S
   }
 
   @Override  
-  public void commitEdit(ExpenseType val) {
-    if (getEntityWrapper().setPropeprty(property, val)) {
+  public void commitEdit(Object val) {
+    if (getEntityWrapper().setPropeprty(property, (ExpenseType) val)) {
       updateItem(val, false);
     }
   }
@@ -31,6 +31,5 @@ class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S
       super.startEdit();
     }
   }
-  
   
 }

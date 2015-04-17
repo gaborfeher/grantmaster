@@ -33,9 +33,32 @@ public class ExpenseTypeWrapper extends EntityWrapper {
     expenseType.setName(name);
   }
 
+  public ExpenseType.Direction getDirection() {
+    return expenseType.getDirection();
+  }
+  
+  public void setDirection(ExpenseType.Direction direction) {
+    expenseType.setDirection(direction);
+  }
+  
+  public String getGroupName() {
+    return expenseType.getGroupName();
+  }
+  
+  public void setGroupName(String groupName) {
+    expenseType.setGroupName(groupName);
+  }
+  
   @Override
   protected Object getEntity() {
     return expenseType;
+  }
+  
+  @Override
+  public List<EntityWrapper> getPossibleValues() {
+    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    List list = getExpenseTypes();
+    return list;
   }
   
   public static List<ExpenseTypeWrapper> getExpenseTypes() {

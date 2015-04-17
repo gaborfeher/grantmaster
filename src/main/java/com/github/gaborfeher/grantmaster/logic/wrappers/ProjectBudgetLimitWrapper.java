@@ -8,7 +8,6 @@ import java.util.List;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javax.persistence.EntityManager;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /**

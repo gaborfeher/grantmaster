@@ -8,28 +8,21 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import javafx.util.StringConverter;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 /**
  *
  * @author gabor
  */
-class ExpenseTypeStringConverter extends StringConverter<ExpenseType> {
-  EntityManager em;
-  
+class ExpenseTypeStringConverter extends StringConverter<Object> {
   public ExpenseTypeStringConverter() {
   }
 
-  ExpenseTypeStringConverter(EntityManager entityManager) {
-    em = entityManager;
-  }
-
   @Override
-  public String toString(ExpenseType t) {
+  public String toString(Object t) {
     if (t == null) {
       return "";
     }
-    return t.getName();
+    return t.toString();
   }
 
   @Override
