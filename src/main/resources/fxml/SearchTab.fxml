@@ -11,7 +11,9 @@
     <GridPane>
       
     </GridPane>
-    
+    <TableView VBox.vgrow="ALWAYS">
+      
+    </TableView> 
     
   </children>
 </VBox>

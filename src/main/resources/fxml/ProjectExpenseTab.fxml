@@ -12,7 +12,7 @@
   <children>
     <Button text="%ProjectExpenseCreateButtonLabbel" onAction="#createProjectExpenseButtonAction"
             GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.columnSpan="3" />
-    <TableView editable="true" fx:id="projectExpensesTable" >
+    <TableView editable="true" fx:id="projectExpensesTable" VBox.vgrow="ALWAYS" >
       <columns>
         <TableColumn prefWidth="150" sortable="false">
           <cellFactory>

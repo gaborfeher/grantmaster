@@ -14,7 +14,7 @@
       <Button text="%AddProjectButtonLabel" onAction="#handleAddButtonAction" />
       <Button text="%OpenProjectButtonLabel" onAction="#handleOpenButtonAction" />
     </HBox>
-    <TableView fx:id="table" editable="true" >
+    <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn prefWidth="150">
           <cellFactory>

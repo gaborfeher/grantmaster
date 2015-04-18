@@ -11,7 +11,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ExpenseTypesTabController">
   <children>
     <Button text="%AddExpenseTypeButtonLabel" onAction="#handleExpenseTypeAddButtonAction" />
-    <TableView fx:id="table" editable="true">
+    <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn prefWidth="150" sortable="false">
           <cellFactory>

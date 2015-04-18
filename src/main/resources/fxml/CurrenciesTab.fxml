@@ -16,7 +16,7 @@
 
       <Button text="%CurrencyAddButton" onAction="#handleAddButtonAction" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
     </GridPane>
-    <TableView fx:id="table">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn text="%CurrencyNameColumn" prefWidth="150">
           <cellValueFactory>
