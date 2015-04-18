@@ -46,7 +46,7 @@
             <PropertyValueFactory property="budgetPercentage" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="300" text="%BudgetLimitValueColumn">
+        <TableColumn prefWidth="350" text="%BudgetLimitValueColumn">
           <columns>
             <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
               <cellFactory>
@@ -66,7 +66,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn text="%BudgetLimitSpentColumn" prefWidth="300" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
+        <TableColumn text="%BudgetLimitSpentColumn" prefWidth="350" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
           <columns>
             <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
@@ -86,7 +86,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn prefWidth="300" text="%BudgetLimitRemainingColumn">
+        <TableColumn prefWidth="350" text="%BudgetLimitRemainingColumn">
           <columns>
             <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
               <cellFactory>

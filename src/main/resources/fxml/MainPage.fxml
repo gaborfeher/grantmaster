@@ -25,9 +25,6 @@
         <Tab text="%CurrenciesTabName" closable="false">
           <fx:include source="CurrenciesTab.fxml" />
         </Tab>
-        <Tab text="%SummaryTabName" closable="false">
-          <fx:include source="SummaryTab.fxml" />
-        </Tab>
         <Tab text="%SearchTabName" closable="false">
           <fx:include source="SearchTab.fxml" />
         </Tab>

@@ -20,11 +20,6 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.sql.Date;
 import javafx.scene.control.DatePicker;
 
-/**
- * FXML Controller class
- *
- * @author gabor
- */
 public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.MessageObserver implements Initializable {  
   @FXML TableView<EntityWrapper> table;
   @FXML TableColumn<EntityWrapper, Double> spentGrantCurrencyColumn;
@@ -64,9 +59,6 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     this.project = project;
   }
   
-  /**
-   * Initializes the controller class.
-   */
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     RefreshControlSingleton.getInstance().subscribe(this);
@@ -80,19 +72,32 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     Date endDate = Utils.toSqlDate(filterEndDate.getValue());
     
     table.getItems().clear();
-    table.getItems().add(new FakeBudgetEntityWrapper("Kiadások"));
     List<ProjectBudgetLimitWrapper> projectResources =
         ProjectBudgetLimitWrapper.getProjectBudgetLimits(
             project,
             startDate,
             endDate);
-    table.getItems().addAll(projectResources);
+    table.getItems().clear();
     FakeBudgetEntityWrapper spentSum = new FakeBudgetEntityWrapper("Kiadások összesen", true);
+    FakeBudgetEntityWrapper groupSum = null;
     for (ProjectBudgetLimitWrapper outgoing : projectResources) {
+      if (groupSum != null && !groupSum.getGroupName().equals(outgoing.getGroupName())) {
+        table.getItems().add(groupSum);
+        groupSum = null;
+      }
+      if (groupSum == null && outgoing.getGroupName() != null) {
+        groupSum = new FakeBudgetEntityWrapper(outgoing.getGroupName() + " összesen", true, outgoing.getGroupName());
+      }
+      table.getItems().add(outgoing);
       spentSum.add(outgoing);
+      if (groupSum != null) {
+        groupSum.add(outgoing);
+      }
+    }
+    if (groupSum != null) {
+      table.getItems().add(groupSum);
     }
     table.getItems().add(spentSum);
-    table.getItems().add(new FakeBudgetEntityWrapper("Bevételek"));
     
     double sumGrantCurrency = 0.0;
     double sumAccountingCurrency = 0.0;
@@ -102,10 +107,10 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     }
     FakeBudgetEntityWrapper incomingSum = new FakeBudgetEntityWrapper("Bevételek összesen", true);
     FakeBudgetEntityWrapper incomingItem = new FakeBudgetEntityWrapper(project.getIncomeType().getName(), true);
-    incomingItem.setBudgetGrantCurrency(sumGrantCurrency);
-    incomingItem.setBudgetAccountingCurrency(sumAccountingCurrency);
-    incomingItem.setSpentGrantCurrency(spentSum.getSpentGrantCurrency());
-    incomingItem.setSpentAccountingCurrency(spentSum.getSpentAccountingCurrency());
+    //incomingItem.setBudgetGrantCurrency(sumGrantCurrency);
+    //incomingItem.setBudgetAccountingCurrency(sumAccountingCurrency);
+    incomingItem.setSpentGrantCurrency(sumGrantCurrency);
+    incomingItem.setSpentAccountingCurrency(sumAccountingCurrency);
     incomingSum.add(incomingItem);
     table.getItems().add(incomingItem);
     table.getItems().add(incomingSum);

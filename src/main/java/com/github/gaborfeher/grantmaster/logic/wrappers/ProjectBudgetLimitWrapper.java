@@ -143,11 +143,11 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     List<ProjectBudgetLimitWrapper> list = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
         "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
-            "WHERE et.direction = :direction " +
+            "WHERE e.project = :project AND et.direction = :direction " +
             " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
             " AND (:filterEndDate IS NULL OR e.paymentDate <= :filterEndDate) " +
             "GROUP BY et " +
-            "ORDER BY et.name",
+            "ORDER BY et.groupName NULLS LAST, et.name",
         ProjectBudgetLimitWrapper.class).
             setParameter("project", project).
             setParameter("direction", ExpenseType.Direction.PAYMENT).
@@ -183,5 +183,11 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
         executeUpdate();
   }
 
+  public String getGroupName() {
+    if (limit == null) {
+      return null;
+    }
+    return limit.getExpenseType().getGroupName();
+  }
   
 }

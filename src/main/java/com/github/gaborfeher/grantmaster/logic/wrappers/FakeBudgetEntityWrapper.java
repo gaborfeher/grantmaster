@@ -16,15 +16,24 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
   private double spentGrantCurrency;
   private double spentAccountingCurrency;
   private final boolean enableNumbers;
+  private final String groupName;
+  
+  public FakeBudgetEntityWrapper(String title, boolean enableNumbers, String groupName) {
+    this.title = title;
+    this.enableNumbers = enableNumbers;
+    this.groupName = groupName;
+  }
   
   public FakeBudgetEntityWrapper(String title, boolean enableNumbers) {
     this.title = title;
     this.enableNumbers = enableNumbers;
+    this.groupName = null;
   }
   
   public FakeBudgetEntityWrapper(String title) {
     this.title = title;
     this.enableNumbers = false;
+    this.groupName = null;
   }
   
   public String getExpenseType() {
@@ -157,6 +166,10 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
 
   public void setBudgetAccountingCurrency(double budgetAccountingCurrency) {
     this.budgetAccountingCurrency = budgetAccountingCurrency;
+  }
+
+  public String getGroupName() {
+    return groupName;
   }
 
   

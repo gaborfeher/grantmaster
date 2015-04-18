@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -16,9 +12,11 @@ import javax.persistence.EntityManager;
  */
 public class ExpenseTypeWrapper extends EntityWrapper {
   ExpenseType expenseType;
+  protected final HashMap<String, Double> summaryValues;
 
   public ExpenseTypeWrapper(ExpenseType expenseType) {
     this.expenseType = expenseType;
+    this.summaryValues = new HashMap<>();
   }
   
   public int getId() {
@@ -63,7 +61,20 @@ public class ExpenseTypeWrapper extends EntityWrapper {
   
   public static List<ExpenseTypeWrapper> getExpenseTypes() {
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    return em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper(e) FROM ExpenseType e", ExpenseTypeWrapper.class).getResultList();
+    return em.createQuery(
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper(e) " +
+            "FROM ExpenseType e " +
+            "ORDER BY e.direction, e.groupName NULLS LAST, e.name",
+        ExpenseTypeWrapper.class).
+            getResultList();
+  }
+
+  public void addSummaryValue(String header, Double value) {
+    summaryValues.put(header, value);
+  }
+
+  public Double getSummaryValue(String columnName) {
+    return summaryValues.get(columnName);
   }
   
 }

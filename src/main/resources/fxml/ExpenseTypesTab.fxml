@@ -13,7 +13,7 @@
     <Button text="%AddExpenseTypeButtonLabel" onAction="#handleExpenseTypeAddButtonAction" />
     <TableView fx:id="table" editable="true">
       <columns>
-        <TableColumn prefWidth="150">
+        <TableColumn prefWidth="150" sortable="false">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>
@@ -21,7 +21,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeNameColumnLabel" prefWidth="150" editable="true">
+        <TableColumn text="%ExpenseTypeNameColumnLabel" prefWidth="150" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>
@@ -29,8 +29,7 @@
             <PropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
-        
-        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="150" editable="true">
+        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="150" editable="true" sortable="false">
           <cellFactory>
             <ExpenseTypeDirectionTableCellFactory property="direction" /> 
           </cellFactory>
@@ -38,16 +37,14 @@
             <PropertyValueFactory property="direction" />
           </cellValueFactory>
         </TableColumn>
-        
-        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="150" editable="true">
+        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="150" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="groupName" /> 
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="groupName" />
           </cellValueFactory>
-        </TableColumn>
-        
+        </TableColumn>        
       </columns>
     </TableView>                
   </children>
