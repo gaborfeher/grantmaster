@@ -7,10 +7,12 @@ import javafx.scene.control.cell.ChoiceBoxTableCell;
 
 class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, Object> {
   String property;
+  ExpenseType.Direction direction;
 
-  public ExpenseTypeTableCell(String property) {
+  public ExpenseTypeTableCell(String property, ExpenseType.Direction direction) {
     super(new ExpenseTypeStringConverter());
     this.property = property;
+    this.direction = direction;
   }
     
   private EntityWrapper getEntityWrapper() {
@@ -27,7 +29,12 @@ class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S
   @Override
   public void startEdit() {
     if (getEntityWrapper().canEdit()) {
-      getItems().setAll(DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT t FROM ExpenseType t", ExpenseType.class).getResultList());
+      getItems().setAll(DatabaseConnectionSingleton.getInstance().em().
+          createQuery(
+              "SELECT t FROM ExpenseType t WHERE t.direction = :direction ORDER BY t.name",
+              ExpenseType.class).
+          setParameter("direction", direction).
+          getResultList());
       super.startEdit();
     }
   }

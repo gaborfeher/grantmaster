@@ -48,6 +48,16 @@
             <PropertyValueFactory property="accountCurrency" />
           </cellValueFactory>
         </TableColumn>
+        
+        <TableColumn text="%ProjectIncomeType" prefWidth="150">
+          <cellFactory>
+            <ExpenseTypeTableCellFactory property="incomeType" direction="INCOME" />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="incomeType" />
+          </cellValueFactory>
+        </TableColumn>
+        
       </columns>
     </TableView>                
   </children>

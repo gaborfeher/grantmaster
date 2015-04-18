@@ -48,7 +48,7 @@
         </TableColumn>
         <TableColumn text="%ExpenseType" sortable="false" prefWidth="150">
           <cellFactory>
-            <ExpenseTypeTableCellFactory property="expenseType" />
+            <ExpenseTypeTableCellFactory property="expenseType" direction="PAYMENT"/>
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="expenseType" /> 

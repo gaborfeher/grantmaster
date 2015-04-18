@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +46,13 @@ public class ProjectWrapper extends EntityWrapper {
     project.setGrantCurrency(currency);
   }
   
+  public void setIncomeType(ExpenseType expenseType) {
+    project.setIncomeType(expenseType);
+  }
+
+  public ExpenseType getIncomeType() {
+    return project.getIncomeType();
+  }
   
   @Override
   protected Object getEntity() {

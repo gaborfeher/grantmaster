@@ -9,8 +9,6 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.ui.cells.PaymentAllocationTableCellFactory;
-import com.github.gaborfeher.grantmaster.ui.cells.PaymentAllocationTableValueFactory;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -30,10 +28,6 @@ public class ProjectExpenseAllocationWindowController implements Initializable {
 
   @FXML TableView<ProjectSource> projectTransfersTable;
   
-  @FXML PaymentAllocationTableCellFactory projectExpenseAmountToUseCellFactory;
-  
-  @FXML PaymentAllocationTableValueFactory projectExpenseAmountToUseValueFactory;
-  
   DatabaseConnectionSingleton databaseConnection;
   Project project;
 
@@ -43,8 +37,6 @@ public class ProjectExpenseAllocationWindowController implements Initializable {
   
   void init(Project project, ProjectExpense expense) {
     this.project = project;
-    projectExpenseAmountToUseCellFactory.setExpense(expense);
-    projectExpenseAmountToUseValueFactory.setExpense(expense);
   }
   
   /**

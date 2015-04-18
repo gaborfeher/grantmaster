@@ -29,6 +29,10 @@ public class Project implements Serializable {
   @ManyToOne
   @JoinColumn(nullable = false)
   private Currency accountCurrency;
+  
+  @ManyToOne
+  @JoinColumn(nullable = false)
+  private ExpenseType incomeType;
 
   public Project() {
   }
@@ -75,5 +79,19 @@ public class Project implements Serializable {
    */
   public void setAccountCurrency(Currency accountCurrency) {
     this.accountCurrency = accountCurrency;
+  }
+
+  /**
+   * @return the incomeType
+   */
+  public ExpenseType getIncomeType() {
+    return incomeType;
+  }
+
+  /**
+   * @param incomeType the incomeType to set
+   */
+  public void setIncomeType(ExpenseType incomeType) {
+    this.incomeType = incomeType;
   }
 }

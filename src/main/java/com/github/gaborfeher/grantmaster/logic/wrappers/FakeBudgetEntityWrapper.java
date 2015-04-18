@@ -68,14 +68,49 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
 
   public void add(ProjectBudgetLimitWrapper budgetLine) {
     if (budgetLine.getSpent() != null) {
-      spent += budgetLine.getSpent();
+      setSpent(getSpent() + budgetLine.getSpent());
     }
     if (budgetLine.getRemaining() != null) {
-      remaining += budgetLine.getRemaining();
+      setRemaining(getRemaining() + budgetLine.getRemaining());
     }
     if (budgetLine.getBudget() != null) {
-      budget += budgetLine.getBudget();
+      setBudget(getBudget() + budgetLine.getBudget());
     }
   }
+
+  public void add(FakeBudgetEntityWrapper budgetLine) {
+    // TODO(gaborfeher): Unify with above.
+    if (budgetLine.getSpent() != null) {
+      setSpent(getSpent() + budgetLine.getSpent());
+    }
+    if (budgetLine.getRemaining() != null) {
+      setRemaining(getRemaining() + budgetLine.getRemaining());
+    }
+    if (budgetLine.getBudget() != null) {
+      setBudget(getBudget() + budgetLine.getBudget());
+    }  }
+  
+
+  /**
+   * @param budget the budget to set
+   */
+  public void setBudget(double budget) {
+    this.budget = budget;
+  }
+
+  /**
+   * @param spent the spent to set
+   */
+  public void setSpent(double spent) {
+    this.spent = spent;
+  }
+
+  /**
+   * @param remaining the remaining to set
+   */
+  public void setRemaining(double remaining) {
+    this.remaining = remaining;
+  }
+
   
 }

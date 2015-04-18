@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.FakeBudgetEntityWrapper;
 import java.net.URL;
@@ -15,6 +16,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 
 /**
  * FXML Controller class
@@ -59,13 +61,25 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     table.getItems().add(new FakeBudgetEntityWrapper("Kiadások"));
     List<ProjectBudgetLimitWrapper> projectResources = ProjectBudgetLimitWrapper.getProjectBudgetLimits(project);
     table.getItems().addAll(projectResources);
-    FakeBudgetEntityWrapper outgoingSum = new FakeBudgetEntityWrapper("Összesen", true);
+    FakeBudgetEntityWrapper spentSum = new FakeBudgetEntityWrapper("Kiadások összesen", true);
     for (ProjectBudgetLimitWrapper outgoing : projectResources) {
-      outgoingSum.add(outgoing);
+      spentSum.add(outgoing);
     }
-    table.getItems().add(outgoingSum);
+    table.getItems().add(spentSum);
     table.getItems().add(new FakeBudgetEntityWrapper("Bevételek"));
-    table.getItems().add(new FakeBudgetEntityWrapper("Összesen", true));
+    
+    double sum = 0.0;
+    for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project)) {
+      sum += source.getGrantCurrencyAmount();
+    }
+    FakeBudgetEntityWrapper incomingSum = new FakeBudgetEntityWrapper("Bevételek összesen", true);
+    FakeBudgetEntityWrapper incomingItem = new FakeBudgetEntityWrapper(project.getIncomeType().getName(), true);
+    incomingItem.setBudget(sum);
+    incomingItem.setSpent(spentSum.getSpent());
+    incomingItem.setRemaining(sum - spentSum.getSpent());
+    incomingSum.add(incomingItem);
+    table.getItems().add(incomingItem);
+    table.getItems().add(incomingSum);
     
     
     budgetColumn.setText(
