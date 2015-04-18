@@ -11,9 +11,10 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
  */
 public class FakeBudgetEntityWrapper extends EntityWrapper {
   private final String title;
-  private double budget;
-  private double spent;
-  private double remaining;
+  private Double budgetGrantCurrency;
+  private Double budgetAccountingCurrency;
+  private double spentGrantCurrency;
+  private double spentAccountingCurrency;
   private final boolean enableNumbers;
   
   public FakeBudgetEntityWrapper(String title, boolean enableNumbers) {
@@ -30,25 +31,35 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
     return title;
   }
   
-  public Double getBudget() {
+  public Double getBudgetGrantCurrency() {
     if (!enableNumbers) {
       return null;
     }
-    return budget;
-  }
-
-  public Double getSpent() {
-    if (!enableNumbers) {
-      return null;
-    }
-    return spent;
+    return budgetGrantCurrency;
   }
   
-  public Double getRemaining() {
+  public Double getBudgetAccountingCurrency() {
     if (!enableNumbers) {
       return null;
     }
-    return remaining;
+    return budgetAccountingCurrency;
+  }
+
+  public Double getSpentGrantCurrency() {
+    if (!enableNumbers) {
+      return null;
+    }
+    return spentGrantCurrency;
+  }
+  
+  public Double getRemainingGrantCurrency() {
+    if (!enableNumbers) {
+      return null;
+    }
+    if (budgetGrantCurrency == null) {
+      return null;
+    }
+    return budgetGrantCurrency - spentGrantCurrency;
   }
   
   @Override
@@ -67,49 +78,85 @@ public class FakeBudgetEntityWrapper extends EntityWrapper {
   }
 
   public void add(ProjectBudgetLimitWrapper budgetLine) {
-    if (budgetLine.getSpent() != null) {
-      setSpent(getSpent() + budgetLine.getSpent());
+    if (budgetLine.getSpentGrantCurrency() != null) {
+      setSpentGrantCurrency(getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency());
     }
-    if (budgetLine.getRemaining() != null) {
-      setRemaining(getRemaining() + budgetLine.getRemaining());
+    if (budgetLine.getSpentAccountingCurrency() != null) {
+      setSpentAccountingCurrency(getSpentAccountingCurrency() + budgetLine.getSpentAccountingCurrency());
     }
-    if (budgetLine.getBudget() != null) {
-      setBudget(getBudget() + budgetLine.getBudget());
+    if (budgetLine.getBudgetGrantCurrency() != null) {
+      if (getBudgetGrantCurrency() == null) {
+        setBudgetGrantCurrency(0.0);
+      }
+      setBudgetGrantCurrency(getBudgetGrantCurrency() + budgetLine.getBudgetGrantCurrency());
     }
   }
 
   public void add(FakeBudgetEntityWrapper budgetLine) {
     // TODO(gaborfeher): Unify with above.
-    if (budgetLine.getSpent() != null) {
-      setSpent(getSpent() + budgetLine.getSpent());
+    if (budgetLine.getSpentGrantCurrency() != null) {
+      setSpentGrantCurrency(getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency());
     }
-    if (budgetLine.getRemaining() != null) {
-      setRemaining(getRemaining() + budgetLine.getRemaining());
+    if (budgetLine.getSpentAccountingCurrency() != null) {
+      setSpentAccountingCurrency(getSpentAccountingCurrency() + budgetLine.getSpentAccountingCurrency());
     }
-    if (budgetLine.getBudget() != null) {
-      setBudget(getBudget() + budgetLine.getBudget());
-    }  }
+    if (budgetLine.getBudgetGrantCurrency() != null) {
+      if (getBudgetGrantCurrency() == null) {
+        setBudgetGrantCurrency(0.0);
+      }
+      setBudgetGrantCurrency(getBudgetGrantCurrency() + budgetLine.getBudgetGrantCurrency());
+    }
+    
+    
+    if (budgetLine.getBudgetAccountingCurrency() != null) {
+      if (getBudgetAccountingCurrency() == null) {
+        setBudgetAccountingCurrency(0.0);
+      }
+      setBudgetAccountingCurrency(getBudgetAccountingCurrency() + budgetLine.getBudgetAccountingCurrency());
+    }
+  }
   
 
   /**
    * @param budget the budget to set
    */
-  public void setBudget(double budget) {
-    this.budget = budget;
+  public void setBudgetGrantCurrency(double budget) {
+    this.budgetGrantCurrency = budget;
   }
 
   /**
    * @param spent the spent to set
    */
-  public void setSpent(double spent) {
-    this.spent = spent;
+  public void setSpentGrantCurrency(double spent) {
+    this.spentGrantCurrency = spent;
   }
 
   /**
-   * @param remaining the remaining to set
+   * @return the spentAccountingCurrency
    */
-  public void setRemaining(double remaining) {
-    this.remaining = remaining;
+  public Double getSpentAccountingCurrency() {
+    if (!enableNumbers) {
+      return null;
+    }
+    return spentAccountingCurrency;
+  }
+  
+  public Double getRemainingAccountingCurrency() {
+    if (!enableNumbers) {
+      return null;
+    }
+    if (budgetAccountingCurrency == null) {
+      return null;
+    }
+    return budgetAccountingCurrency - spentAccountingCurrency;
+  }
+
+  public void setSpentAccountingCurrency(double spentAccountingCurrency) {
+    this.spentAccountingCurrency = spentAccountingCurrency;
+  }
+
+  public void setBudgetAccountingCurrency(double budgetAccountingCurrency) {
+    this.budgetAccountingCurrency = budgetAccountingCurrency;
   }
 
   

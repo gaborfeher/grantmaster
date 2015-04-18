@@ -10,6 +10,15 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectBudgetLimitsTabController">
   <children>
+    <HBox>
+      <children>
+        <Label text="%ProjectBudgetLimitsFilterDates" />
+        <DatePicker fx:id="filterStartDate" onAction="#filterUpdateAction" />
+        <Label text="-" />
+        <DatePicker fx:id="filterEndDate" onAction="#filterUpdateAction" />
+        <Button onAction="#filterResetButtonAction" text="%ProjectBudgetLimitsFilterResetButton" /> 
+      </children>
+    </HBox>
     <Button text="%ProjectBudgetLimitAddButtonLabel" onAction="#createButtonAction" />    
     <TableView editable="true" fx:id="table" >
       <columns>
@@ -36,31 +45,67 @@
           <cellValueFactory>
             <PropertyValueFactory property="budgetPercentage" /> 
           </cellValueFactory>
-        </TableColumn> 
-        <TableColumn prefWidth="200" fx:id="budgetColumn" styleClass="numColumn" sortable="false">
-          <cellFactory>
-            <DoubleTableCellFactory property="budget" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="budget" />
-          </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="200" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
-          <cellFactory>
-            <DoubleTableCellFactory property="spent" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="spent" />
-          </cellValueFactory>
+        <TableColumn prefWidth="300" text="%BudgetLimitValueColumn">
+          <columns>
+            <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
+              <cellFactory>
+                <DoubleTableCellFactory property="budgetAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="budgetAccountingCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true">
+              <cellFactory>
+                <DoubleTableCellFactory property="budgetGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="budgetGrantCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+          </columns>
         </TableColumn>
-        <TableColumn prefWidth="200" fx:id="remainingColumn" styleClass="numColumn" editable="false" sortable="false">
-          <cellFactory>
-            <DoubleTableCellFactory property="remaining" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="remaining" />
-          </cellValueFactory>
-        </TableColumn>        
+        <TableColumn text="%BudgetLimitSpentColumn" prefWidth="300" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
+          <columns>
+            <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false">
+              <cellFactory>
+                <DoubleTableCellFactory property="spentAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="spentAccountingCurrency" />
+              </cellValueFactory>              
+            </TableColumn>
+            <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false">
+              <cellFactory>
+                <DoubleTableCellFactory property="spentGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="spentGrantCurrency" />
+              </cellValueFactory>              
+            </TableColumn>
+          </columns>
+        </TableColumn>
+        <TableColumn prefWidth="300" text="%BudgetLimitRemainingColumn">
+          <columns>
+            <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
+              <cellFactory>
+                <DoubleTableCellFactory property="remainingAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="remainingAccountingCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false">
+              <cellFactory>
+                <DoubleTableCellFactory property="remainingGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <PropertyValueFactory property="remainingGrantCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+          </columns>
+        </TableColumn>   
       </columns>
     </TableView>
   </children> 

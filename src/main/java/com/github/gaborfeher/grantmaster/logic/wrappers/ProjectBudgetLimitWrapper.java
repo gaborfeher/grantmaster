@@ -5,10 +5,10 @@ import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
+import java.sql.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 /**
  *
@@ -16,15 +16,17 @@ import javax.persistence.TypedQuery;
  */
 public class ProjectBudgetLimitWrapper extends EntityWrapper {
   private ProjectBudgetLimit limit;
-  final private Double spent;
-  private Double remaining;
+  final private Double spentGrantCurrency;
+  final private Double spentAccountingCurrency;
+  private Double remainingGrantCurrency;
   private ExpenseType expenseType;
   private Project project;
   
-  public ProjectBudgetLimitWrapper(ExpenseType expenseType, Double spent) {
-    this.spent = spent;
+  public ProjectBudgetLimitWrapper(ExpenseType expenseType, Double spentAccountingCurrency, Double spentGrantCurrency) {
+    this.spentGrantCurrency = spentGrantCurrency;
+    this.spentAccountingCurrency = spentAccountingCurrency;
     this.expenseType = expenseType;
-    this.remaining = null;
+    this.remainingGrantCurrency = null;
   }
   
   public void setProject(Project project) {
@@ -48,35 +50,35 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
       limit.setBudget(total * limit.getBudgetPercentage() / 100.0);
     }
     if (limit.getBudget() != null) {
-      this.remaining = limit.getBudget();
-      if (spent != null) {
-        this.remaining -= spent;
+      this.remainingGrantCurrency = limit.getBudget();
+      if (spentGrantCurrency != null) {
+        this.remainingGrantCurrency -= spentGrantCurrency;
       }
     }
 
   }
   
-  public Double getBudget() {
+  public Double getBudgetGrantCurrency() {
     if (limit == null) {
       return null;
     }
     return limit.getBudget();
   }
   
-  public void setBudget(Double budget) {
+  public void setBudgetGrantCurrency(Double budget) {
     limit.setBudget(budget);
-    remaining = limit.getBudget();
-    if (spent != null) {
-      remaining -= spent;
+    remainingGrantCurrency = limit.getBudget();
+    if (spentGrantCurrency != null) {
+      remainingGrantCurrency -= spentGrantCurrency;
     }
   }
   
-  public Double getSpent() {
-    return spent;
+  public Double getSpentGrantCurrency() {
+    return spentGrantCurrency;
   }
   
-  public Double getRemaining() {
-    return remaining;
+  public Double getRemainingGrantCurrency() {
+    return remainingGrantCurrency;
   }
   
   public ExpenseType getExpenseType() {
@@ -99,50 +101,7 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     limit.setBudgetPercentage(budgetPercentage);
   }
   
-  public static List<ProjectBudgetLimitWrapper> getProjectBudgetLimits(Project project) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    Double total = 
-        Utils.getSingleResultWithDefault(0.0,
-            em.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
-            setParameter("project", project));
-        
-    List<ProjectBudgetLimitWrapper> list = em.createQuery(
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
-        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
-            "WHERE et.direction = :direction " +
-            "GROUP BY et " +
-            "ORDER BY et.name",
-        ProjectBudgetLimitWrapper.class).
-            setParameter("project", project).
-            setParameter("direction", ExpenseType.Direction.PAYMENT).
-            getResultList();
     
-    Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
-    while (iterator.hasNext()) {
-      ProjectBudgetLimitWrapper limitWrapper = iterator.next();
-      limitWrapper.setProject(project);
-      ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
-          "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.expenseType = :expenseType",
-          ProjectBudgetLimit.class).
-          setParameter("project", project).
-          setParameter("expenseType", limitWrapper.getExpenseType()));
-
-      limitWrapper.setLimit(total, limit);
-      if (limitWrapper.getEntity() == null && limitWrapper.getSpent() == null) {
-        iterator.remove();
-      }
-    }
-
-    return list;
-  }
-  
-  static void removeProjectBudgetLimits(Project project) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.createQuery("DELETE FROM ProjectBudgetLimit l WHERE l.project = :project").
-        setParameter("project", project).
-        executeUpdate();
-  }
-  
   @Override
   protected Object getEntity() {
     return limit;
@@ -160,5 +119,69 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     }
     super.setState(state);
   }
+
+  /**
+   * @return the spentAccountingCurrency
+   */
+  public Double getSpentAccountingCurrency() {
+    return spentAccountingCurrency;
+  }
+  
+  
+  public static List<ProjectBudgetLimitWrapper> getProjectBudgetLimits(
+      Project project,
+      Date filterStartDate,
+      Date filterEndDate) {
+    System.out.println("getLimits " + filterStartDate + " " + filterEndDate);
+    
+    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    Double total = 
+        Utils.getSingleResultWithDefault(0.0,
+            em.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
+            setParameter("project", project));
+        
+    List<ProjectBudgetLimitWrapper> list = em.createQuery(
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
+        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
+            "WHERE et.direction = :direction " +
+            " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
+            " AND (:filterEndDate IS NULL OR e.paymentDate <= :filterEndDate) " +
+            "GROUP BY et " +
+            "ORDER BY et.name",
+        ProjectBudgetLimitWrapper.class).
+            setParameter("project", project).
+            setParameter("direction", ExpenseType.Direction.PAYMENT).
+            setParameter("filterStartDate", filterStartDate).
+            //setParameter("noFilterStartDate", filterStartDate == null).
+            setParameter("filterEndDate", filterEndDate).
+            //setParameter("noFilterEndDate", filterEndDate == null).
+            getResultList();
+    
+    Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
+    while (iterator.hasNext()) {
+      ProjectBudgetLimitWrapper limitWrapper = iterator.next();
+      limitWrapper.setProject(project);
+      ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
+          "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.expenseType = :expenseType",
+          ProjectBudgetLimit.class).
+          setParameter("project", project).
+          setParameter("expenseType", limitWrapper.getExpenseType()));
+
+      limitWrapper.setLimit(total, limit);
+      if (limitWrapper.getEntity() == null && limitWrapper.getSpentGrantCurrency() == null) {
+        iterator.remove();
+      }
+    }
+
+    return list;
+  }
+  
+  static void removeProjectBudgetLimits(Project project) {
+    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    em.createQuery("DELETE FROM ProjectBudgetLimit l WHERE l.project = :project").
+        setParameter("project", project).
+        executeUpdate();
+  }
+
   
 }

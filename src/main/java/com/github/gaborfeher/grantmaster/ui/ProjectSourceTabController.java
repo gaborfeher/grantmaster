@@ -53,7 +53,7 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
 
   @Override
   public void refresh(RefreshMessage message) {
-    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project);
+    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project, null, null);
     table.getItems().setAll(projectTransfers);
     
     String grantCurrency = project.getGrantCurrency().getCode();

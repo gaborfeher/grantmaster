@@ -4,7 +4,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.FakeBudgetEntityWrapper;
 import java.net.URL;
@@ -17,6 +17,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
+import java.sql.Date;
+import javafx.scene.control.DatePicker;
 
 /**
  * FXML Controller class
@@ -25,9 +27,15 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
  */
 public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.MessageObserver implements Initializable {  
   @FXML TableView<EntityWrapper> table;
-  @FXML TableColumn<EntityWrapper, Float> budgetColumn;
-  @FXML TableColumn<EntityWrapper, Float> spentColumn;
-  @FXML TableColumn<EntityWrapper, Float> remainingColumn;
+  @FXML TableColumn<EntityWrapper, Double> spentGrantCurrencyColumn;
+  @FXML TableColumn<EntityWrapper, Double> spentAccountingCurrencyColumn;  
+  @FXML TableColumn<EntityWrapper, Double> remainingGrantCurrencyColumn;
+  @FXML TableColumn<EntityWrapper, Double> remainingAccountingCurrencyColumn;
+  @FXML TableColumn<EntityWrapper, Double> budgetGrantCurrencyColumn;
+  @FXML TableColumn<EntityWrapper, Double> budgetAccountingCurrencyColumn;
+  
+  @FXML DatePicker filterStartDate;
+  @FXML DatePicker filterEndDate;
   
   Project project;
   ResourceBundle resourceBundle;
@@ -35,11 +43,21 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
   public void createButtonAction(ActionEvent event) {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
-    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(limit.getExpenseType(), 0.0);
+    ProjectBudgetLimitWrapper wrapper = new ProjectBudgetLimitWrapper(limit.getExpenseType(), 0.0, 0.0);
     wrapper.setProject(project);
     wrapper.setLimit(0.0, limit);
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
     table.getItems().add(wrapper);
+  }
+  
+  public void filterUpdateAction(ActionEvent event) {
+    refresh(null);
+  }
+  
+  public void filterResetButtonAction(ActionEvent event) {
+    filterStartDate.setValue(null);
+    filterEndDate.setValue(null);
+    refresh(null);
   }
   
   void init(Project project) {
@@ -57,9 +75,17 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
 
   @Override
   public void refresh(RefreshMessage message) {
+    System.out.println("refresh");
+    Date startDate = Utils.toSqlDate(filterStartDate.getValue());
+    Date endDate = Utils.toSqlDate(filterEndDate.getValue());
+    
     table.getItems().clear();
     table.getItems().add(new FakeBudgetEntityWrapper("Kiadások"));
-    List<ProjectBudgetLimitWrapper> projectResources = ProjectBudgetLimitWrapper.getProjectBudgetLimits(project);
+    List<ProjectBudgetLimitWrapper> projectResources =
+        ProjectBudgetLimitWrapper.getProjectBudgetLimits(
+            project,
+            startDate,
+            endDate);
     table.getItems().addAll(projectResources);
     FakeBudgetEntityWrapper spentSum = new FakeBudgetEntityWrapper("Kiadások összesen", true);
     for (ProjectBudgetLimitWrapper outgoing : projectResources) {
@@ -68,26 +94,28 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     table.getItems().add(spentSum);
     table.getItems().add(new FakeBudgetEntityWrapper("Bevételek"));
     
-    double sum = 0.0;
-    for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project)) {
-      sum += source.getGrantCurrencyAmount();
+    double sumGrantCurrency = 0.0;
+    double sumAccountingCurrency = 0.0;
+    for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
+      sumGrantCurrency += source.getGrantCurrencyAmount();
+      sumAccountingCurrency += source.getAccountingCurrencyAmount();
     }
     FakeBudgetEntityWrapper incomingSum = new FakeBudgetEntityWrapper("Bevételek összesen", true);
     FakeBudgetEntityWrapper incomingItem = new FakeBudgetEntityWrapper(project.getIncomeType().getName(), true);
-    incomingItem.setBudget(sum);
-    incomingItem.setSpent(spentSum.getSpent());
-    incomingItem.setRemaining(sum - spentSum.getSpent());
+    incomingItem.setBudgetGrantCurrency(sumGrantCurrency);
+    incomingItem.setBudgetAccountingCurrency(sumAccountingCurrency);
+    incomingItem.setSpentGrantCurrency(spentSum.getSpentGrantCurrency());
+    incomingItem.setSpentAccountingCurrency(spentSum.getSpentAccountingCurrency());
     incomingSum.add(incomingItem);
     table.getItems().add(incomingItem);
     table.getItems().add(incomingSum);
     
-    
-    budgetColumn.setText(
-        resourceBundle.getString("BudgetLimitValueColumn") + " (" + project.getGrantCurrency().getCode() + ")");
-    spentColumn.setText(
-        resourceBundle.getString("BudgetLimitSpentColumn") + " (" + project.getGrantCurrency().getCode() + ")");
-    remainingColumn.setText(
-        resourceBundle.getString("BudgetLimitRemainingColumn") + " (" + project.getGrantCurrency().getCode() + ")");
+    spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+    spentGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
+    remainingAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+    remainingGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
+    budgetAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+    budgetGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
   }
 
   @Override

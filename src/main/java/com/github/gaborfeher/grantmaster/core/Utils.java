@@ -1,5 +1,7 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.TypedQuery;
 
@@ -14,5 +16,12 @@ public class Utils {
       System.err.println("too long list");
     }
     return list.get(0);    
+  }
+  
+  public static Date toSqlDate(LocalDate date) {
+    if (date == null) {
+      return null;
+    }
+    return new Date(date.toEpochDay() * 24 * 60 * 60 * 1000);
   }
 }

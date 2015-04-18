@@ -90,14 +90,20 @@ public class ProjectSourceWrapper extends EntityWrapper {
     source.setAvailabilityDate(date);
   }
   
-  public static List<ProjectSourceWrapper> getProjectSources(Project project) {
+  public static List<ProjectSourceWrapper> getProjectSources(
+      Project project, Date filterStartDate, Date filterEndDate) {
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
     TypedQuery<ProjectSourceWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +
-            "WHERE s.project = :project GROUP BY s " +
+            "WHERE s.project = :project " +
+            "  AND (:filterStartDate IS NULL OR s.availabilityDate >= :filterStartDate) " +
+            "  AND (:filterEndDate IS NULL OR s.availabilityDate <= :filterEndDate) " +
+            "GROUP BY s " +
             "ORDER BY s.availabilityDate, s.id", ProjectSourceWrapper.class);
     query.setParameter("project", project);
+    query.setParameter("filterStartDate", filterStartDate);
+    query.setParameter("filterEndDate", filterEndDate);
     return query.getResultList();
   }
   

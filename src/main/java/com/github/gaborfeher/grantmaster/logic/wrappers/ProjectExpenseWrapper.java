@@ -111,15 +111,20 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   private void recalculateAllocations() {
     double amount = accountingCurrencyAmount;
 
-    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(expense.getProject());  // TODO
+    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(expense.getProject(), null, null);  // TODO
     double grantCurrencyAmountDouble = 0.0;
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
-    for (ProjectSourceWrapper source : list) {
+    
+    for (int i = 0; i < list.size(); ++i) {
+      ProjectSourceWrapper source = list.get(i);
       if (amount == 0.0) {
         break;
       }
       if (source.getRemainingAccountingCurrencyAmount() > 0) {
         double take = Math.min(amount, source.getRemainingAccountingCurrencyAmount());
+        if (i == list.size() - 1) {
+          take = amount;  // Allow of going below zero balance for the last source.
+        }
         amount -= take;
         ExpenseSourceAllocation allocation = new ExpenseSourceAllocation();
         allocation.setExpense(expense);
