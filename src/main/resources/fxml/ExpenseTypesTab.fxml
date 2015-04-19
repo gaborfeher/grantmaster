@@ -24,7 +24,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="150" editable="true" sortable="false">
+        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="100" editable="true" sortable="false">
           <cellFactory>
             <ExpenseTypeDirectionTableCellFactory property="direction" /> 
           </cellFactory>
@@ -32,7 +32,7 @@
             <PropertyValueFactory property="direction" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="150" editable="true" sortable="false">
+        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="300" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="groupName" /> 
           </cellFactory>
@@ -40,7 +40,7 @@
             <PropertyValueFactory property="groupName" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeNameColumnLabel" prefWidth="150" editable="true" sortable="false">
+        <TableColumn text="%ExpenseTypeNameColumnLabel" prefWidth="350" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>

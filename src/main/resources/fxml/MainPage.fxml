@@ -6,15 +6,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="768" prefWidth="1024" fx:controller="com.github.gaborfeher.grantmaster.ui.MainPageController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="768" prefWidth="1024" fx:controller="com.github.gaborfeher.grantmaster.ui.MainPageController">
   <children>
     <HBox>
       <children>
-        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" fx:id="openButton" />  
-        <Label fx:id="pathLabel" />
+        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" />  
+        <Button text="%NewDatabase" onAction="#handleNewButtonAction" />  
       </children>
     </HBox>
-    <TabPane AnchorPane.topAnchor="50" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0" fx:id="mainTabs">
+    <Label fx:id="pathLabel" />
+    <TabPane VBox.vgrow="ALWAYS" fx:id="mainTabs">
       <tabs>
         <Tab text="%ProjectsTabName" closable="false">
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
@@ -31,4 +32,4 @@
       </tabs>
     </TabPane>      
   </children>
-</AnchorPane>
+</VBox>

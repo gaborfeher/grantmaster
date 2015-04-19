@@ -32,14 +32,6 @@
             <PropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectGrantCurrency" prefWidth="150">
-          <cellFactory>
-            <CurrencyTableCellFactory property="grantCurrency" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="grantCurrency" />
-          </cellValueFactory>
-        </TableColumn>
         <TableColumn text="%ProjectAccountCurrency" prefWidth="150">
           <cellFactory>
             <CurrencyTableCellFactory property="accountCurrency" />
@@ -48,8 +40,15 @@
             <PropertyValueFactory property="accountCurrency" />
           </cellValueFactory>
         </TableColumn>
-        
-        <TableColumn text="%ProjectIncomeType" prefWidth="150">
+        <TableColumn text="%ProjectGrantCurrency" prefWidth="150">
+          <cellFactory>
+            <CurrencyTableCellFactory property="grantCurrency" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="grantCurrency" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectIncomeType" prefWidth="300">
           <cellFactory>
             <ExpenseTypeTableCellFactory property="incomeType" direction="INCOME" />
           </cellFactory>

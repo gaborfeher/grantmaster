@@ -19,34 +19,6 @@ public class ExpenseType implements Serializable {
   
   @Column(nullable = false)
   private String name;
-
-  /**
-   * @return the direction
-   */
-  public Direction getDirection() {
-    return direction;
-  }
-
-  /**
-   * @param direction the direction to set
-   */
-  public void setDirection(Direction direction) {
-    this.direction = direction;
-  }
-
-  /**
-   * @return the groupName
-   */
-  public String getGroupName() {
-    return groupName;
-  }
-
-  /**
-   * @param groupName the groupName to set
-   */
-  public void setGroupName(String groupName) {
-    this.groupName = groupName;
-  }
   
   public static enum Direction {
     PAYMENT,
@@ -59,6 +31,28 @@ public class ExpenseType implements Serializable {
   private String groupName;
 
   public ExpenseType() {
+  }
+  
+  public ExpenseType(Direction direction, String groupName, String name) {
+    this.direction = direction;
+    this.groupName = groupName;
+    this.name = name;
+  }
+  
+  public Direction getDirection() {
+    return direction;
+  }
+
+  public void setDirection(Direction direction) {
+    this.direction = direction;
+  }
+
+  public String getGroupName() {
+    return groupName;
+  }
+
+  public void setGroupName(String groupName) {
+    this.groupName = groupName;
   }
 
   public String getName() {

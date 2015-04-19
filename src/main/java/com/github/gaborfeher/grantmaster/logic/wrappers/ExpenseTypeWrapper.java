@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 
-/**
- *
- * @author gabor
- */
 public class ExpenseTypeWrapper extends EntityWrapper {
   protected ExpenseType expenseType;
   protected final HashMap<String, Double> summaryValues;
@@ -102,7 +98,15 @@ public class ExpenseTypeWrapper extends EntityWrapper {
   public boolean isSummary() {
     return fakeName != null;
   }
-  
+
+  public void addSummaryValue(String header, Double value) {
+    summaryValues.put(header, value);
+  }
+
+  public Double getSummaryValue(String columnName) {
+    return summaryValues.get(columnName);
+  }
+
   public static List<ExpenseTypeWrapper> getExpenseTypeWrappers(ExpenseType.Direction direction) {
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
     return em.createQuery(
@@ -169,6 +173,76 @@ public class ExpenseTypeWrapper extends EntityWrapper {
 
   }
 
+  public static void createDefaultExpenseTypes() {
+    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    ExpenseType e;
+    
+    String groupName = "Személyi jellegű ráfordítások";
+    ExpenseType.Direction direction = ExpenseType.Direction.PAYMENT;
+    for (String name :
+        new String[]{
+            "Alkalmazottak bruttó bérköltsége",
+            "Alkalmazottak járulékköltsége",
+            "Bruttó megbízási díjak",
+            "Megbízási díjak járulékköltsége", 
+            "Béren kívüli juttatások összege",
+            "Béren kívüli juttatások adóterhe",
+            "Reprezentációs költség",
+            "Személyi jellegű egyéb kifizetések"}) {
+      em.persist(new ExpenseType(direction, groupName, name));
+    }
+    
+    groupName = "Iroda működtetésének költségei (bérek nélkül)";
+    direction = ExpenseType.Direction.PAYMENT;
+    for (String name :
+        new String[]{
+            "Irodaszerek (egy éven belül elhasználódó anyagi eszközök)",
+            "Bérleti díjak",
+            "Telefonköltségek és járulékai",
+            "Internet költsége",
+            "Postaköltség",
+            "Könyvviteli szolgáltatás",
+            "Hirdetési díjak",
+            "Karbantartás költsége",
+            "Egyéb kiadások, ráfordítások"}) {
+      em.persist(new ExpenseType(direction, groupName, name));
+    }
+    
+    groupName = "Egyéb szolgáltatások költsége";
+    direction = ExpenseType.Direction.PAYMENT;
+    for (String name :
+        new String[]{
+            "Biztosítási díjak",
+            "Bankköltségek",
+            "Jogi szolgáltatási díjak",
+            "Utazási, kiküldetési költségek",
+            "Fordítási díjak",
+            "Minden egyéb szolgáltatás díja"}) {
+      em.persist(new ExpenseType(direction, groupName, name));
+    }
+    
+    groupName = "Tárgyi eszköz beszerzés";
+    direction = ExpenseType.Direction.PAYMENT;
+    for (String name :
+        new String[]{"100eFt egyedi érték feletti eszközök beszerzése"}) {
+      em.persist(new ExpenseType(direction, groupName, name));
+    }
+    
+    groupName = null;
+    direction = ExpenseType.Direction.INCOME;
+    for (String name : new String[]{
+            "Közhasznú tevékenység bevétele",
+            "Tagdíjak",
+            "SZJA 1%",
+            "Magánszemélyek támogatásai",
+            "Jogi személyek támogatásai",
+            "Pályázati bevételek",
+            "Kamatbevételek",
+            "Egyéb bevételek"}) {
+      em.persist(new ExpenseType(direction, groupName, name));
+    }
+  }
+  
   public static void createBudgetSummaryList(List<ExpenseTypeWrapper> paymentTypes, List<ExpenseTypeWrapper> incomeTypes, List<ExpenseTypeWrapper> output) {
     output.clear();
     createBudgetSummaryList(paymentTypes, "Kiadások összesen", output);
@@ -176,12 +250,5 @@ public class ExpenseTypeWrapper extends EntityWrapper {
   }
 
 
-  public void addSummaryValue(String header, Double value) {
-    summaryValues.put(header, value);
-  }
-
-  public Double getSummaryValue(String columnName) {
-    return summaryValues.get(columnName);
-  }
   
 }
