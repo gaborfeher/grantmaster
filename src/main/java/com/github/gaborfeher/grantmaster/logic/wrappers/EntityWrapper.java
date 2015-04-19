@@ -51,15 +51,7 @@ public abstract class EntityWrapper {
       return false;
     }
   }
-  
-  /**
-   * Possible values for enum-like entities. Otherwise null.
-   * @return 
-   */
-  public List<EntityWrapper> getPossibleValues() {
-    return null;
-  }
-  
+
   public void persist() {
     DatabaseConnectionSingleton.getInstance().persist(getEntity());
     RefreshControlSingleton.getInstance().broadcastRefresh(null);
@@ -78,6 +70,10 @@ public abstract class EntityWrapper {
       // This thing will just go away at next refresh.
     }
     RefreshControlSingleton.getInstance().broadcastRefresh(null);  // TODO: narrower refresh
+  }
+  
+  public boolean isSummary() {
+    return false;
   }
   
   protected abstract Object getEntity();

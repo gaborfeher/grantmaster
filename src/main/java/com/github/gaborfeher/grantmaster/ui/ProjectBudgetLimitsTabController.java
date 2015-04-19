@@ -6,7 +6,7 @@ import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import com.github.gaborfeher.grantmaster.logic.wrappers.FakeBudgetEntityWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -18,16 +18,17 @@ import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.sql.Date;
+import java.util.Arrays;
 import javafx.scene.control.DatePicker;
 
 public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.MessageObserver implements Initializable {  
-  @FXML TableView<EntityWrapper> table;
-  @FXML TableColumn<EntityWrapper, Double> spentGrantCurrencyColumn;
-  @FXML TableColumn<EntityWrapper, Double> spentAccountingCurrencyColumn;  
-  @FXML TableColumn<EntityWrapper, Double> remainingGrantCurrencyColumn;
-  @FXML TableColumn<EntityWrapper, Double> remainingAccountingCurrencyColumn;
-  @FXML TableColumn<EntityWrapper, Double> budgetGrantCurrencyColumn;
-  @FXML TableColumn<EntityWrapper, Double> budgetAccountingCurrencyColumn;
+  @FXML TableView<ExpenseTypeWrapper> table;
+  @FXML TableColumn<ExpenseTypeWrapper, Double> spentGrantCurrencyColumn;
+  @FXML TableColumn<ExpenseTypeWrapper, Double> spentAccountingCurrencyColumn;  
+  @FXML TableColumn<ExpenseTypeWrapper, Double> remainingGrantCurrencyColumn;
+  @FXML TableColumn<ExpenseTypeWrapper, Double> remainingAccountingCurrencyColumn;
+  @FXML TableColumn<ExpenseTypeWrapper, Double> budgetGrantCurrencyColumn;
+  @FXML TableColumn<ExpenseTypeWrapper, Double> budgetAccountingCurrencyColumn;
   
   @FXML DatePicker filterStartDate;
   @FXML DatePicker filterEndDate;
@@ -71,49 +72,20 @@ public class ProjectBudgetLimitsTabController extends RefreshControlSingleton.Me
     Date startDate = Utils.toSqlDate(filterStartDate.getValue());
     Date endDate = Utils.toSqlDate(filterEndDate.getValue());
     
-    table.getItems().clear();
-    List<ProjectBudgetLimitWrapper> projectResources =
+    List paymentLines = 
         ProjectBudgetLimitWrapper.getProjectBudgetLimits(
             project,
             startDate,
             endDate);
-    table.getItems().clear();
-    FakeBudgetEntityWrapper spentSum = new FakeBudgetEntityWrapper("Kiadások összesen", true);
-    FakeBudgetEntityWrapper groupSum = null;
-    for (ProjectBudgetLimitWrapper outgoing : projectResources) {
-      if (groupSum != null && !groupSum.getGroupName().equals(outgoing.getGroupName())) {
-        table.getItems().add(groupSum);
-        groupSum = null;
-      }
-      if (groupSum == null && outgoing.getGroupName() != null) {
-        groupSum = new FakeBudgetEntityWrapper(outgoing.getGroupName() + " összesen", true, outgoing.getGroupName());
-      }
-      table.getItems().add(outgoing);
-      spentSum.add(outgoing);
-      if (groupSum != null) {
-        groupSum.add(outgoing);
-      }
-    }
-    if (groupSum != null) {
-      table.getItems().add(groupSum);
-    }
-    table.getItems().add(spentSum);
-    
-    double sumGrantCurrency = 0.0;
-    double sumAccountingCurrency = 0.0;
+    ProjectBudgetLimitWrapper incomingItem = new ProjectBudgetLimitWrapper(project.getIncomeType().getName());
     for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
-      sumGrantCurrency += source.getGrantCurrencyAmount();
-      sumAccountingCurrency += source.getAccountingCurrencyAmount();
+      incomingItem.addAmounts(source.getGrantCurrencyAmount(), source.getAccountingCurrencyAmount());
     }
-    FakeBudgetEntityWrapper incomingSum = new FakeBudgetEntityWrapper("Bevételek összesen", true);
-    FakeBudgetEntityWrapper incomingItem = new FakeBudgetEntityWrapper(project.getIncomeType().getName(), true);
-    //incomingItem.setBudgetGrantCurrency(sumGrantCurrency);
-    //incomingItem.setBudgetAccountingCurrency(sumAccountingCurrency);
-    incomingItem.setSpentGrantCurrency(sumGrantCurrency);
-    incomingItem.setSpentAccountingCurrency(sumAccountingCurrency);
-    incomingSum.add(incomingItem);
-    table.getItems().add(incomingItem);
-    table.getItems().add(incomingSum);
+    
+    ExpenseTypeWrapper.createBudgetSummaryList(
+        paymentLines,
+        Arrays.asList((ExpenseTypeWrapper)incomingItem),
+        table.getItems());
     
     spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
     spentGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());

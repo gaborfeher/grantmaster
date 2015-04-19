@@ -1,3 +1,7 @@
 .numColumn {
     -fx-alignment: top-right;
 }
+
+.summaryRow {
+  -fx-font-weight: bold;
+}

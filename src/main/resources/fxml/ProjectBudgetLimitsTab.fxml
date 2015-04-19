@@ -21,6 +21,9 @@
     </HBox>
     <Button text="%ProjectBudgetLimitAddButtonLabel" onAction="#createButtonAction" />    
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS" >
+      <rowFactory>
+        <SummaryHighlighterRowFactory />
+      </rowFactory>
       <columns>
         <TableColumn prefWidth="150" sortable="false">
           <cellFactory>

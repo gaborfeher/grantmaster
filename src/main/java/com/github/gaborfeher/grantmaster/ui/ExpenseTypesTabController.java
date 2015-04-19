@@ -5,7 +5,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeSummary;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;
 import java.net.URL;
@@ -33,9 +32,14 @@ public class ExpenseTypesTabController extends RefreshControlSingleton.MessageOb
   
   @Override
   public void refresh(RefreshMessage message) {
-    List<ExpenseTypeWrapper> expenseTypes = ExpenseTypeWrapper.getExpenseTypes();
+    List<ExpenseTypeWrapper> paymentTypes = ExpenseTypeWrapper.getExpenseTypeWrappers(ExpenseType.Direction.PAYMENT);
+    List<ExpenseTypeWrapper> incomeTypes = ExpenseTypeWrapper.getExpenseTypeWrappers(ExpenseType.Direction.INCOME);
+    
     Map<Integer, ExpenseTypeWrapper> expenseTypeMap = new HashMap<>();
-    for (ExpenseTypeWrapper expenseTypeWrapper : expenseTypes) {
+    for (ExpenseTypeWrapper expenseTypeWrapper : paymentTypes) {
+      expenseTypeMap.put(expenseTypeWrapper.getId(), expenseTypeWrapper);
+    }
+    for (ExpenseTypeWrapper expenseTypeWrapper : incomeTypes) {
       expenseTypeMap.put(expenseTypeWrapper.getId(), expenseTypeWrapper);
     }
     
@@ -88,44 +92,7 @@ public class ExpenseTypesTabController extends RefreshControlSingleton.MessageOb
       table.getColumns().add(column);
     }
     
-    // Insert rows summary rows.
-    table.getItems().clear();
-    ExpenseTypeSummary totalSum = new ExpenseTypeSummary("Kiadások összesen:");
-    ExpenseTypeSummary groupSum = null;
-    String currentGroupName = null;
-    ExpenseTypeWrapper previous = null;
-    for (ExpenseTypeWrapper current : expenseTypes) {
-      if (previous != null) {
-        if (currentGroupName != null && !currentGroupName.equals(current.getGroupName())) {
-          table.getItems().add(groupSum);
-          currentGroupName = null;
-          groupSum = null;
-        }
-        
-        if (previous.getDirection() != current.getDirection()) {
-          table.getItems().add(totalSum);
-          totalSum = new ExpenseTypeSummary("Bevételek összesen");
-        }
-      }
-      
-      if (current.getGroupName() != null) {
-        if (currentGroupName == null || groupSum == null) {
-          currentGroupName = current.getGroupName();
-          groupSum = new ExpenseTypeSummary(current.getGroupName() + " összesen");
-        }
-        groupSum.addSummaryValues(current);
-      }
-      
-      table.getItems().add(current);
-      totalSum.addSummaryValues(current);
-      
-      previous = current;
-    }
-    if (groupSum != null) {
-      table.getItems().add(groupSum);
-    }
-    table.getItems().add(totalSum);
-    
+    ExpenseTypeWrapper.createBudgetSummaryList(paymentTypes, incomeTypes, table.getItems());
   }
 
   /**

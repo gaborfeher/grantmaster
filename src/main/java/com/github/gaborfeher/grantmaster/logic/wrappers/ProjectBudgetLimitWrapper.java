@@ -14,19 +14,32 @@ import javax.persistence.EntityManager;
  *
  * @author gabor
  */
-public class ProjectBudgetLimitWrapper extends EntityWrapper {
+public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
   private ProjectBudgetLimit limit;
-  final private Double spentGrantCurrency;
-  final private Double spentAccountingCurrency;
+  private Double spentGrantCurrency;
+  private Double spentAccountingCurrency;
   private Double remainingGrantCurrency;
-  private ExpenseType expenseType;
   private Project project;
   
   public ProjectBudgetLimitWrapper(ExpenseType expenseType, Double spentAccountingCurrency, Double spentGrantCurrency) {
+    super(expenseType);
     this.spentGrantCurrency = spentGrantCurrency;
     this.spentAccountingCurrency = spentAccountingCurrency;
-    this.expenseType = expenseType;
     this.remainingGrantCurrency = null;
+  }
+  
+  public ProjectBudgetLimitWrapper(String fakeTitle) {
+    super(fakeTitle);
+    this.spentAccountingCurrency = 0.0;
+    this.spentGrantCurrency = 0.0;
+    this.remainingGrantCurrency = null;
+  }
+  
+  @Override
+  public ExpenseTypeWrapper createFakeCopy(String fakeTitle) {
+    ExpenseTypeWrapper copy = new ProjectBudgetLimitWrapper(fakeTitle);
+    copy.addSummaryValues(this);
+    return copy;
   }
   
   public void setProject(Project project) {
@@ -81,8 +94,12 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     return remainingGrantCurrency;
   }
   
-  public ExpenseType getExpenseType() {
-    return expenseType;
+  public void setSpentGrantCurrency(double spentGrantCurrency) {
+    this.spentGrantCurrency = spentGrantCurrency;
+  }
+  
+  public void setSpentAccountingCurrency(double spentAccountingCurrency) {
+    this.spentAccountingCurrency = spentAccountingCurrency;
   }
 
   public void setExpenseType(ExpenseType expenseType) {
@@ -101,7 +118,27 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     limit.setBudgetPercentage(budgetPercentage);
   }
   
+  @Override
+  public void addSummaryValues(ExpenseTypeWrapper other) {
+    System.out.println("ProjectBudggetLimitWrapper.addSummaryValues");
     
+    ProjectBudgetLimitWrapper budgetLine = (ProjectBudgetLimitWrapper) other;
+    
+    if (budgetLine.getSpentGrantCurrency() != null) {
+      spentGrantCurrency = getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency();
+    }
+    if (budgetLine.getSpentAccountingCurrency() != null) {
+      spentAccountingCurrency = getSpentAccountingCurrency() + budgetLine.getSpentAccountingCurrency();
+    }
+  }
+  
+  public void addAmounts(double grantCurrencyAmount, double accountingCurrencyAmount) {
+    this.spentGrantCurrency = (this.spentGrantCurrency == null ? 0.0 : this.spentAccountingCurrency) + grantCurrencyAmount;
+    this.spentAccountingCurrency = (this.spentAccountingCurrency == null ? 0.0 : this.spentAccountingCurrency) + accountingCurrencyAmount;
+  }
+    
+  
+  
   @Override
   protected Object getEntity() {
     return limit;
@@ -158,7 +195,6 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
     Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
     while (iterator.hasNext()) {
       ProjectBudgetLimitWrapper limitWrapper = iterator.next();
-      System.out.println("checking: " + limitWrapper.getExpenseType().getName());
       
       limitWrapper.setProject(project);
       ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
@@ -169,7 +205,6 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
 
       limitWrapper.setLimit(total, limit);
       if (limitWrapper.getEntity() == null && limitWrapper.getSpentGrantCurrency() == null) {
-        System.out.println("DISCARDED");
         iterator.remove();
       }
     }
@@ -184,8 +219,4 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
         executeUpdate();
   }
 
-  public String getGroupName() {
-    return getExpenseType().getGroupName();
-  }
-  
 }
