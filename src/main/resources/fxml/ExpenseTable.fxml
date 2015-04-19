@@ -73,7 +73,7 @@
     </TableColumn>
     <TableColumn text="%ProjectExpensesAmount">
       <columns>
-        <TableColumn fx:id="accountingCurrencyAmountColumn" styleClass="numColumn" sortable="false">
+        <TableColumn fx:id="accountingCurrencyAmountColumn" styleClass="numColumn" sortable="false" prefWidth="130">
           <cellFactory>
             <DoubleTableCellFactory property="accountingCurrencyAmount" />
           </cellFactory>
@@ -81,7 +81,7 @@
             <PropertyValueFactory property="accountingCurrencyAmount" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn fx:id="grantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false">
+        <TableColumn fx:id="grantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false" prefWidth="130">
           <cellFactory>
             <DoubleTableCellFactory property="grantCurrencyAmount"  />
           </cellFactory>

@@ -2,11 +2,13 @@ package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.sql.Timestamp;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
 public class ProjectNote {
   @Id
+  @GeneratedValue
   private Long id;
   
   private Project project;
@@ -37,5 +39,19 @@ public class ProjectNote {
 
   public void setNote(String note) {
     this.note = note;
+  }
+
+  /**
+   * @return the project
+   */
+  public Project getProject() {
+    return project;
+  }
+
+  /**
+   * @param project the project to set
+   */
+  public void setProject(Project project) {
+    this.project = project;
   }
 }

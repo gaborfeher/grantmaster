@@ -16,6 +16,7 @@ public class ProjectTabController implements Initializable {
   @FXML ProjectExpenseTabController projectExpenseTabController;
   @FXML ProjectSourceTabController projectSourceTabController;
   @FXML ProjectBudgetLimitsTabController projectBudgetLimitsTabController;
+  @FXML ProjectNotesTabController projectNotesTabController;
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
@@ -26,6 +27,7 @@ public class ProjectTabController implements Initializable {
     this.projectExpenseTabController.init(project);
     this.projectSourceTabController.init(project);
     this.projectBudgetLimitsTabController.init(project);
+    this.projectNotesTabController.init(project);
   }
 
 

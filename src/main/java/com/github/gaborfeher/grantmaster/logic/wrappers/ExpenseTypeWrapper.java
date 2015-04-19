@@ -75,8 +75,6 @@ public class ExpenseTypeWrapper extends EntityWrapper {
   }
   
   public void addSummaryValues(ExpenseTypeWrapper expenseTypeWrapper) {
-    System.out.println("ExpenseTypeWrapper.addSummaryValues");
-    
     for (Map.Entry<String, Double> summaryEntry : expenseTypeWrapper.summaryValues.entrySet()) {
       String key = summaryEntry.getKey();
       Double value = summaryEntry.getValue();

@@ -120,10 +120,7 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
   
   @Override
   public void addSummaryValues(ExpenseTypeWrapper other) {
-    System.out.println("ProjectBudggetLimitWrapper.addSummaryValues");
-    
     ProjectBudgetLimitWrapper budgetLine = (ProjectBudgetLimitWrapper) other;
-    
     if (budgetLine.getSpentGrantCurrency() != null) {
       spentGrantCurrency = getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency();
     }

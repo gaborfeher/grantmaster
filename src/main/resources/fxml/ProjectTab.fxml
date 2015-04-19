@@ -12,14 +12,17 @@
   <children>
     <TabPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="40">
       <tabs>
-        <Tab text="%SourcesTabName">
-          <fx:include source="ProjectSourceTab.fxml" fx:id="projectSourceTab" />
-        </Tab>
         <Tab text="%ProjectBudgetLimitsTabName">
           <fx:include source="ProjectBudgetLimitsTab.fxml" fx:id="projectBudgetLimitsTab" />
         </Tab>
+        <Tab text="%SourcesTabName">
+          <fx:include source="ProjectSourceTab.fxml" fx:id="projectSourceTab" />
+        </Tab>
         <Tab text="%ProjectExpensesTabName">
           <fx:include source="ProjectExpenseTab.fxml" fx:id="projectExpenseTab" />
+        </Tab>
+        <Tab text="%ProjectNotesTabName">
+          <fx:include source="ProjectNotesTab.fxml" fx:id="projectNotesTab" />
         </Tab>
       </tabs>
     </TabPane>

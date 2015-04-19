@@ -28,7 +28,7 @@ class ExpenseTypeTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S
 
   @Override
   public void startEdit() {
-    if (getEntityWrapper().canEdit()) {
+    if (getEntityWrapper() != null && getEntityWrapper().canEdit()) {
       getItems().setAll(DatabaseConnectionSingleton.getInstance().em().
           createQuery(
               "SELECT t FROM ExpenseType t WHERE t.direction = :direction ORDER BY t.name",

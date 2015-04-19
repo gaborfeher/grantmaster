@@ -33,7 +33,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseType" prefWidth="150" sortable="false">
+        <TableColumn text="%ExpenseType" prefWidth="400" sortable="false">
           <cellFactory>
             <ExpenseTypeTableCellFactory property="expenseType" direction="PAYMENT"/>  
           </cellFactory>
@@ -51,7 +51,7 @@
         </TableColumn>
         <TableColumn prefWidth="350" text="%BudgetLimitValueColumn">
           <columns>
-            <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
+            <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="budgetAccountingCurrency" /> 
               </cellFactory>
@@ -59,7 +59,7 @@
                 <PropertyValueFactory property="budgetAccountingCurrency" />
               </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true">
+            <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="budgetGrantCurrency" /> 
               </cellFactory>
@@ -71,7 +71,7 @@
         </TableColumn>
         <TableColumn text="%BudgetLimitSpentColumn" prefWidth="350" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
           <columns>
-            <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false">
+            <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="spentAccountingCurrency" /> 
               </cellFactory>
@@ -79,7 +79,7 @@
                 <PropertyValueFactory property="spentAccountingCurrency" />
               </cellValueFactory>              
             </TableColumn>
-            <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false">
+            <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="spentGrantCurrency" /> 
               </cellFactory>
@@ -91,7 +91,7 @@
         </TableColumn>
         <TableColumn prefWidth="350" text="%BudgetLimitRemainingColumn">
           <columns>
-            <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" >
+            <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="remainingAccountingCurrency" /> 
               </cellFactory>
@@ -99,7 +99,7 @@
                 <PropertyValueFactory property="remainingAccountingCurrency" />
               </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false">
+            <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="100">
               <cellFactory>
                 <DoubleTableCellFactory property="remainingGrantCurrency" /> 
               </cellFactory>
