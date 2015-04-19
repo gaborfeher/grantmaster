@@ -10,10 +10,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 
-/**
- *
- * @author gabor
- */
 public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
   final String property;
   final TextField editTextField;
@@ -69,7 +65,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
   @Override
   public void startEdit() {
     userCancelled = false;
-    if (getEntityWrapper().canEdit()) {
+    if (getEntityWrapper() != null && getEntityWrapper().canEdit()) {
       super.startEdit();
       updateItem(getItem(), false);
       editTextField.requestFocus();

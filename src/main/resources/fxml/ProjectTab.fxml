@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectTabController">
   <children>
-    <TabPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="40">
+    <TabPane VBox.vgrow="ALWAYS">
       <tabs>
         <Tab text="%BudgetCategoriesTabName">
           <fx:include source="ProjectBudgetCategoriesTab.fxml" fx:id="projectBudgetCategoriesTab" />
@@ -27,4 +27,4 @@
       </tabs>
     </TabPane>
   </children>
-</AnchorPane>
+</VBox>

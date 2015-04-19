@@ -8,10 +8,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 
 public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
-  final Button saveButton = new Button("Save");
-  final Button editButton = new Button("Edit");
-  final Button discardButton = new Button("Discard");
-  final Button deleteButton = new Button("Delete");
+  final Button saveButton = new Button("Ment");
+  final Button editButton = new Button("Szerkeszt");
+  final Button discardButton = new Button("Visszavon");
+  final Button deleteButton = new Button("Töröl");
   
   final HBox editDeleteBox = new HBox(editButton, deleteButton);
   final HBox saveDiscardBox = new HBox(saveButton, discardButton);
@@ -87,6 +87,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   void handleDeleteButtonClick() {
+    
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.delete();
   }

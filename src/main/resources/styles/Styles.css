@@ -1,7 +1,26 @@
 .numColumn {
-    -fx-alignment: top-right;
+  -fx-alignment: bottom-right;
+}
+
+.textColumn {
+  -fx-alignment: bottom-left;
 }
 
 .summaryRow {
   -fx-font-weight: bold;
+  -fx-background-color: #cfe7f5;
+}
+
+TableView .editColumn Button {
+  -fx-font-size: 1.0em;
+  -fx-padding: 3px;
+  -fx-margin: 1px;
+}
+
+.editColumn {
+  -fx-alignment: center;
+}
+
+.editColumn HBox {
+  -fx-alignment: center;
 }

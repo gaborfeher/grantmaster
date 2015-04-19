@@ -14,7 +14,7 @@ public class SummaryHighlighterRowFactory implements Callback<TableView<EntityWr
       @Override
       protected void updateItem(EntityWrapper entityWrapper, boolean empty) {
         super.updateItem(entityWrapper, empty);
-        if (!empty && entityWrapper != null && entityWrapper.isSummary()) {
+        if (!empty && entityWrapper != null && entityWrapper.getIsSummary()) {
           if (!getStyleClass().contains("summaryRow")) {
             getStyleClass().add("summaryRow");
           }

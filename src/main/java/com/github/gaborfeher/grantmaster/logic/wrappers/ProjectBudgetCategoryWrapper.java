@@ -10,10 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
 
-/**
- *
- * @author gabor
- */
 public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   private ProjectBudgetLimit limit;
   private Double spentGrantCurrency;
@@ -38,7 +34,8 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   @Override
   public BudgetCategoryWrapper createFakeCopy(String fakeTitle) {
     BudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
-    copy.addSummaryValues(this);
+    copy.addSummaryValues(this, 1.0);
+    copy.setIsSummary(true);
     return copy;
   }
   
@@ -68,7 +65,10 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
         this.remainingGrantCurrency -= spentGrantCurrency;
       }
     }
-
+  }
+  
+  public Double getSpentAccountingCurrency() {
+    return spentAccountingCurrency;
   }
   
   public Double getBudgetGrantCurrency() {
@@ -119,13 +119,15 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   }
   
   @Override
-  public void addSummaryValues(BudgetCategoryWrapper other) {
+  public void addSummaryValues(BudgetCategoryWrapper other, double multiplier) {
     ProjectBudgetCategoryWrapper budgetLine = (ProjectBudgetCategoryWrapper) other;
     if (budgetLine.getSpentGrantCurrency() != null) {
-      spentGrantCurrency = getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency();
+      spentGrantCurrency = getSpentGrantCurrency() +
+          budgetLine.getSpentGrantCurrency() * multiplier;
     }
     if (budgetLine.getSpentAccountingCurrency() != null) {
-      spentAccountingCurrency = getSpentAccountingCurrency() + budgetLine.getSpentAccountingCurrency();
+      spentAccountingCurrency = getSpentAccountingCurrency() +
+          budgetLine.getSpentAccountingCurrency() * multiplier;
     }
   }
   
@@ -133,8 +135,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     this.spentGrantCurrency = (this.spentGrantCurrency == null ? 0.0 : this.spentAccountingCurrency) + grantCurrencyAmount;
     this.spentAccountingCurrency = (this.spentAccountingCurrency == null ? 0.0 : this.spentAccountingCurrency) + accountingCurrencyAmount;
   }
-    
-  
   
   @Override
   protected Object getEntity() {
@@ -153,14 +153,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     }
     super.setState(state);
   }
-
-  /**
-   * @return the spentAccountingCurrency
-   */
-  public Double getSpentAccountingCurrency() {
-    return spentAccountingCurrency;
-  }
-  
   
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
       Project project,

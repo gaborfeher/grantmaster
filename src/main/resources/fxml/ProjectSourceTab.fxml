@@ -13,7 +13,7 @@
     <Button text="%ProjectSourceAddButtonLabel" onAction="#createButtonAction" />
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS">
       <columns>
-        <TableColumn prefWidth="150" sortable="false">
+        <TableColumn prefWidth="150" sortable="false" styleClass="editColumn">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>

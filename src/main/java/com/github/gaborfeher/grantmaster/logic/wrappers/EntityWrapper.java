@@ -19,9 +19,11 @@ public abstract class EntityWrapper {
   }
   
   private State state;
+  private boolean isSummary;
   
   public EntityWrapper() {
     state = State.SAVED;
+    isSummary = false;
   }
   
   public State getState() {
@@ -71,8 +73,12 @@ public abstract class EntityWrapper {
     RefreshControlSingleton.getInstance().broadcastRefresh();  // TODO: narrower refresh
   }
   
-  public boolean isSummary() {
-    return false;
+  public boolean getIsSummary() {
+    return isSummary;
+  }
+  
+  public void setIsSummary(boolean isSummary) {
+    this.isSummary = isSummary;
   }
   
   protected abstract Object getEntity();

@@ -16,7 +16,7 @@
         <SummaryHighlighterRowFactory />
       </rowFactory>
       <columns>
-        <TableColumn prefWidth="150" sortable="false">
+        <TableColumn prefWidth="150" sortable="false" styleClass="editColumn">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>

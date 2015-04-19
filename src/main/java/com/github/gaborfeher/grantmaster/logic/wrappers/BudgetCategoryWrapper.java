@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import javax.persistence.EntityManager;
 
 public class BudgetCategoryWrapper extends EntityWrapper {
   protected BudgetCategory budgetCategory;
   protected final HashMap<String, Double> summaryValues;
   private final String fakeName;
+  private boolean summary;
 
   public BudgetCategoryWrapper(BudgetCategory budgetCategory) {
     this.budgetCategory = budgetCategory;
@@ -28,7 +28,8 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   
   public BudgetCategoryWrapper createFakeCopy(String fakeName) {
     BudgetCategoryWrapper copy = new BudgetCategoryWrapper(fakeName);
-    copy.addSummaryValues(this);
+    copy.addSummaryValues(this, 1.0);
+    copy.setIsSummary(true);
     return copy;
   }
   
@@ -76,10 +77,10 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return budgetCategory;
   }
   
-  public void addSummaryValues(BudgetCategoryWrapper other) {
+  public void addSummaryValues(BudgetCategoryWrapper other, double multiplier) {
     for (Map.Entry<String, Double> summaryEntry : other.summaryValues.entrySet()) {
       String key = summaryEntry.getKey();
-      Double value = summaryEntry.getValue();
+      Double value = summaryEntry.getValue() * multiplier;
       summaryValues.put(key, value + summaryValues.getOrDefault(key, 0.0));
     }
   }
@@ -92,11 +93,6 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   @Override
   protected Object getEntity() {
     return budgetCategory;
-  }
-  
-  @Override
-  public boolean isSummary() {
-    return fakeName != null;
   }
 
   public void addSummaryValue(String header, Double value) {
@@ -187,7 +183,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
         columnNames);
   }
   
-  private static void createBudgetSummaryList(
+  private static BudgetCategoryWrapper createBudgetSummaryList(
       List<BudgetCategoryWrapper> rawLines,
       String summaryTitle,
       List<BudgetCategoryWrapper> summary) {
@@ -207,15 +203,15 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       if (current.getGroupName() != null) {
         if (currentGroupName == null || groupSum == null) {
           currentGroupName = current.getGroupName();
-          groupSum = current.createFakeCopy(current.getGroupName() + " összesen");
+          groupSum = current.createFakeCopy(current.getGroupName() + " mindösszesen");
         } else {
-          groupSum.addSummaryValues(current);
+          groupSum.addSummaryValues(current, 1.0);
         }
       }
       
       summary.add(current);
       if (totalSum != null) {
-        totalSum.addSummaryValues(current);
+        totalSum.addSummaryValues(current, 1.0);
       } else {
         totalSum = current.createFakeCopy(summaryTitle);
       }
@@ -225,8 +221,10 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     if (groupSum != null) {
       summary.add(groupSum);
     }
-    summary.add(totalSum);
-
+    if (totalSum != null) {
+      summary.add(totalSum);
+    }
+    return totalSum;
   }
 
   /**
@@ -241,8 +239,15 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       List<BudgetCategoryWrapper> incomeCategories,
       List<BudgetCategoryWrapper> output) {
     output.clear();
-    createBudgetSummaryList(paymentCategories, "Kiadások összesen", output);
-    createBudgetSummaryList(incomeCategories, "Bevételek összesen", output);
+    BudgetCategoryWrapper expenseSum =
+        createBudgetSummaryList(paymentCategories, "Költségek mindösszesen", output);
+    BudgetCategoryWrapper incomeSum = 
+        createBudgetSummaryList(incomeCategories, "Bevételek mindösszesen", output);
+    BudgetCategoryWrapper finalSum = incomeSum.createFakeCopy("Különbség");
+    if (expenseSum != null) {
+      finalSum.addSummaryValues(expenseSum, -1.0);
+    }
+    output.add(finalSum);
   }
   
   public static void createDefaultBudgetCategories() {

@@ -50,6 +50,10 @@ public class MainPageController implements Initializable {
     DatabaseConnectionSingleton.getInstance().close();
   }
 
+  private void closeProjectTabs() {
+    mainTabs.getTabs().remove(4, mainTabs.getTabs().size());
+  }
+ 
   public void addProjectTab(final Project project) throws IOException {
     Tab newTab = new Tab(project.getName());
     mainTabs.getTabs().add(newTab);
@@ -88,7 +92,7 @@ public class MainPageController implements Initializable {
 
     pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
     connection.connectTo(pathString);
-    
+    closeProjectTabs();
     RefreshControlSingleton.getInstance().broadcastRefresh();
     pathLabel.setText(pathString);
   }
@@ -128,6 +132,7 @@ public class MainPageController implements Initializable {
     
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
     connection.close();
+    closeProjectTabs();
     
     pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
     connection.connectTo(pathString);
@@ -150,4 +155,6 @@ public class MainPageController implements Initializable {
   void setStage(Stage stage) {
     this.stage = stage;
   }
+
+ 
 }

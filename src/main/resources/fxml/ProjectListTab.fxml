@@ -16,7 +16,7 @@
     </HBox>
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
-        <TableColumn prefWidth="150">
+        <TableColumn prefWidth="150" styleClass="editColumn">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>
@@ -24,7 +24,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectName" prefWidth="150">
+        <TableColumn text="%ProjectName" prefWidth="150" styleClass="textColumn">
           <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>
@@ -32,7 +32,7 @@
             <PropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectAccountCurrency" prefWidth="150">
+        <TableColumn text="%ProjectAccountCurrency" prefWidth="150" styleClass="textColumn">
           <cellFactory>
             <CurrencyTableCellFactory property="accountCurrency" />
           </cellFactory>
@@ -40,7 +40,7 @@
             <PropertyValueFactory property="accountCurrency" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectGrantCurrency" prefWidth="150">
+        <TableColumn text="%ProjectGrantCurrency" prefWidth="150" styleClass="textColumn">
           <cellFactory>
             <CurrencyTableCellFactory property="grantCurrency" /> 
           </cellFactory>
@@ -48,7 +48,7 @@
             <PropertyValueFactory property="grantCurrency" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectIncomeType" prefWidth="300">
+        <TableColumn text="%ProjectIncomeType" prefWidth="300" styleClass="textColumn">
           <cellFactory>
             <BudgetCategoryTableCellFactory property="incomeType" direction="INCOME" />
           </cellFactory>
