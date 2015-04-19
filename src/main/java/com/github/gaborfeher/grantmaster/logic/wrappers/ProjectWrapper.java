@@ -4,7 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,11 +46,11 @@ public class ProjectWrapper extends EntityWrapper {
     project.setGrantCurrency(currency);
   }
   
-  public void setIncomeType(ExpenseType expenseType) {
-    project.setIncomeType(expenseType);
+  public void setIncomeType(BudgetCategory budgetCategory) {
+    project.setIncomeType(budgetCategory);
   }
 
-  public ExpenseType getIncomeType() {
+  public BudgetCategory getIncomeType() {
     return project.getIncomeType();
   }
   
@@ -66,7 +66,7 @@ public class ProjectWrapper extends EntityWrapper {
       em.getTransaction().begin();
       ProjectExpenseWrapper.removeProjectExpenses(project);
       ProjectSourceWrapper.removeProjectSources(project);
-      ProjectBudgetLimitWrapper.removeProjectBudgetLimits(project);
+      ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(project);
       em.remove(project);
       em.getTransaction().commit();
     } catch (Throwable t) {

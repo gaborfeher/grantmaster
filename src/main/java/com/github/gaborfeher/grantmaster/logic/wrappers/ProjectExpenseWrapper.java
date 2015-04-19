@@ -3,7 +3,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseSourceAllocation;
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
@@ -59,12 +59,12 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     expense.setPartnerName(partnerName);
   }
   
-  public ExpenseType getExpenseType() {
-    return expense.getExpenseType();
+  public BudgetCategory getBudgetCategory() {
+    return expense.getBudgetCategory();
   }
   
-  public void setExpenseType(ExpenseType expenseType) {
-    expense.setExpenseType(expenseType);
+  public void setBudgetCategory(BudgetCategory budgetCategory) {
+    expense.setBudgetCategory(budgetCategory);
   }
   
   public Double getOriginalAmount() {
@@ -268,14 +268,14 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       Project project,
       Date startDate,
       Date endDate,
-      ExpenseType expenseType,
-      String expenseTypeGroup,
+      BudgetCategory budgetCategory,
+      String budgetCategoryGroup,
       String accountNo,
       String partnerName,
       String comment1,
       String comment2) {
-    if ("".equals(expenseTypeGroup)) {
-      expenseTypeGroup = null;
+    if ("".equals(budgetCategoryGroup)) {
+      budgetCategoryGroup = null;
     }
     if ("".equals(accountNo)) {
       accountNo = null;
@@ -297,8 +297,8 @@ public class ProjectExpenseWrapper extends EntityWrapper {
             "WHERE (e.project.id = :project OR :project IS NULL) " +
             " AND (e.paymentDate >= :startDate OR :startDate IS NULL) " +
             " AND (e.paymentDate <= :endDate OR :endDate IS NULL) " +
-            " AND (e.expenseType.id = :expenseType OR :expenseType IS NULL) " +
-            " AND (e.expenseType.groupName = :expenseTypeGroup OR :expenseTypeGroup IS NULL) " +
+            " AND (e.budgetCategory.id = :budgetCategory OR :budgetCategory IS NULL) " +
+            " AND (e.budgetCategory.groupName = :budgetCategoryGroup OR :budgetCategoryGroup IS NULL) " +
             " AND (e.accountNo = :accountNo OR :accountNo IS NULL) " +
             " AND (e.partnerName = :partnerName OR :partnerName IS NULL) " +
             " AND (e.comment1 = :comment1 OR :comment1 IS NULL) " +
@@ -309,8 +309,8 @@ public class ProjectExpenseWrapper extends EntityWrapper {
      query.setParameter("project", project == null ? null : project.getId());
      query.setParameter("startDate", startDate);
      query.setParameter("endDate", endDate);
-     query.setParameter("expenseType", expenseType == null ? null : expenseType.getId());
-     query.setParameter("expenseTypeGroup", expenseTypeGroup);
+     query.setParameter("budgetCategory", budgetCategory == null ? null : budgetCategory.getId());
+     query.setParameter("budgetCategoryGroup", budgetCategoryGroup);
      query.setParameter("partnerName", partnerName);
      query.setParameter("accountNo", accountNo);
      query.setParameter("comment1", comment1);

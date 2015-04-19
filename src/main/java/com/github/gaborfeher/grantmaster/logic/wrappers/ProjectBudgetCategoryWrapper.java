@@ -2,7 +2,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import java.sql.Date;
@@ -14,21 +14,21 @@ import javax.persistence.EntityManager;
  *
  * @author gabor
  */
-public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
+public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   private ProjectBudgetLimit limit;
   private Double spentGrantCurrency;
   private Double spentAccountingCurrency;
   private Double remainingGrantCurrency;
   private Project project;
   
-  public ProjectBudgetLimitWrapper(ExpenseType expenseType, Double spentAccountingCurrency, Double spentGrantCurrency) {
-    super(expenseType);
+  public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, Double spentAccountingCurrency, Double spentGrantCurrency) {
+    super(budgetCategory);
     this.spentGrantCurrency = spentGrantCurrency;
     this.spentAccountingCurrency = spentAccountingCurrency;
     this.remainingGrantCurrency = null;
   }
   
-  public ProjectBudgetLimitWrapper(String fakeTitle) {
+  public ProjectBudgetCategoryWrapper(String fakeTitle) {
     super(fakeTitle);
     this.spentAccountingCurrency = 0.0;
     this.spentGrantCurrency = 0.0;
@@ -36,8 +36,8 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
   }
   
   @Override
-  public ExpenseTypeWrapper createFakeCopy(String fakeTitle) {
-    ExpenseTypeWrapper copy = new ProjectBudgetLimitWrapper(fakeTitle);
+  public BudgetCategoryWrapper createFakeCopy(String fakeTitle) {
+    BudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
     copy.addSummaryValues(this);
     return copy;
   }
@@ -52,7 +52,7 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
       return;
     }
     
-    if (expenseType != null && expenseType.getId() != limit.getExpenseType().getId()) {
+    if (budgetCategory != null && budgetCategory.getId() != limit.getBudgetCategory().getId()) {
       System.out.println("bad expense type");
     }
     if (project.getId() != limit.getProject().getId()) {
@@ -102,9 +102,9 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
     this.spentAccountingCurrency = spentAccountingCurrency;
   }
 
-  public void setExpenseType(ExpenseType expenseType) {
-    limit.setExpenseType(expenseType);
-    this.expenseType = expenseType;
+  public void setBudgetCategory(BudgetCategory budgetCategory) {
+    limit.setBudgetCategory(budgetCategory);
+    this.budgetCategory = budgetCategory;
   }
   
   public Double getBudgetPercentage() {
@@ -119,8 +119,8 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
   }
   
   @Override
-  public void addSummaryValues(ExpenseTypeWrapper other) {
-    ProjectBudgetLimitWrapper budgetLine = (ProjectBudgetLimitWrapper) other;
+  public void addSummaryValues(BudgetCategoryWrapper other) {
+    ProjectBudgetCategoryWrapper budgetLine = (ProjectBudgetCategoryWrapper) other;
     if (budgetLine.getSpentGrantCurrency() != null) {
       spentGrantCurrency = getSpentGrantCurrency() + budgetLine.getSpentGrantCurrency();
     }
@@ -147,7 +147,7 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
       if (limit == null) {
         state = State.EDITING_NEW;
         limit = new ProjectBudgetLimit();
-        limit.setExpenseType(expenseType);
+        limit.setBudgetCategory(budgetCategory);
         limit.setProject(project);
       }
     }
@@ -162,7 +162,7 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
   }
   
   
-  public static List<ProjectBudgetLimitWrapper> getProjectBudgetLimits(
+  public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
       Project project,
       Date filterStartDate,
       Date filterEndDate) {
@@ -174,31 +174,30 @@ public class ProjectBudgetLimitWrapper extends ExpenseTypeWrapper {
             em.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
             setParameter("project", project));
         
-    List<ProjectBudgetLimitWrapper> list = em.createQuery(
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
-        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
-            "WHERE et.direction = :direction " +
+    List<ProjectBudgetCategoryWrapper> list = em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
+        "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
+            "WHERE c.direction = :direction " +
             " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
             " AND (:filterEndDate IS NULL OR e.paymentDate <= :filterEndDate) " +
-            "GROUP BY et " +
-            "ORDER BY et.groupName NULLS LAST, et.name",
-        ProjectBudgetLimitWrapper.class).
+            "GROUP BY c " +
+            "ORDER BY c.groupName NULLS LAST, c.name",
+        ProjectBudgetCategoryWrapper.class).
             setParameter("project", project).
-            setParameter("direction", ExpenseType.Direction.PAYMENT).
+            setParameter("direction", BudgetCategory.Direction.PAYMENT).
             setParameter("filterStartDate", filterStartDate).
             setParameter("filterEndDate", filterEndDate).
             getResultList();
     
-    Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
+    Iterator<ProjectBudgetCategoryWrapper> iterator = list.iterator();
     while (iterator.hasNext()) {
-      ProjectBudgetLimitWrapper limitWrapper = iterator.next();
+      ProjectBudgetCategoryWrapper limitWrapper = iterator.next();
       
       limitWrapper.setProject(project);
       ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
-          "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.expenseType = :expenseType",
+          "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.budgetCategory = :budgetCategory",
           ProjectBudgetLimit.class).
           setParameter("project", project).
-          setParameter("expenseType", limitWrapper.getExpenseType()));
+          setParameter("budgetCategory", limitWrapper.getBudgetCategory()));
 
       limitWrapper.setLimit(total, limit);
       if (limitWrapper.getEntity() == null && limitWrapper.getSpentGrantCurrency() == null) {

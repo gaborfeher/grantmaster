@@ -12,8 +12,8 @@
   <children>
     <TabPane AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="40">
       <tabs>
-        <Tab text="%ProjectBudgetLimitsTabName">
-          <fx:include source="ProjectBudgetLimitsTab.fxml" fx:id="projectBudgetLimitsTab" />
+        <Tab text="%BudgetCategoriesTabName">
+          <fx:include source="ProjectBudgetCategoriesTab.fxml" fx:id="projectBudgetCategoriesTab" />
         </Tab>
         <Tab text="%SourcesTabName">
           <fx:include source="ProjectSourceTab.fxml" fx:id="projectSourceTab" />

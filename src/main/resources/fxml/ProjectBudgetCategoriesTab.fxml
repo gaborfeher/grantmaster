@@ -8,7 +8,7 @@
 <?import javafx.scene.control.cell.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectBudgetLimitsTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectBudgetCategoriesTabController">
   <children>
     <HBox>
       <children>
@@ -33,12 +33,12 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseType" prefWidth="400" sortable="false">
+        <TableColumn text="%BudgetCategory" prefWidth="400" sortable="false">
           <cellFactory>
-            <ExpenseTypeTableCellFactory property="expenseType" direction="PAYMENT"/>  
+            <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>  
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="expenseType" /> 
+            <PropertyValueFactory property="budgetCategory" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">

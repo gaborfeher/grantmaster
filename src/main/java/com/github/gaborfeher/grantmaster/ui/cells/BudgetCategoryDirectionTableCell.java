@@ -6,7 +6,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
@@ -16,14 +16,14 @@ import javafx.util.converter.DefaultStringConverter;
  *
  * @author gabor
  */
-class ExpenseTypeDirectionTableCell<S> extends ChoiceBoxTableCell<S, ExpenseType.Direction> {
+class BudgetCategoryDirectionTableCell<S> extends ChoiceBoxTableCell<S, BudgetCategory.Direction> {
   String property;
   
-  public ExpenseTypeDirectionTableCell(String property) {
-    super(new ExpenseTypeDirectionStringConverter());
+  public BudgetCategoryDirectionTableCell(String property) {
+    super(new BudgetCategoryDirectionStringConverter());
     this.property = property;
-    getItems().add(ExpenseType.Direction.PAYMENT);
-    getItems().add(ExpenseType.Direction.INCOME);
+    getItems().add(BudgetCategory.Direction.PAYMENT);
+    getItems().add(BudgetCategory.Direction.INCOME);
   }
     
   private EntityWrapper getEntityWrapper() {
@@ -31,7 +31,7 @@ class ExpenseTypeDirectionTableCell<S> extends ChoiceBoxTableCell<S, ExpenseType
   }
 
   @Override  
-  public void commitEdit(ExpenseType.Direction val) {
+  public void commitEdit(BudgetCategory.Direction val) {
     if (getEntityWrapper().setPropeprty(property, val)) {
       updateItem(val, false);
     }

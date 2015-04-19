@@ -19,7 +19,7 @@ public class RefreshControlSingleton {
     }
   }
 
-  public static RefreshControlSingleton getInstance() {
+  public static synchronized RefreshControlSingleton getInstance() {
     if (instance == null) {
       instance = new RefreshControlSingleton();
     }

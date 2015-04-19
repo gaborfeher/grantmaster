@@ -32,7 +32,7 @@ public class ProjectExpense implements Serializable {
   
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
-  private ExpenseType expenseType;
+  private BudgetCategory budgetCategory;
   
   @Column(nullable = false)
   private Double originalAmount;
@@ -100,25 +100,16 @@ public class ProjectExpense implements Serializable {
     return partnerName;
   }
 
-  /**
-   * @param partnerName the partnerName to set
-   */
   public void setPartnerName(String partnerName) {
     this.partnerName = partnerName;
   }
 
-  /**
-   * @return the expenseType
-   */
-  public ExpenseType getExpenseType() {
-    return expenseType;
+  public BudgetCategory getBudgetCategory() {
+    return budgetCategory;
   }
 
-  /**
-   * @param expenseType the expenseType to set
-   */
-  public void setExpenseType(ExpenseType expenseType) {
-    this.expenseType = expenseType;
+  public void setBudgetCategory(BudgetCategory budgetCategory) {
+    this.budgetCategory = budgetCategory;
   }
 
   public Project getProject() {

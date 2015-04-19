@@ -32,7 +32,7 @@ public class Project implements Serializable {
   
   @ManyToOne
   @JoinColumn(nullable = false)
-  private ExpenseType incomeType;
+  private BudgetCategory incomeType;
 
   public Project() {
   }
@@ -84,14 +84,14 @@ public class Project implements Serializable {
   /**
    * @return the incomeType
    */
-  public ExpenseType getIncomeType() {
+  public BudgetCategory getIncomeType() {
     return incomeType;
   }
 
   /**
    * @param incomeType the incomeType to set
    */
-  public void setIncomeType(ExpenseType incomeType) {
+  public void setIncomeType(BudgetCategory incomeType) {
     this.incomeType = incomeType;
   }
   

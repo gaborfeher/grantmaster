@@ -17,7 +17,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(
     uniqueConstraints=
-        @UniqueConstraint(columnNames={"expenseType_id", "project_id"}))
+        @UniqueConstraint(columnNames={"budgetCategory_id", "project_id"}))
 public class ProjectBudgetLimit implements Serializable {
   @Id
   @GeneratedValue
@@ -29,7 +29,7 @@ public class ProjectBudgetLimit implements Serializable {
   
   @ManyToOne
   @JoinColumn(nullable = false)
-  private ExpenseType expenseType;
+  private BudgetCategory budgetCategory;
   
   @ManyToOne
   @JoinColumn(nullable = false)
@@ -48,12 +48,12 @@ public class ProjectBudgetLimit implements Serializable {
   }
 
 
-  public ExpenseType getExpenseType() {
-    return expenseType;
+  public BudgetCategory getBudgetCategory() {
+    return budgetCategory;
   }
 
-  public void setExpenseType(ExpenseType expenseType) {
-    this.expenseType = expenseType;
+  public void setBudgetCategory(BudgetCategory budgetCategory) {
+    this.budgetCategory = budgetCategory;
   }
 
   public Project getProject() {

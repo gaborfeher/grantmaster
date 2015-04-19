@@ -47,12 +47,12 @@
         <PropertyValueFactory property="partnerName" /> 
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%ExpenseType" sortable="false" prefWidth="150">
+    <TableColumn text="%BudgetCategory" sortable="false" prefWidth="150">
       <cellFactory>
-        <ExpenseTypeTableCellFactory property="expenseType" direction="PAYMENT"/>
+        <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="expenseType" /> 
+        <PropertyValueFactory property="budgetCategory" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">

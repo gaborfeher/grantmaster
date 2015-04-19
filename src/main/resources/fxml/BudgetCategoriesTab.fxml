@@ -8,9 +8,9 @@
 <?import javafx.scene.control.cell.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ExpenseTypesTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.BudgetCategoriesTabController">
   <children>
-    <Button text="%AddExpenseTypeButtonLabel" onAction="#handleExpenseTypeAddButtonAction" />
+    <Button text="%AddBudgetCategoryButtonLabel" onAction="#handleAddButtonAction" />
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <rowFactory>
         <SummaryHighlighterRowFactory />
@@ -24,15 +24,15 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeDirectionColumnLabel" prefWidth="100" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryDirection" prefWidth="100" editable="true" sortable="false">
           <cellFactory>
-            <ExpenseTypeDirectionTableCellFactory property="direction" /> 
+            <BudgetCategoryDirectionTableCellFactory property="direction" /> 
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="direction" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeGroupNameColumnLabel" prefWidth="250" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryGroupName" prefWidth="250" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="groupName" /> 
           </cellFactory>
@@ -40,7 +40,7 @@
             <PropertyValueFactory property="groupName" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ExpenseTypeNameColumnLabel" prefWidth="400" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryName" prefWidth="400" editable="true" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>

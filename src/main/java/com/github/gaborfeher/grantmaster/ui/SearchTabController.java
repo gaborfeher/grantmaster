@@ -3,10 +3,10 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.net.URL;
@@ -34,8 +34,8 @@ public class SearchTabController
   @FXML ChoiceBox<Project> project;
   @FXML DatePicker startDate;
   @FXML DatePicker endDate;
-  @FXML ChoiceBox<ExpenseType> expenseType;
-  @FXML TextField expenseTypeGroup;
+  @FXML ChoiceBox<BudgetCategory> budgetCategory;
+  @FXML TextField budgetCategoryGroup;
   @FXML TextField accountNo;
   @FXML TextField partnerName;
   @FXML TextField comment1;
@@ -51,21 +51,20 @@ public class SearchTabController
         project.getValue(),
         Utils.toSqlDate(startDate.getValue()),
         Utils.toSqlDate(endDate.getValue()),
-        expenseType.getValue(),
-        expenseTypeGroup.getText(),
+        budgetCategory.getValue(),
+        budgetCategoryGroup.getText(),
         accountNo.getText(),
         partnerName.getText(),
         comment1.getText(),
         comment2.getText());
     table.getItems().setAll(projectExpenses);
-
   }
 
   @Override
   public void refresh(RefreshMessage message) {
-    expenseType.getItems().clear();
-    expenseType.getItems().add(null);
-    expenseType.getItems().addAll(ExpenseTypeWrapper.getExpenseTypes(ExpenseType.Direction.PAYMENT));
+    budgetCategory.getItems().clear();
+    budgetCategory.getItems().add(null);
+    budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(BudgetCategory.Direction.PAYMENT));
     project.getItems().clear();
     project.getItems().add(null);
     project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping());
@@ -87,7 +86,6 @@ public class SearchTabController
       }
     });
        
-    
     tableController.grantCurrencyAmountColumn.setCellValueFactory(
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override

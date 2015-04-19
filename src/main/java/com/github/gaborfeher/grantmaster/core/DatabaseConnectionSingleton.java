@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.core;
 
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -14,12 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import org.eclipse.persistence.exceptions.DatabaseException;
 
-/**
- *
- * @author gabor
- */
 public class DatabaseConnectionSingleton {
   private static DatabaseConnectionSingleton instance;
   
@@ -30,7 +19,7 @@ public class DatabaseConnectionSingleton {
     
   }
   
-  public static DatabaseConnectionSingleton getInstance() {
+  public static synchronized DatabaseConnectionSingleton getInstance() {
     if (instance == null) {
       instance = new DatabaseConnectionSingleton();
     }

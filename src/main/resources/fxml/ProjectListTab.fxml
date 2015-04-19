@@ -50,7 +50,7 @@
         </TableColumn>
         <TableColumn text="%ProjectIncomeType" prefWidth="300">
           <cellFactory>
-            <ExpenseTypeTableCellFactory property="incomeType" direction="INCOME" />
+            <BudgetCategoryTableCellFactory property="incomeType" direction="INCOME" />
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="incomeType" />

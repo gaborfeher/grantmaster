@@ -20,8 +20,8 @@
         <Tab text="%ProjectsTabName" closable="false">
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>
-        <Tab text="%ExpenseTypesTabName" closable="false">
-          <fx:include source="ExpenseTypesTab.fxml" />
+        <Tab text="%BudgetCategoriesTabName" closable="false">
+          <fx:include source="BudgetCategoriesTab.fxml" />
         </Tab>
         <Tab text="%CurrenciesTabName" closable="false">
           <fx:include source="CurrenciesTab.fxml" />

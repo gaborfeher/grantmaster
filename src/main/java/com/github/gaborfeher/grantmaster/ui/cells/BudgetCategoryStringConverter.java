@@ -5,7 +5,7 @@
  */
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.logic.entities.ExpenseType;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import javafx.util.StringConverter;
 import javax.persistence.EntityManager;
 
@@ -13,8 +13,8 @@ import javax.persistence.EntityManager;
  *
  * @author gabor
  */
-class ExpenseTypeStringConverter extends StringConverter<Object> {
-  public ExpenseTypeStringConverter() {
+class BudgetCategoryStringConverter extends StringConverter<Object> {
+  public BudgetCategoryStringConverter() {
   }
 
   @Override
@@ -26,11 +26,8 @@ class ExpenseTypeStringConverter extends StringConverter<Object> {
   }
 
   @Override
-  public ExpenseType fromString(String string) {
+  public BudgetCategory fromString(String string) {
     throw new RuntimeException("not used");
-    //TypedQuery<ExpenseType> query = em.createQuery("SELECT t FROM ExpenseType t WHERE t.name = :name", ExpenseType.class);
-    //query.setParameter("name", string);
-    //return query.getSingleResult();
   }
   
 }

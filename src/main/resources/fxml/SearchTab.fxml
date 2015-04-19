@@ -12,11 +12,11 @@
       <Label text="%ExpenseSearchProject" GridPane.rowIndex="0" GridPane.columnIndex="0" />
       <ChoiceBox fx:id="project" GridPane.rowIndex="0" GridPane.columnIndex="1" />  
       
-      <Label text="%ExpenseType" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-      <ChoiceBox fx:id="expenseType" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+      <Label text="%BudgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+      <ChoiceBox fx:id="budgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="1" />
       
-      <Label text="%ExpenseTypeGroup" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-      <TextField fx:id="expenseTypeGroup" GridPane.rowIndex="2" GridPane.columnIndex="1" />   
+      <Label text="%BudgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+      <TextField fx:id="budgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="1" />   
       
       <Label text="%ExpenseSearchInterval" GridPane.rowIndex="3" GridPane.columnIndex="0" />
       <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" >

@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"name"}))
-public class ExpenseType implements Serializable {
+public class BudgetCategory implements Serializable {
   @Id
   @GeneratedValue
   private Integer id;
@@ -30,10 +30,10 @@ public class ExpenseType implements Serializable {
   @Column(nullable = true)
   private String groupName;
 
-  public ExpenseType() {
+  public BudgetCategory() {
   }
   
-  public ExpenseType(Direction direction, String groupName, String name) {
+  public BudgetCategory(Direction direction, String groupName, String name) {
     this.direction = direction;
     this.groupName = groupName;
     this.name = name;

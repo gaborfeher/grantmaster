@@ -5,7 +5,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
-import com.github.gaborfeher.grantmaster.logic.wrappers.ExpenseTypeWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -134,7 +134,7 @@ public class MainPageController implements Initializable {
 
     connection.em().getTransaction().begin();
     CurrencyManager.createDefaultCurrencies();
-    ExpenseTypeWrapper.createDefaultExpenseTypes();
+    BudgetCategoryWrapper.createDefaultBudgetCategories();
     connection.em().getTransaction().commit();
     
     RefreshControlSingleton.getInstance().broadcastRefresh(null);
