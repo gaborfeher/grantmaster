@@ -3,13 +3,13 @@ package com.github.gaborfeher.grantmaster.core;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 
 public class RefreshMessage {
-  Project sourceProject;
+ // Project sourceProject;
   
   public RefreshMessage(Project sourceProject) {
-    this.sourceProject = sourceProject;
+  //  this.sourceProject = sourceProject;
   }
 
-  public Project getSourceProject() {
-    return sourceProject;
-  }
+ // public Project getSourceProject() {
+ //   return sourceProject;
+//  }
 }

@@ -6,11 +6,6 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
-/**
- * FXML Controller class
- *
- * @author gabor
- */
 public class ProjectTabController implements Initializable {
   @FXML ProjectExpenseTabController projectExpenseTabController;
   @FXML ProjectSourceTabController projectSourceTabController;
@@ -26,5 +21,12 @@ public class ProjectTabController implements Initializable {
     this.projectSourceTabController.init(project);
     this.projectBudgetCategoriesTabController.init(project);
     this.projectNotesTabController.init(project);
+  }
+
+  void destroy() {
+    this.projectExpenseTabController.unsubscribe();
+    this.projectSourceTabController.unsubscribe();
+    this.projectBudgetCategoriesTabController.unsubscribe();
+    this.projectNotesTabController.unsubscribe();
   }
 }

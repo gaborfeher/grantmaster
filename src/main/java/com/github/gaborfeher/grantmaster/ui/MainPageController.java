@@ -65,7 +65,7 @@ public class MainPageController implements Initializable {
     newTab.setOnClosed(new EventHandler<Event>() {
       @Override
       public void handle(Event t) {
-        RefreshControlSingleton.getInstance().broadcastDestroy(new RefreshMessage(project));
+        controller.destroy();
       }
     });
   }
@@ -89,7 +89,7 @@ public class MainPageController implements Initializable {
     pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
     connection.connectTo(pathString);
     
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
     pathLabel.setText(pathString);
   }
 
@@ -137,7 +137,7 @@ public class MainPageController implements Initializable {
     BudgetCategoryWrapper.createDefaultBudgetCategories();
     connection.em().getTransaction().commit();
     
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
     pathLabel.setText(pathString);
   }
 

@@ -28,7 +28,7 @@ public class BudgetCategoriesTabController extends RefreshControlSingleton.Messa
   }
   
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     List<BudgetCategoryWrapper> paymentCategories = new ArrayList<>();
     List<BudgetCategoryWrapper> incomeCategories = new ArrayList<>();
     Set<String> columnNames = new TreeSet<>();
@@ -64,7 +64,7 @@ public class BudgetCategoriesTabController extends RefreshControlSingleton.Messa
    */
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }  
 
   @FXML

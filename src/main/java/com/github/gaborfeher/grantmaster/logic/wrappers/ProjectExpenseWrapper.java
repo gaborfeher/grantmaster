@@ -224,8 +224,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       return;
     }
     
-    RefreshControlSingleton.getInstance().broadcastRefresh(
-        new RefreshMessage(expense.getProject()));
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   @Override
@@ -245,8 +244,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       return;
     }
     
-    RefreshControlSingleton.getInstance().broadcastRefresh(
-        new RefreshMessage(expense.getProject()));
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   public static List<ProjectExpenseWrapper> getProjectExpenseList(Project project) {

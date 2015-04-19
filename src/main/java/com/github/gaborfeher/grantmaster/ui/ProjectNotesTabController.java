@@ -1,5 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
@@ -12,7 +14,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 
-public class ProjectNotesTabController implements Initializable {
+public class ProjectNotesTabController
+    extends RefreshControlSingleton.MessageObserver
+    implements Initializable {
+
   @FXML TableView<ProjectNoteWrapper> table;
   
   Project project;
@@ -34,8 +39,9 @@ public class ProjectNotesTabController implements Initializable {
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
     table.getItems().add(wrapper);
   }
-  
-  void refresh() {
+
+  @Override
+  public void refresh() {
     table.getItems().setAll(ProjectNoteWrapper.getNotes(project));
   }
 

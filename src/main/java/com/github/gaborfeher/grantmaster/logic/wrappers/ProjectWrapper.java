@@ -74,7 +74,7 @@ public class ProjectWrapper extends EntityWrapper {
       DatabaseConnectionSingleton.getInstance().hardReset();
       return;
     }
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
 
   public Project getProject() {

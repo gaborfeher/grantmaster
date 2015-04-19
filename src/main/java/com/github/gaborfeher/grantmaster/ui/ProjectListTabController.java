@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
@@ -19,11 +14,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 
-/**
- * FXML Controller class
- *
- * @author gabor
- */
 public class ProjectListTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
 
   @FXML TableView<ProjectWrapper> table;
@@ -34,11 +24,11 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }  
   
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     projects = table.getItems();
     projects.setAll(ProjectWrapper.getProjects());
   }
@@ -61,7 +51,7 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
     }
     parent.addProjectTab(selectedProjectWrapper.getProject());
         
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   void init(MainPageController parent) {

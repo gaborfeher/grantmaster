@@ -72,7 +72,7 @@ public class DatabaseConnectionSingleton {
   public void hardReset() {
     entityManager.close();
     entityManager = entityManagerFactory.createEntityManager();
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   public EntityManager em() {

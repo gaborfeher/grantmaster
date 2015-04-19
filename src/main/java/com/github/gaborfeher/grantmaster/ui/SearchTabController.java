@@ -5,7 +5,6 @@ import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
@@ -43,7 +42,7 @@ public class SearchTabController
   
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }
   
   public void search() {
@@ -61,7 +60,7 @@ public class SearchTabController
   }
 
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     budgetCategory.getItems().clear();
     budgetCategory.getItems().add(null);
     budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(BudgetCategory.Direction.PAYMENT));

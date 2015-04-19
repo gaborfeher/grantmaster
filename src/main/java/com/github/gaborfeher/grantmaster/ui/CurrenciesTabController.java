@@ -19,14 +19,14 @@ public class CurrenciesTabController extends RefreshControlSingleton.MessageObse
   @FXML TableView<Currency> table;
 
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     List<Currency> list = DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT c FROM Currency c").getResultList();
     table.getItems().setAll(list);
   }
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }
   
   public void handleAddButtonAction(ActionEvent e) {
@@ -41,6 +41,6 @@ public class CurrenciesTabController extends RefreshControlSingleton.MessageObse
     Currency currency = new Currency();
     currency.setCode(code);
     connection.persist(currency);
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
 }

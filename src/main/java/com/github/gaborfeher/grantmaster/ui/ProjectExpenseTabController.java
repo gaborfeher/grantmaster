@@ -31,25 +31,21 @@ public class ProjectExpenseTabController extends RefreshControlSingleton.Message
     this.project = project;
     tableController.init(project);
     table.setItems(list);
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }
   
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     List<ProjectExpenseWrapper> projectExpenses = ProjectExpenseWrapper.getProjectExpenseList(project);
     list.setAll(projectExpenses);
   }
-  
-  @Override
-  public boolean forMe(RefreshMessage message) {
-    return message.getSourceProject() == project;
-  }
-  
+
   public void createProjectExpenseButtonAction(ActionEvent event) {
     ProjectExpense expense = new ProjectExpense();
     expense.setProject(project);
     ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense, 0.0, 0.0);
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
+    wrapper.setOriginalCurrency(project.getAccountCurrency());
     list.add(wrapper);
   }
 

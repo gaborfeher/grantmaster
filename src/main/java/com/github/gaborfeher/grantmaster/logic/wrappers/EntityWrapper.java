@@ -53,12 +53,12 @@ public abstract class EntityWrapper {
 
   public void persist() {
     DatabaseConnectionSingleton.getInstance().persist(getEntity());
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   public void delete() {
     DatabaseConnectionSingleton.getInstance().remove(getEntity());
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   public void discardEdits() {
@@ -68,7 +68,7 @@ public abstract class EntityWrapper {
     } else if (state == State.EDITING_NEW) {
       // This thing will just go away at next refresh.
     }
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);  // TODO: narrower refresh
+    RefreshControlSingleton.getInstance().broadcastRefresh();  // TODO: narrower refresh
   }
   
   public boolean isSummary() {

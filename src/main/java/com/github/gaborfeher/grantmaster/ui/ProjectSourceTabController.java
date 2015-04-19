@@ -37,22 +37,18 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
     wrapper.setState(EntityWrapper.State.EDITING_NEW);
     table.getItems().add(wrapper);
   }  
-   
-  /**
-   * Initializes the controller class.
-   */
+
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    // TODO
   }  
 
   void init(Project project) {
     this.project = project;
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }
 
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project, null, null);
     table.getItems().setAll(projectTransfers);
     
@@ -66,10 +62,4 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
     remainingAccountingCurrencyAmountColumn.setText(accountingCurrency);
     remainingGrantCurrencyAmountColumn.setText(grantCurrency);
   }
-
-  @Override
-  public boolean forMe(RefreshMessage message) {
-    return message.getSourceProject() == project;
-  }
-  
 }

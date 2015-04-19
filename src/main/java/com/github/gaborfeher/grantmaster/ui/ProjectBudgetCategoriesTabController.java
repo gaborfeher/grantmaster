@@ -33,8 +33,10 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
   @FXML DatePicker filterStartDate;
   @FXML DatePicker filterEndDate;
   
+  /**
+   * Project currently being opened.
+   */
   Project project;
-  ResourceBundle resourceBundle;
   
   public void createButtonAction(ActionEvent event) {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
@@ -47,27 +49,26 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
   }
   
   public void filterUpdateAction(ActionEvent event) {
-    refresh(null);
+    refresh();
   }
   
   public void filterResetButtonAction(ActionEvent event) {
     filterStartDate.setValue(null);
     filterEndDate.setValue(null);
-    refresh(null);
+    refresh();
   }
   
   void init(Project project) {
     this.project = project;
+    subscribe();
   }
   
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    RefreshControlSingleton.getInstance().subscribe(this);
-    this.resourceBundle = rb;
   }  
 
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     System.out.println("refresh");
     Date startDate = Utils.toSqlDate(filterStartDate.getValue());
     Date endDate = Utils.toSqlDate(filterEndDate.getValue());
@@ -92,10 +93,5 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
     remainingGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
     budgetAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
     budgetGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
-  }
-
-  @Override
-  public boolean forMe(RefreshMessage message) {
-    return message.getSourceProject() == project;
   }
 }

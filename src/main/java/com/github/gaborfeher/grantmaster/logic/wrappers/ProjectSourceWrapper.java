@@ -141,7 +141,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
     em.persist(source);
     ProjectExpenseWrapper.updateExpenseAllocations(source.getProject(), source.getAvailabilityDate());
     em.getTransaction().commit();
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
+    RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
 }

@@ -22,20 +22,15 @@ public class ExpenseTableController extends RefreshControlSingleton.MessageObser
 
   public void init(Project project) {
     this.project = project;
-    RefreshControlSingleton.getInstance().subscribe(this);
+    subscribe();
   }
 
   @Override
-  public void refresh(RefreshMessage message) {
+  public void refresh() {
     if (project != null) {
       accountingCurrencyAmountColumn.setText(project.getAccountCurrency().toString());
       grantCurrencyAmountColumn.setText(project.getGrantCurrency().toString());    
     }
   }
-  
-  @Override
-  public boolean forMe(RefreshMessage message) {
-    return message.getSourceProject() == project;
-  }
-  
+ 
 }

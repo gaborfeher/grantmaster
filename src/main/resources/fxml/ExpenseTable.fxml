@@ -99,7 +99,7 @@
         <PropertyValueFactory property="exchangeRate" /> 
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%ExpenseComment1" editable="true" sortable="false">
+    <TableColumn text="%ExpenseComment1" editable="true" sortable="false" prefWidth="120">
       <cellFactory>
         <StringTableCellFactory property="comment1" /> 
       </cellFactory>
@@ -107,7 +107,7 @@
         <PropertyValueFactory property="comment1" /> 
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%ExpenseComment2" editable="true" sortable="false">
+    <TableColumn text="%ExpenseComment2" editable="true" sortable="false" prefWidth="120">
       <cellFactory>
         <StringTableCellFactory property="comment2" /> 
       </cellFactory>
