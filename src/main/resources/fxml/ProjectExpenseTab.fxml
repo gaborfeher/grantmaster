@@ -5,100 +5,10 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.cell.*?>
-<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectExpenseTabController" stylesheets="styles/Styles.css">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectExpenseTabController">
   <children>
-    <Button text="%ProjectExpenseCreateButtonLabbel" onAction="#createProjectExpenseButtonAction"
-            GridPane.rowIndex="9" GridPane.columnIndex="0" GridPane.columnSpan="3" />
-    <TableView editable="true" fx:id="projectExpensesTable" VBox.vgrow="ALWAYS" >
-      <columns>
-        <TableColumn prefWidth="150" sortable="false">
-          <cellFactory>
-            <EditButtonTableCellFactory />
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="state" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false">
-          <cellFactory>
-            <DateTableCellFactory property="paymentDate" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="paymentDate" />
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesAccountNo" prefWidth="120" sortable="false">
-          <cellFactory>
-            <StringTableCellFactory property="accountNo" />
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="accountNo" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesPartnerName" sortable="false">
-          <cellFactory>
-            <StringTableCellFactory property="partnerName" />
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="partnerName" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ExpenseType" sortable="false" prefWidth="150">
-          <cellFactory>
-            <ExpenseTypeTableCellFactory property="expenseType" direction="PAYMENT"/>
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="expenseType" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">
-          <cellFactory>
-            <DoubleTableCellFactory property="originalAmount" />
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="originalAmount" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesOriginalCurrency" sortable="false">
-          <cellFactory>
-            <CurrencyTableCellFactory property="originalCurrency" />
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="originalCurrency" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectExpensesAmount">
-          <columns>
-            <TableColumn fx:id="projectExpensesAccountingCurrencyAmountColumn" styleClass="numColumn" sortable="false">
-              <cellFactory>
-                <DoubleTableCellFactory property="accountingCurrencyAmount" />
-              </cellFactory>
-              <cellValueFactory>
-                <PropertyValueFactory property="accountingCurrencyAmount" /> 
-              </cellValueFactory>
-            </TableColumn>
-            <TableColumn fx:id="projectExpensesGrantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false">
-              <cellFactory>
-                <DoubleTableCellFactory property="grantCurrencyAmount"  />
-              </cellFactory>
-              <cellValueFactory>
-                <PropertyValueFactory property="grantCurrencyAmount" /> 
-              </cellValueFactory>
-            </TableColumn>
-          </columns>
-        </TableColumn> 
-        <TableColumn text="%ProjectExpensesExchangeRate" editable="false" styleClass="numColumn" sortable="false">
-          <cellFactory>
-            <DoubleTableCellFactory property="exchangeRate" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <PropertyValueFactory property="exchangeRate" /> 
-          </cellValueFactory>
-        </TableColumn>
-      </columns>
-    </TableView>
-  </children> 
+    <Button text="%ProjectExpenseCreateButtonLabbel" onAction="#createProjectExpenseButtonAction" />
+    <fx:include source="ExpenseTable.fxml" fx:id="table" />
+  </children>
 </VBox>

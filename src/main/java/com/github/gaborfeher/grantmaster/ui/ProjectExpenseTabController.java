@@ -11,18 +11,15 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class ProjectExpenseTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
-  @FXML TableView<ProjectExpenseWrapper> projectExpensesTable;
+  @FXML TableView<ProjectExpenseWrapper> table;
+  @FXML ExpenseTableController tableController;
   
-  @FXML TableColumn<ProjectExpense, Float> projectExpensesAccountingCurrencyAmountColumn;
-  @FXML TableColumn<ProjectExpense, Float> projectExpensesGrantCurrencyAmountColumn;
-    
   Project project;
   
   ObservableList<ProjectExpenseWrapper> list = FXCollections.observableArrayList();
@@ -32,7 +29,8 @@ public class ProjectExpenseTabController extends RefreshControlSingleton.Message
   
   void init(Project project) {
     this.project = project;
-    projectExpensesTable.setItems(list);
+    tableController.init(project);
+    table.setItems(list);
     RefreshControlSingleton.getInstance().subscribe(this);
   }
   
@@ -40,9 +38,6 @@ public class ProjectExpenseTabController extends RefreshControlSingleton.Message
   public void refresh(RefreshMessage message) {
     List<ProjectExpenseWrapper> projectExpenses = ProjectExpenseWrapper.getProjectExpenseList(project);
     list.setAll(projectExpenses);
-    
-    projectExpensesAccountingCurrencyAmountColumn.setText(project.getAccountCurrency().toString());
-    projectExpensesGrantCurrencyAmountColumn.setText(project.getGrantCurrency().toString());    
   }
   
   @Override

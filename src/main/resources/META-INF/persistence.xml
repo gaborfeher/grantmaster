@@ -9,6 +9,7 @@
     <class>com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.Project</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.ExpenseType</class>
+    <class>com.github.gaborfeher.grantmaster.logic.entities.ProjectNote</class>
     <properties>
       <property name="javax.persistence.jdbc.user" value="sa"/>
       <property name="javax.persistence.jdbc.password" value=""/>

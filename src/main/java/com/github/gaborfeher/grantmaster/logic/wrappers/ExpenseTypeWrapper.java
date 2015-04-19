@@ -68,6 +68,19 @@ public class ExpenseTypeWrapper extends EntityWrapper {
         ExpenseTypeWrapper.class).
             getResultList();
   }
+  
+  public static List<ExpenseType> getExpenseTypes(ExpenseType.Direction direction) {
+    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    return em.createQuery(
+        "SELECT e " +
+            "FROM ExpenseType e " +
+            "WHERE e.direction = :direction " +
+            "ORDER BY e.groupName NULLS LAST, e.name",
+        ExpenseType.class).
+            setParameter("direction", direction).
+            getResultList();
+  }
+
 
   public void addSummaryValue(String header, Double value) {
     summaryValues.put(header, value);

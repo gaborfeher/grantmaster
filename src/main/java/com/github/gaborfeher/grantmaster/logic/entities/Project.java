@@ -94,4 +94,9 @@ public class Project implements Serializable {
   public void setIncomeType(ExpenseType incomeType) {
     this.incomeType = incomeType;
   }
+  
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

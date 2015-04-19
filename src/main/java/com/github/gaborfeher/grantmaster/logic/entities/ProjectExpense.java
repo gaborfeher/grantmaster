@@ -44,6 +44,10 @@ public class ProjectExpense implements Serializable {
   @OneToMany(mappedBy="expense", cascade=CascadeType.ALL, orphanRemoval = true)
   private List<ExpenseSourceAllocation> sourceAllocations;
 
+  private String comment1;
+  
+  private String comment2;
+  
   public ProjectExpense() {
   }
 
@@ -168,6 +172,34 @@ public class ProjectExpense implements Serializable {
    */
   public void setSourceAllocations(List<ExpenseSourceAllocation> sources) {
     this.sourceAllocations = sources;
+  }
+
+  /**
+   * @return the comment1
+   */
+  public String getComment1() {
+    return comment1;
+  }
+
+  /**
+   * @param comment1 the comment1 to set
+   */
+  public void setComment1(String comment1) {
+    this.comment1 = comment1;
+  }
+
+  /**
+   * @return the comment2
+   */
+  public String getComment2() {
+    return comment2;
+  }
+
+  /**
+   * @param comment2 the comment2 to set
+   */
+  public void setComment2(String comment2) {
+    this.comment2 = comment2;
   }
 
 

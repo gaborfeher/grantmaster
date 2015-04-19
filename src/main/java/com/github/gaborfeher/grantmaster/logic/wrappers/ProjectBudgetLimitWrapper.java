@@ -142,8 +142,8 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
         
     List<ProjectBudgetLimitWrapper> list = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetLimitWrapper(et, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
-        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
-            "WHERE e.project = :project AND et.direction = :direction " +
+        "FROM ExpenseType et LEFT OUTER JOIN ProjectExpense e ON e.expenseType = et AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
+            "WHERE et.direction = :direction " +
             " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
             " AND (:filterEndDate IS NULL OR e.paymentDate <= :filterEndDate) " +
             "GROUP BY et " +
@@ -152,14 +152,14 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
             setParameter("project", project).
             setParameter("direction", ExpenseType.Direction.PAYMENT).
             setParameter("filterStartDate", filterStartDate).
-            //setParameter("noFilterStartDate", filterStartDate == null).
             setParameter("filterEndDate", filterEndDate).
-            //setParameter("noFilterEndDate", filterEndDate == null).
             getResultList();
     
     Iterator<ProjectBudgetLimitWrapper> iterator = list.iterator();
     while (iterator.hasNext()) {
       ProjectBudgetLimitWrapper limitWrapper = iterator.next();
+      System.out.println("checking: " + limitWrapper.getExpenseType().getName());
+      
       limitWrapper.setProject(project);
       ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
           "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.expenseType = :expenseType",
@@ -169,6 +169,7 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
 
       limitWrapper.setLimit(total, limit);
       if (limitWrapper.getEntity() == null && limitWrapper.getSpentGrantCurrency() == null) {
+        System.out.println("DISCARDED");
         iterator.remove();
       }
     }
@@ -184,10 +185,7 @@ public class ProjectBudgetLimitWrapper extends EntityWrapper {
   }
 
   public String getGroupName() {
-    if (limit == null) {
-      return null;
-    }
-    return limit.getExpenseType().getGroupName();
+    return getExpenseType().getGroupName();
   }
   
 }

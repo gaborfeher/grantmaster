@@ -84,4 +84,10 @@ public class ProjectWrapper extends EntityWrapper {
   public static List<ProjectWrapper> getProjects() {
     return DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p", ProjectWrapper.class).getResultList();
   }
+  
+  public static List<Project> getProjectsWithoutWrapping() {
+    return DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT p FROM Project p", Project.class).getResultList();
+  }
+  
+ 
 }

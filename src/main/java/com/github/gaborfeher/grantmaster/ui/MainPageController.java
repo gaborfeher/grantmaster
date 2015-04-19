@@ -47,7 +47,7 @@ public class MainPageController implements Initializable {
     
     final ProjectTabController controller;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
-    loader.setResources(ResourceBundle.getBundle("bundles.ProjectTab", new Locale("hu")));
+    loader.setResources(ResourceBundle.getBundle("bundles.MainPage", new Locale("hu")));
     Parent root1 = loader.load();
     controller = loader.getController();
     controller.init(project);
