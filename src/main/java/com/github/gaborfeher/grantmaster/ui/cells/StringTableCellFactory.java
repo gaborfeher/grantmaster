@@ -12,7 +12,7 @@ public class StringTableCellFactory<S extends EntityWrapper>
   
   @Override  
   public TableCell<S, String> call(TableColumn<S, String> param) {  
-    return new TextFieldTableCell<>(property, new DefaultStringConverter());  
+    return new TextFieldTableCell<>(property, new DefaultMultiStringConverter());  
   }        
 
 }

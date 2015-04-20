@@ -13,13 +13,13 @@ import javafx.util.StringConverter;
 public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
   final String property;
   final TextField editTextField;
-  final StringConverter<T> stringConverter;
+  final MultiStringConverter<T> stringConverter;
   
   // true if the last editing session was cancelled by user (currently esc key)
   // This disables later spurious commit messages.
   boolean userCancelled;
   
-  public TextFieldTableCell(String property, StringConverter<T> stringConverter0) {
+  public TextFieldTableCell(String property, MultiStringConverter<T> stringConverter0) {
     //super(new DefaultStringConverter());
     this.property = property;
     this.stringConverter = stringConverter0;
@@ -86,7 +86,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
       setGraphic(null);
     } else {
       if (isEditing()) {
-        editTextField.setText(stringConverter.toString(item));
+        editTextField.setText(stringConverter.toEditableString(item));
         setGraphic(editTextField);
         setText(null);
       } else {

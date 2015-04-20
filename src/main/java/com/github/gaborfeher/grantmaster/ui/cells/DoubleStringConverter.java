@@ -1,9 +1,8 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import java.text.DecimalFormat;
-import javafx.util.StringConverter;
 
-class DoubleStringConverter extends StringConverter<Double> {
+class DoubleStringConverter extends MultiStringConverter<Double> {
   final DecimalFormat formatter;
   
   public DoubleStringConverter() {
@@ -23,9 +22,15 @@ class DoubleStringConverter extends StringConverter<Double> {
     if (string == null) {
       return null;
     }
-    string = string.replace(",", "");
-    // TODO: replaceFirst(" [A-Z]+$", "");
     return Double.parseDouble(string);
+  }
+  
+  @Override
+  public String toEditableString(Double t) {
+    if (t == null) {
+      return null;
+    }
+    return String.format("%2.2f", t);
   }
   
 }
