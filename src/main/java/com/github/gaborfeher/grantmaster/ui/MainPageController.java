@@ -119,7 +119,7 @@ public class MainPageController implements Initializable {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Adatbázis létrehozása");
     fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("H2 Database Files (*" + Constants.SUFFIX_PAGE_FILE + ")", "*" + Constants.SUFFIX_PAGE_FILE));
-    path = fileChooser.showOpenDialog(stage);
+    path = fileChooser.showSaveDialog(stage);
     if (path == null) {
       return;
     }
@@ -129,19 +129,10 @@ public class MainPageController implements Initializable {
     }
     path = new File(pathString);
     if (path.exists()) {
-      Alert alert = new Alert(AlertType.CONFIRMATION);
-      alert.setTitle("Fájl felülírás");
-      alert.setHeaderText("Ez a fájl már létezik");
-      alert.setContentText("Ha ezt választod, elveszik a tartalma");
-      Optional<ButtonType> result = alert.showAndWait();
-      if (result.get() == ButtonType.OK){
-        try {
-          Files.delete(path.toPath());
-        } catch (IOException ex) {
-          Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      } else {
-        return;
+      try {
+        Files.delete(path.toPath());
+      } catch (IOException ex) {
+        Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
     
