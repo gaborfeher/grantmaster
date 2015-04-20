@@ -104,8 +104,8 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   }
 
   public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(BudgetCategory.Direction direction) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    return em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper(c) " +
+    return DatabaseConnectionSingleton.getInstance().createQuery(
+            "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper(c) " +
             "FROM BudgetCategory c " +
             "WHERE :direction IS NULL OR c.direction = :direction " +
             "ORDER BY c.direction, c.groupName NULLS LAST, c.name",
@@ -115,8 +115,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   }
   
   public static List<BudgetCategory> getBudgetCategories(BudgetCategory.Direction direction) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    return em.createQuery("SELECT c " +
+    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT c " +
             "FROM BudgetCategory c " +
             "WHERE c.direction = :direction " +
             "ORDER BY c.groupName NULLS LAST, c.name",
@@ -129,8 +128,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       String query,
       Map<Integer, BudgetCategoryWrapper> map,
       Set<String> columnNames) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    List<Object[]> summaryList = em.createQuery(query).getResultList();
+    List<Object[]> summaryList = DatabaseConnectionSingleton.getInstance().createQuery(query, Object[].class).getResultList();
     for (Object[] line : summaryList) {
       BudgetCategoryWrapper budgetCategoryWrapper = map.get(((BudgetCategory)line[0]).getId());
       int year = (Integer)line[2];
@@ -250,9 +248,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     output.add(finalSum);
   }
   
-  public static void createDefaultBudgetCategories() {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    
+  public static void createDefaultBudgetCategories(EntityManager em) {
     String groupName = "Személyi jellegű ráfordítások";
     BudgetCategory.Direction direction = BudgetCategory.Direction.PAYMENT;
     for (String name :

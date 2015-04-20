@@ -3,6 +3,7 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import java.io.File;
@@ -28,6 +29,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javax.persistence.EntityManager;
 import org.h2.engine.Constants;
 
 public class MainPageController implements Initializable {
@@ -141,11 +143,17 @@ public class MainPageController implements Initializable {
     pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
     connection.connectTo(pathString);
 
-    connection.em().getTransaction().begin();
-    CurrencyManager.createDefaultCurrencies();
-    BudgetCategoryWrapper.createDefaultBudgetCategories();
-    connection.em().getTransaction().commit();
-    
+    boolean result = connection.runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        CurrencyManager.createDefaultCurrencies(em);
+        BudgetCategoryWrapper.createDefaultBudgetCategories(em);
+        return true;
+      }
+    });
+    if (!result) {
+      return;
+    }
     RefreshControlSingleton.getInstance().broadcastRefresh();
     pathLabel.setText(pathString);
   }

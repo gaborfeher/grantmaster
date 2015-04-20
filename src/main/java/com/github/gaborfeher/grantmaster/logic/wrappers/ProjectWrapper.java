@@ -4,12 +4,10 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
-import org.eclipse.persistence.exceptions.DatabaseException;
 
 public class ProjectWrapper extends EntityWrapper {
   Project project;
@@ -61,20 +59,24 @@ public class ProjectWrapper extends EntityWrapper {
   
   @Override
   public void delete() {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    try {
-      em.getTransaction().begin();
-      ProjectExpenseWrapper.removeProjectExpenses(project);
-      ProjectSourceWrapper.removeProjectSources(project);
-      ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(project);
-      em.remove(project);
-      em.getTransaction().commit();
-    } catch (Throwable t) {
-      Logger.getLogger(ProjectWrapper.class.getName()).log(Level.SEVERE, null, t);
-      DatabaseConnectionSingleton.getInstance().hardReset();
-      return;
-    }
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        ProjectExpenseWrapper.removeProjectExpenses(em, project);
+        ProjectSourceWrapper.removeProjectSources(em, project);
+        ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(em, project);
+        em.remove(project);
+        return true;
+      }
+      @Override
+      public void onFailure() {
+        DatabaseConnectionSingleton.getInstance().hardReset();
+      }
+      @Override
+      public void onSuccess() {
+        RefreshControlSingleton.getInstance().broadcastRefresh();
+      }
+    });
   }
 
   public Project getProject() {
@@ -82,11 +84,11 @@ public class ProjectWrapper extends EntityWrapper {
   }
   
   public static List<ProjectWrapper> getProjects() {
-    return DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p", ProjectWrapper.class).getResultList();
+    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p", ProjectWrapper.class).getResultList();
   }
   
   public static List<Project> getProjectsWithoutWrapping() {
-    return DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT p FROM Project p", Project.class).getResultList();
+    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT p FROM Project p", Project.class).getResultList();
   }
   
  

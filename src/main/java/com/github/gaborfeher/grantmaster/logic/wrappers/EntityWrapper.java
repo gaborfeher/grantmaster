@@ -65,8 +65,7 @@ public abstract class EntityWrapper {
   
   public void discardEdits() {
     if (state == State.EDITING) {
-      EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-      em.refresh(getEntity());
+      DatabaseConnectionSingleton.getInstance().refresh(getEntity());
       setState(State.SAVED);
     } else if (state == State.EDITING_NEW) {
       // This thing will just go away at next refresh.

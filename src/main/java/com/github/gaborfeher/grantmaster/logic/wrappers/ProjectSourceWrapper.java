@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.sql.Date;
@@ -86,8 +87,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
   
   public static List<ProjectSourceWrapper> getProjectSources(
       Project project, Date filterStartDate, Date filterEndDate) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    TypedQuery<ProjectSourceWrapper> query = em.createQuery(
+    TypedQuery<ProjectSourceWrapper> query = DatabaseConnectionSingleton.getInstance().createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +
             "WHERE s.project = :project " +
@@ -101,8 +101,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
     return query.getResultList();
   }
   
-  static void removeProjectSources(Project project) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+  static void removeProjectSources(EntityManager em, Project project) {
     em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a IN (SELECT a FROM ExpenseSourceAllocation a, ProjectSource s WHERE a.source = s AND s.project = :project)").
         setParameter("project", project).
         executeUpdate();
@@ -115,27 +114,23 @@ public class ProjectSourceWrapper extends EntityWrapper {
   protected Object getEntity() {
     return source;
   }
-  
-  /*
-  // This is pointless in its current form: existing allocations are blocking the delete.
-  @Override
-  public void delete() {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.getTransaction().begin();
-    em.remove(source);
-    ProjectExpenseWrapper.updateExpenseAllocations(source.getProject(), source.getAvailabilityDate());
-    em.getTransaction().commit();
-    RefreshControlSingleton.getInstance().broadcastRefresh(null);
-  }*/
-  
+
   @Override
   public void persist() {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
-    em.getTransaction().begin();
-    em.persist(source);
-    ProjectExpenseWrapper.updateExpenseAllocations(source.getProject(), source.getAvailabilityDate());
-    em.getTransaction().commit();
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        em.persist(source);
+        ProjectExpenseWrapper.updateExpenseAllocations(em, source.getProject(), source.getAvailabilityDate());
+        return true;
+      }
+
+      @Override
+      public void onSuccess() {
+        RefreshControlSingleton.getInstance().broadcastRefresh();
+      }
+      
+    });
   }
   
 }

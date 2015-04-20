@@ -31,12 +31,13 @@ public class ProjectNoteWrapper extends EntityWrapper {
   }
   
   public static List<ProjectNoteWrapper> getNotes(Project project) {
-    return DatabaseConnectionSingleton.getInstance().em().
+    return DatabaseConnectionSingleton.getInstance().
         createQuery(
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper(n) " +
             "FROM ProjectNote n " +
             "WHERE n.project = :project " +
-            "ORDER BY n.entryTime").
+            "ORDER BY n.entryTime",
+            ProjectNoteWrapper.class).
         setParameter("project", project).
         getResultList();
   }

@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -9,6 +10,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 public class DatabaseConnectionSingleton {
   private static DatabaseConnectionSingleton instance;
@@ -52,41 +55,69 @@ public class DatabaseConnectionSingleton {
     return true;
   }
   
-  public void persist(Object obj) {
-  //  try {
-      entityManager.getTransaction().begin();
-      entityManager.persist(obj);
-      entityManager.getTransaction().commit();
-  //  } catch (Throwable t) {
-  //    Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
-  //    cleanup();
-  //  }
+  public void persist(final Object obj) {
+    runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        em.persist(obj);
+        return true;
+      }
+    });
   }
 
-  public void remove(Object obj) {
-    EntityTransaction transaction = entityManager.getTransaction();
-    try {
-      transaction.begin();
-      entityManager.remove(obj);
-      transaction.commit();
-    } catch (Throwable t) {
-      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
-      hardReset();
-    }
+  public void remove(final Object obj) {
+    runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        em.remove(obj);
+        return true;
+      }
+      @Override
+      public void onFailure() {
+        hardReset();
+      }
+    });
   }
   
   public void hardReset() {
+    // TODO: try to figure out when this is exactly needed
     entityManager.close();
     entityManager = entityManagerFactory.createEntityManager();
     RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
-  public EntityManager em() {
-    return entityManager;
+  public boolean runInTransaction(TransactionRunner runner) {
+    EntityTransaction transaction = entityManager.getTransaction();
+    try {
+      transaction.begin();
+      if (runner.run(entityManager)) {
+        transaction.commit();
+      } else {
+        transaction.rollback();
+        runner.onFailure();
+        return false;
+      }
+    } catch (Throwable t) {
+      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
+      if (transaction.isActive()) {
+        transaction.rollback();
+      }
+      runner.onFailure();
+      return false;
+    }
+    runner.onSuccess();
+    return true;
   }
 
   public boolean isConnected() {
     return entityManager != null;
   }
 
+  public <T extends Object> TypedQuery<T> createQuery(String query, Class<T> resultClass) {
+    return entityManager.createQuery(query, resultClass);
+  }
+
+  public void refresh(Object entity) {
+    entityManager.refresh(entity);
+  }
 }

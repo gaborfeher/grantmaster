@@ -19,7 +19,8 @@ public class CurrenciesTabController extends RefreshControlSingleton.MessageObse
 
   @Override
   public void refresh() {
-    List<Currency> list = DatabaseConnectionSingleton.getInstance().em().createQuery("SELECT c FROM Currency c").getResultList();
+    List<Currency> list = DatabaseConnectionSingleton.getInstance().createQuery(
+        "SELECT c FROM Currency c", Currency.class).getResultList();
     table.getItems().setAll(list);
   }
 

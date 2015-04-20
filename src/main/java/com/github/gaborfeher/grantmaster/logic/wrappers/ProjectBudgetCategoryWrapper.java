@@ -158,13 +158,13 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       Project project,
       Date filterStartDate,
       Date filterEndDate) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+    DatabaseConnectionSingleton conn = DatabaseConnectionSingleton.getInstance();
     Double total = 
         Utils.getSingleResultWithDefault(0.0,
-            em.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
+            conn.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
             setParameter("project", project));
         
-    List<ProjectBudgetCategoryWrapper> list = em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
+    List<ProjectBudgetCategoryWrapper> list = conn.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
         "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
             "WHERE c.direction = :direction " +
             " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
@@ -183,7 +183,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       ProjectBudgetCategoryWrapper limitWrapper = iterator.next();
       
       limitWrapper.setProject(project);
-      ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, em.createQuery(
+      ProjectBudgetLimit limit = Utils.getSingleResultWithDefault(null, conn.createQuery(
           "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.budgetCategory = :budgetCategory",
           ProjectBudgetLimit.class).
           setParameter("project", project).
@@ -198,8 +198,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     return list;
   }
   
-  static void removeProjectBudgetLimits(Project project) {
-    EntityManager em = DatabaseConnectionSingleton.getInstance().em();
+  static void removeProjectBudgetLimits(EntityManager em, Project project) {
     em.createQuery("DELETE FROM ProjectBudgetLimit l WHERE l.project = :project").
         setParameter("project", project).
         executeUpdate();
