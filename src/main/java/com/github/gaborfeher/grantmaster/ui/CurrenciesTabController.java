@@ -3,7 +3,6 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;

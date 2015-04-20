@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;

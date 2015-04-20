@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
 public class DatabaseConnectionSingleton {
   private static DatabaseConnectionSingleton instance;
@@ -37,13 +38,18 @@ public class DatabaseConnectionSingleton {
     }
   }
   
-  public void connectTo(String pathString) {
+  public boolean connectTo(String pathString) {
     Map<String, String> properties = new HashMap<>();
     properties.put("javax.persistence.jdbc.url", "jdbc:h2:" + pathString);
-    entityManagerFactory = Persistence.createEntityManagerFactory(
-        "LocalH2ConnectionTemplate", properties);
-    entityManager = entityManagerFactory.createEntityManager();
+    try {
+      entityManagerFactory = Persistence.createEntityManagerFactory(
+          "LocalH2ConnectionTemplate", properties);
+      entityManager = entityManagerFactory.createEntityManager();
+    } catch (PersistenceException ex) {
+      return false;
+    }
     System.out.println("Successful JPA connection");
+    return true;
   }
   
   public void persist(Object obj) {

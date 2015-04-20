@@ -3,7 +3,6 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import java.io.File;
@@ -87,20 +86,36 @@ public class MainPageController implements Initializable {
     }
     String pathString = path.getAbsolutePath();
     if (!pathString.endsWith(Constants.SUFFIX_MV_FILE)) {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Fájl megnyitás");
+      alert.setHeaderText("Megnyitáshoz a fájl kiterjesztése .mv.db kell, hogy legyen.");
+      alert.showAndWait();
+      return;
+    }
+    if (!path.exists()) {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Fájl megnyitás");
+      alert.setHeaderText("A fájl nem létezik.");
+      alert.showAndWait();
       return;
     }
 
     pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
-    connection.connectTo(pathString);
+    if (!connection.connectTo(pathString)) {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Adatbázis megnyitás");
+      alert.setHeaderText("Hiba az adatbázisfájl megnyitása közben.");
+      alert.setContentText("Próbálj meg minden alkalmazást bezárni,\namiben ez a fájl meg van nyitva.");
+      alert.showAndWait();
+      return;
+    }
     closeProjectTabs();
     RefreshControlSingleton.getInstance().broadcastRefresh();
     pathLabel.setText(pathString);
   }
-
   
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
-
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Adatbázis létrehozása");
     fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("H2 Database Files (*" + Constants.SUFFIX_PAGE_FILE + ")", "*" + Constants.SUFFIX_PAGE_FILE));

@@ -1,9 +1,12 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 
@@ -87,7 +90,14 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   void handleDeleteButtonClick() {
-    
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Bejegyzés törlés");
+    alert.setHeaderText("Biztos, hogy töröljem?");
+    alert.setContentText("A törlés végleges, nem lehet visszavonni.");
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() != ButtonType.OK) {
+      return;
+    }
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.delete();
   }

@@ -7,7 +7,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -221,6 +220,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     } catch (Throwable t) {
       Logger.getLogger(ProjectExpenseWrapper.class.getName()).log(Level.SEVERE, null, t);
       em.getTransaction().rollback();
+      DatabaseConnectionSingleton.getInstance().hardReset();
       return;
     }
     
@@ -241,6 +241,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     } catch (Throwable t) {
       Logger.getLogger(ProjectExpenseWrapper.class.getName()).log(Level.SEVERE, null, t);
       em.getTransaction().rollback();
+      DatabaseConnectionSingleton.getInstance().hardReset();
       return;
     }
     

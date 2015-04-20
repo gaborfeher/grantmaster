@@ -3,7 +3,6 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshMessage;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
