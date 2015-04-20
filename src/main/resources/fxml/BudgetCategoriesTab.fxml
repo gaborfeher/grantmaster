@@ -24,7 +24,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%BudgetCategoryDirection" prefWidth="100" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryDirection" prefWidth="100" editable="true" sortable="false" styleClass="textColumn">
           <cellFactory>
             <BudgetCategoryDirectionTableCellFactory property="direction" /> 
           </cellFactory>
@@ -32,7 +32,7 @@
             <PropertyValueFactory property="direction" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%BudgetCategoryGroupName" prefWidth="250" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryGroupName" prefWidth="250" editable="true" sortable="false" styleClass="textColumn">
           <cellFactory>
             <StringTableCellFactory property="groupName" /> 
           </cellFactory>
@@ -40,7 +40,7 @@
             <PropertyValueFactory property="groupName" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%BudgetCategoryName" prefWidth="400" editable="true" sortable="false">
+        <TableColumn text="%BudgetCategoryName" prefWidth="400" editable="true" sortable="false" styleClass="textColumn">
           <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>

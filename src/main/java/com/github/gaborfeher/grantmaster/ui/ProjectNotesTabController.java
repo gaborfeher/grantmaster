@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
@@ -23,7 +24,7 @@ public class ProjectNotesTabController
   
   void init(Project project) {
     this.project = project;
-    refresh();
+    subscribe();
   }
   
   @Override
@@ -35,8 +36,7 @@ public class ProjectNotesTabController
     projectNote.setEntryTime(new Timestamp(new Date().getTime()));
     projectNote.setProject(project);
     ProjectNoteWrapper wrapper = new ProjectNoteWrapper(projectNote);
-    wrapper.setState(EntityWrapper.State.EDITING_NEW);
-    table.getItems().add(wrapper);
+    Utils.addNewEntityForEditing(wrapper, table.getItems());
   }
 
   @Override

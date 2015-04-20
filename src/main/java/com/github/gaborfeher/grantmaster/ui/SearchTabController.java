@@ -39,13 +39,15 @@ public class SearchTabController
   @FXML TextField comment1;
   @FXML TextField comment2;
   
+  List<ProjectExpenseWrapper> searchResults;
+  
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     subscribe();
   }
   
   public void search() {
-    List<ProjectExpenseWrapper> projectExpenses = ProjectExpenseWrapper.getExpenseList(
+    searchResults = ProjectExpenseWrapper.getExpenseList(
         project.getValue(),
         Utils.toSqlDate(startDate.getValue()),
         Utils.toSqlDate(endDate.getValue()),
@@ -55,7 +57,7 @@ public class SearchTabController
         partnerName.getText(),
         comment1.getText(),
         comment2.getText());
-    table.getItems().setAll(projectExpenses);
+    table.getItems().setAll(searchResults);
   }
 
   @Override
@@ -101,6 +103,11 @@ public class SearchTabController
       }
     });
 
+    if (searchResults != null) {
+      table.getItems().setAll(searchResults);
+    } else {
+      table.getItems().clear();
+    }
   }
   
 }

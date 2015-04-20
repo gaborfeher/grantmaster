@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
@@ -14,10 +9,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-/**
- *
- * @author gabor
- */
 public class ProjectSourceWrapper extends EntityWrapper {
   private ProjectSource source;
   private double usedAccountingCurrencyAmount;
@@ -27,9 +18,6 @@ public class ProjectSourceWrapper extends EntityWrapper {
     this.usedAccountingCurrencyAmount = usedAccountingCurrencyAmount;
   }
 
-  /**
-   * @return the source
-   */
   public ProjectSource getSource() {
     return source;
   }
@@ -46,7 +34,10 @@ public class ProjectSourceWrapper extends EntityWrapper {
  //   this.usedAccountingCurrencyAmount = usedAccountingCurrencyAmount;
  // }
   
-  public double getUsedGrantCurrencyAmount() {
+  public Double getUsedGrantCurrencyAmount() {
+    if (source.getExchangeRate() <= 0.0) {
+      return null;
+    }
     return usedAccountingCurrencyAmount / source.getExchangeRate();
   }
   
@@ -66,7 +57,10 @@ public class ProjectSourceWrapper extends EntityWrapper {
     return source.getAmount() * source.getExchangeRate();
   }
   
-  public double getRemainingGrantCurrencyAmount() {
+  public Double getRemainingGrantCurrencyAmount() {
+    if (source.getExchangeRate() <= 0.0) {
+      return null;
+    }
     return getGrantCurrencyAmount() - getUsedGrantCurrencyAmount();
   }
   

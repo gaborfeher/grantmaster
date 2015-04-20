@@ -4,7 +4,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import java.net.URL;
 import java.util.List;
@@ -33,7 +32,7 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
   @FXML DatePicker filterEndDate;
   
   /**
-   * Project currently being opened.
+   * Project currently being open.
    */
   Project project;
   
@@ -43,8 +42,7 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
     ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), 0.0, 0.0);
     wrapper.setProject(project);
     wrapper.setLimit(0.0, limit);
-    wrapper.setState(EntityWrapper.State.EDITING_NEW);
-    table.getItems().add(wrapper);
+    Utils.addNewEntityForEditing(wrapper, table.getItems());
   }
   
   public void filterUpdateAction(ActionEvent event) {
@@ -68,7 +66,6 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
 
   @Override
   public void refresh() {
-    System.out.println("refresh");
     Date startDate = Utils.toSqlDate(filterStartDate.getValue());
     Date endDate = Utils.toSqlDate(filterEndDate.getValue());
     

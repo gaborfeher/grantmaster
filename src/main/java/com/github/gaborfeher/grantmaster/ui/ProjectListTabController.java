@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.io.IOException;
@@ -18,8 +19,6 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
   @FXML TableView<ProjectWrapper> table;
   
   MainPageController parent;
-  
-  ObservableList<ProjectWrapper> projects;
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
@@ -28,15 +27,13 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
   
   @Override
   public void refresh() {
-    projects = table.getItems();
-    projects.setAll(ProjectWrapper.getProjects());
+    table.getItems().setAll(ProjectWrapper.getProjects());
   }
   
   public void handleAddButtonAction(ActionEvent event) {
     Project newProject = new Project();
     ProjectWrapper projectWrapper = new ProjectWrapper(newProject);
-    projectWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    projects.add(projectWrapper);
+    Utils.addNewEntityForEditing(projectWrapper, table.getItems());
   }
   
   public void handleOpenButtonAction(ActionEvent event) throws IOException {
@@ -44,7 +41,7 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
     if (selectedIndex < 0) {
       return;
     }
-    ProjectWrapper selectedProjectWrapper = projects.get(selectedIndex);
+    ProjectWrapper selectedProjectWrapper = table.getItems().get(selectedIndex);
     if (selectedProjectWrapper.getState() != EntityWrapper.State.SAVED) {
       return;
     }

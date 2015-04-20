@@ -3,6 +3,7 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
@@ -33,8 +34,7 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
     ProjectSource newSource = new ProjectSource();
     newSource.setProject(project);
     ProjectSourceWrapper wrapper = new ProjectSourceWrapper(newSource, 0.0);
-    wrapper.setState(EntityWrapper.State.EDITING_NEW);
-    table.getItems().add(wrapper);
+    Utils.addNewEntityForEditing(wrapper, table.getItems());
   }  
 
   @Override

@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -22,7 +20,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   private ProjectExpense expense;
   private double accountingCurrencyAmount;
   private double grantCurrencyAmount;
-  DoubleProperty exchangeRate;
+  private Double exchangeRate;
   
   double editedAccountingCurrencyAmount;
   
@@ -30,7 +28,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     this.expense = expense;
     this.accountingCurrencyAmount = accountingCurrencyAmount;
     this.grantCurrencyAmount = grantCurrencyAmount;
-    this.exchangeRate = new SimpleDoubleProperty(accountingCurrencyAmount / grantCurrencyAmount);
+    this.exchangeRate = grantCurrencyAmount <= 0.0 ? null : accountingCurrencyAmount / grantCurrencyAmount;
     this.editedAccountingCurrencyAmount = accountingCurrencyAmount;
   }
   
@@ -94,7 +92,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     return grantCurrencyAmount;
   }
   
-  public DoubleProperty exchangeRateProperty() {
+  public Double getExchangeRate() {
     return exchangeRate;
   }
 
@@ -213,7 +211,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       
       if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
         em.getTransaction().rollback();
-        System.out.println("persist failed, missing allocation");
+        RefreshControlSingleton.getInstance().broadcastRefresh();  // TODO: keep editing instead of this
         return;
       }
       em.getTransaction().commit();

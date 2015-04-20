@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.Optional;
 import javafx.event.ActionEvent;
@@ -79,12 +80,16 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   void handleEditButtonClick() {
+    if (!Utils.prepareForEditing()) {
+      return;
+    }
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.setState(EntityWrapper.State.EDITING);
     updateItem(entityWrapper.getState(), false);
   }
   
   void handleDiscardButtonClick() {
+    System.out.println("discarding edits");
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.discardEdits();
   }

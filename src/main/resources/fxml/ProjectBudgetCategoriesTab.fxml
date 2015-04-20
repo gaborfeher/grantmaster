@@ -33,7 +33,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%BudgetCategory" prefWidth="400" sortable="false">
+        <TableColumn text="%BudgetCategory" prefWidth="400" sortable="false" styleClass="textColumn">
           <cellFactory>
             <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>  
           </cellFactory>

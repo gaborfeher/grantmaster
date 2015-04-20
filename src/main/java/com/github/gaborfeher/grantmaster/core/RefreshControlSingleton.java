@@ -26,16 +26,15 @@ public class RefreshControlSingleton {
   }
   
   private final List<RefreshControlSingleton.MessageObserver> observers;
+  
+  /**
+   * true if somewhere in the GUI an item is opened for editing. This is
+   * erased by a refresh.
+   */
+  private boolean editingActive;
 
   public RefreshControlSingleton() {
     observers = new ArrayList<>();
-  }
-
-  public void broadcastRefresh() {
-    System.out.println("Broadcast refresh");
-    for (RefreshControlSingleton.MessageObserver observer : observers) {
-      observer.refresh();
-    }
   }
     
   private void subscribe(RefreshControlSingleton.MessageObserver observer) {
@@ -53,4 +52,20 @@ public class RefreshControlSingleton {
     }
   }
 
+  
+  public void broadcastRefresh() {
+    System.out.println("Broadcast refresh");
+    editingActive = false;
+    for (RefreshControlSingleton.MessageObserver observer : observers) {
+      observer.refresh();
+    }
+  }
+  
+  public boolean isEditingActive() {
+    return editingActive;
+  }
+  
+  public void setEditingActive(boolean editingActive) {
+    this.editingActive = editingActive;
+  }
 }

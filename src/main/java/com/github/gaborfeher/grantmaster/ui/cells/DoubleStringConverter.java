@@ -4,9 +4,10 @@ import java.text.DecimalFormat;
 import javafx.util.StringConverter;
 
 class DoubleStringConverter extends StringConverter<Double> {
-  final DecimalFormat formatter = new DecimalFormat("#,###.00");
+  final DecimalFormat formatter;
   
   public DoubleStringConverter() {
+    formatter = new DecimalFormat("#,##0.00");
   }
 
   @Override
@@ -19,6 +20,9 @@ class DoubleStringConverter extends StringConverter<Double> {
 
   @Override
   public Double fromString(String string) {
+    if (string == null) {
+      return null;
+    }
     string = string.replace(",", "");
     // TODO: replaceFirst(" [A-Z]+$", "");
     return Double.parseDouble(string);

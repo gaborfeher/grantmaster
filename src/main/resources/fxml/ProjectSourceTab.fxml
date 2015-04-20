@@ -21,7 +21,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectSourceAvailabilityDate" prefWidth="120" sortable="false">
+        <TableColumn text="%ProjectSourceAvailabilityDate" prefWidth="120" sortable="false" styleClass="textColumn">
           <cellFactory>
             <DateTableCellFactory property="availabilityDate" /> 
           </cellFactory>

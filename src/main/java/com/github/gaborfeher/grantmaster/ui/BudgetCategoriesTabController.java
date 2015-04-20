@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;
@@ -70,8 +71,7 @@ public class BudgetCategoriesTabController extends RefreshControlSingleton.Messa
   public void handleAddButtonAction(ActionEvent event) {
     BudgetCategory budgetCategory = new BudgetCategory();
     BudgetCategoryWrapper wrapper = new BudgetCategoryWrapper(budgetCategory);
-    wrapper.setState(EntityWrapper.State.EDITING_NEW);
-    table.getItems().add(wrapper);
+    Utils.addNewEntityForEditing(wrapper, table.getItems());
   }
 
 }

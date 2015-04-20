@@ -158,8 +158,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       Project project,
       Date filterStartDate,
       Date filterEndDate) {
-    System.out.println("getLimits " + filterStartDate + " " + filterEndDate);
-    
     EntityManager em = DatabaseConnectionSingleton.getInstance().em();
     Double total = 
         Utils.getSingleResultWithDefault(0.0,
