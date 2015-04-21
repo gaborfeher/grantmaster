@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import java.net.URL;
 import java.util.List;
@@ -62,8 +63,8 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
   
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-  }  
-
+  }
+  
   @Override
   public void refresh() {
     Date startDate = Utils.toSqlDate(filterStartDate.getValue());
@@ -74,15 +75,14 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
             project,
             startDate,
             endDate);
-    ProjectBudgetCategoryWrapper incomingItem = new ProjectBudgetCategoryWrapper(project.getIncomeType().getName());
+    table.getItems().clear();
+    BudgetCategoryWrapper.createBudgetSummaryList(paymentLines, "Összes projektbevétel és -költség", table.getItems());  
+    ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) table.getItems().get(table.getItems().size() - 1);
+    
     for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
-      incomingItem.addAmounts(source.getGrantCurrencyAmount(), source.getAccountingCurrencyAmount());
+      lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
     }
-    
-    BudgetCategoryWrapper.createBudgetSummaryList(paymentLines,
-        Arrays.asList((BudgetCategoryWrapper)incomingItem),
-        table.getItems());
-    
+
     spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
     spentGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
     remainingAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());

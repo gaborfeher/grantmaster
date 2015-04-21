@@ -181,7 +181,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
         columnNames);
   }
   
-  private static BudgetCategoryWrapper createBudgetSummaryList(
+  public static BudgetCategoryWrapper createBudgetSummaryList(
       List<BudgetCategoryWrapper> rawLines,
       String summaryTitle,
       List<BudgetCategoryWrapper> summary) {

@@ -12,8 +12,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 

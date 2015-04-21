@@ -12,9 +12,11 @@ import javax.persistence.EntityManager;
 
 public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   private ProjectBudgetLimit limit;
+  private Double budgetAccountingCurrency;  // Only for display purposes in summary view.
   private Double spentGrantCurrency;
   private Double spentAccountingCurrency;
   private Double remainingGrantCurrency;
+  private Double remainingAccountingCurrency;  // Only for display purposes in summary view.
   private Project project;
   
   public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, Double spentAccountingCurrency, Double spentGrantCurrency) {
@@ -22,6 +24,8 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     this.spentGrantCurrency = spentGrantCurrency;
     this.spentAccountingCurrency = spentAccountingCurrency;
     this.remainingGrantCurrency = null;
+    this.budgetAccountingCurrency = null;
+    this.remainingAccountingCurrency = null;
   }
   
   public ProjectBudgetCategoryWrapper(String fakeTitle) {
@@ -29,6 +33,8 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     this.spentAccountingCurrency = 0.0;
     this.spentGrantCurrency = 0.0;
     this.remainingGrantCurrency = null;
+    this.budgetAccountingCurrency = null;
+    this.remainingAccountingCurrency = null;
   }
   
   @Override
@@ -78,6 +84,10 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     return limit.getBudget();
   }
   
+  public Double getBudgetAccountingCurrency() {
+    return budgetAccountingCurrency;
+  }
+  
   public void setBudgetGrantCurrency(Double budget) {
     limit.setBudget(budget);
     remainingGrantCurrency = limit.getBudget();
@@ -94,6 +104,10 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     return remainingGrantCurrency;
   }
   
+  public Double getRemainingAccountingCurrency() {
+    return remainingAccountingCurrency;
+  }
+
   public void setSpentGrantCurrency(double spentGrantCurrency) {
     this.spentGrantCurrency = spentGrantCurrency;
   }
@@ -131,9 +145,29 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     }
   }
   
+  /*
   public void addAmounts(double grantCurrencyAmount, double accountingCurrencyAmount) {
     this.spentGrantCurrency = (this.spentGrantCurrency == null ? 0.0 : this.spentAccountingCurrency) + grantCurrencyAmount;
     this.spentAccountingCurrency = (this.spentAccountingCurrency == null ? 0.0 : this.spentAccountingCurrency) + accountingCurrencyAmount;
+  }
+  */
+  
+  public void addBudgetAmounts(double accountingCurrencyAmount, double grantCurrencyAmount) {
+    if (limit == null) {
+      limit = new ProjectBudgetLimit();
+    }
+    if (limit.getBudget() == null) {
+      limit.setBudget(grantCurrencyAmount);
+    } else {
+      limit.setBudget(limit.getBudget() + grantCurrencyAmount);
+    }
+    if (budgetAccountingCurrency == null) {
+      budgetAccountingCurrency = accountingCurrencyAmount;
+    } else {
+      budgetAccountingCurrency += accountingCurrencyAmount;
+    }
+    this.remainingGrantCurrency = limit.getBudget() - spentGrantCurrency;
+    this.remainingAccountingCurrency = budgetAccountingCurrency - spentAccountingCurrency;
   }
   
   @Override
@@ -203,5 +237,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
         setParameter("project", project).
         executeUpdate();
   }
+
 
 }
