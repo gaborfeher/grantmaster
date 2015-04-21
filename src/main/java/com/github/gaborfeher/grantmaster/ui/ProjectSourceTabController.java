@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
@@ -12,12 +11,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 
-public class ProjectSourceTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
-  @FXML TableView table;
-  
+public class ProjectSourceTabController extends ControllerBase implements Initializable {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> grantCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> usedAccountingCurrencyAmountColumn;
@@ -29,13 +25,6 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
 
   public ProjectSourceTabController() {
   }
-    
-  public void createButtonAction(ActionEvent event) {
-    ProjectSource newSource = new ProjectSource();
-    newSource.setProject(project);
-    ProjectSourceWrapper wrapper = new ProjectSourceWrapper(newSource, 0.0);
-    Utils.addNewEntityForEditing(wrapper, table.getItems());
-  }  
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
@@ -60,5 +49,12 @@ public class ProjectSourceTabController extends RefreshControlSingleton.MessageO
     usedGrantCurrencyAmountColumn.setText(grantCurrency);
     remainingAccountingCurrencyAmountColumn.setText(accountingCurrency);
     remainingGrantCurrencyAmountColumn.setText(grantCurrency);
+  }
+
+  @Override
+  protected EntityWrapper createNewEntity() {
+    ProjectSource newSource = new ProjectSource();
+    newSource.setProject(project);
+    return new ProjectSourceWrapper(newSource, 0.0);
   }
 }

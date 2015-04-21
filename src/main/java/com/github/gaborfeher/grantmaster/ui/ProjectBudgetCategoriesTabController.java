@@ -2,10 +2,9 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -13,15 +12,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.sql.Date;
-import java.util.Arrays;
 import javafx.scene.control.DatePicker;
 
-public class ProjectBudgetCategoriesTabController extends RefreshControlSingleton.MessageObserver implements Initializable {  
-  @FXML TableView<BudgetCategoryWrapper> table;
+public class ProjectBudgetCategoriesTabController extends ControllerBase implements Initializable {  
   @FXML TableColumn<BudgetCategoryWrapper, Double> spentGrantCurrencyColumn;
   @FXML TableColumn<BudgetCategoryWrapper, Double> spentAccountingCurrencyColumn;  
   @FXML TableColumn<BudgetCategoryWrapper, Double> remainingGrantCurrencyColumn;
@@ -37,13 +33,14 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
    */
   Project project;
   
-  public void createButtonAction(ActionEvent event) {
+  @Override
+  protected EntityWrapper createNewEntity() {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
     ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), 0.0, 0.0);
     wrapper.setProject(project);
     wrapper.setLimit(0.0, limit);
-    Utils.addNewEntityForEditing(wrapper, table.getItems());
+    return wrapper;
   }
   
   public void filterUpdateAction(ActionEvent event) {
@@ -91,4 +88,5 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
     budgetAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
     budgetGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
   }
+
 }

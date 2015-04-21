@@ -8,16 +8,12 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 
-public class ProjectListTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
-
-  @FXML TableView<ProjectWrapper> table;
-  
+public class ProjectListTabController extends ControllerBase<ProjectWrapper> implements Initializable {
   MainPageController parent;
 
   @Override
@@ -28,12 +24,6 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
   @Override
   public void refresh() {
     table.getItems().setAll(ProjectWrapper.getProjects());
-  }
-  
-  public void handleAddButtonAction(ActionEvent event) {
-    Project newProject = new Project();
-    ProjectWrapper projectWrapper = new ProjectWrapper(newProject);
-    Utils.addNewEntityForEditing(projectWrapper, table.getItems());
   }
   
   public void handleOpenButtonAction(ActionEvent event) throws IOException {
@@ -52,5 +42,11 @@ public class ProjectListTabController extends RefreshControlSingleton.MessageObs
   
   void init(MainPageController parent) {
     this.parent = parent;
+  }
+
+  @Override
+  protected ProjectWrapper createNewEntity() {
+    Project newProject = new Project();
+    return new ProjectWrapper(newProject);
   }
 }

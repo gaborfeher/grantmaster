@@ -11,7 +11,7 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectListTabController">
   <children>
     <HBox>
-      <Button text="%AddProjectButtonLabel" onAction="#handleAddButtonAction" />
+      <Button text="%AddProjectButtonLabel" onAction="#addButtonAction" />
       <Button text="%OpenProjectButtonLabel" onAction="#handleOpenButtonAction" />
     </HBox>
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">

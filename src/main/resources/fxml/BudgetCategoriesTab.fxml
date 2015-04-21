@@ -10,7 +10,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.BudgetCategoriesTabController">
   <children>
-    <Button text="%AddBudgetCategoryButtonLabel" onAction="#handleAddButtonAction" />
+    <Button text="%AddBudgetCategoryButtonLabel" onAction="#addButtonAction" />
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <rowFactory>
         <SummaryHighlighterRowFactory />

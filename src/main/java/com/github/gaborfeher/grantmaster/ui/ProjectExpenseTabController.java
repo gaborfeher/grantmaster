@@ -2,18 +2,13 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableView;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 
-public class ProjectExpenseTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
-  @FXML TableView<ProjectExpenseWrapper> table;
+public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> implements Initializable {
   @FXML ExpenseTableController tableController;
   
   Project project;
@@ -32,16 +27,17 @@ public class ProjectExpenseTabController extends RefreshControlSingleton.Message
     table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(project));
   }
 
-  public void createProjectExpenseButtonAction(ActionEvent event) {
+  @Override
+  public void initialize(URL url, ResourceBundle rb) {
+  }
+
+  @Override
+  public ProjectExpenseWrapper createNewEntity() {
     ProjectExpense expense = new ProjectExpense();
     expense.setProject(project);
     ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense, 0.0, 0.0);
     wrapper.setOriginalCurrency(project.getAccountCurrency());
-    Utils.addNewEntityForEditing(wrapper, table.getItems());
-  }
-
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
+    return wrapper;
   }
 
 }

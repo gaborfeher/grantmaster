@@ -18,11 +18,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-public class BudgetCategoriesTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
-  @FXML TableView<BudgetCategoryWrapper> table;
+public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> implements Initializable {
 
   public BudgetCategoriesTabController() {
   }
@@ -67,11 +65,10 @@ public class BudgetCategoriesTabController extends RefreshControlSingleton.Messa
     subscribe();
   }  
 
-  @FXML
-  public void handleAddButtonAction(ActionEvent event) {
+  @Override
+  public BudgetCategoryWrapper createNewEntity() {
     BudgetCategory budgetCategory = new BudgetCategory();
-    BudgetCategoryWrapper wrapper = new BudgetCategoryWrapper(budgetCategory);
-    Utils.addNewEntityForEditing(wrapper, table.getItems());
+    return new BudgetCategoryWrapper(budgetCategory);
   }
 
 }

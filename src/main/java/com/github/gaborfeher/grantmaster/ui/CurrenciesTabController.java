@@ -14,7 +14,7 @@ import javafx.scene.control.TextField;
 
 public class CurrenciesTabController extends RefreshControlSingleton.MessageObserver implements Initializable {
   @FXML TextField codeEntry;
-  
+
   @FXML TableView<Currency> table;
 
   @Override
