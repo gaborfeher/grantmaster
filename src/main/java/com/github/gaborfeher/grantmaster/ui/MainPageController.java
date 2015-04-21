@@ -24,13 +24,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.persistence.EntityManager;
-import org.h2.engine.Constants;
 
 public class MainPageController implements Initializable {
   @FXML private Label pathLabel;
@@ -40,9 +40,15 @@ public class MainPageController implements Initializable {
   List<Project> projects;
 
   Stage stage;
-  File path = null;
   
   @FXML ProjectListTabController projectListTabController;
+  
+  /**
+   * The database file which is open. null for newly created databases.
+   * This is the file what the user sees at save/open, not the temporary
+   * directory where we extract the databases.
+   */
+  File openedFile;
   
   public void stop() {
     System.out.println("STOPPING: closing database connection");
@@ -50,6 +56,7 @@ public class MainPageController implements Initializable {
   }
 
   private void closeProjectTabs() {
+    mainTabs.getSelectionModel().selectFirst();
     mainTabs.getTabs().remove(4, mainTabs.getTabs().size());
   }
  
@@ -73,76 +80,48 @@ public class MainPageController implements Initializable {
     });
   }
   
+  private FileChooser getFileChooser() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("zip-compressed hsqldb files", "*.hdb"));
+    fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get(0));
+    return fileChooser;
+  }
+  
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
     connection.close();
-    FileChooser fileChooser = new FileChooser();
+    closeProjectTabs();
+    FileChooser fileChooser = getFileChooser();
     fileChooser.setTitle("Adatbázis megnyitása");
-    fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("H2 Database Files (*" + Constants.SUFFIX_PAGE_FILE + ")", "*" + Constants.SUFFIX_PAGE_FILE));
-    path = fileChooser.showOpenDialog(stage);
+    
+    File path = fileChooser.showOpenDialog(stage);
     if (path == null) {
       return;
     }
-    String pathString = path.getAbsolutePath();
-    if (!pathString.endsWith(Constants.SUFFIX_MV_FILE)) {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle("Fájl megnyitás");
-      alert.setHeaderText("Megnyitáshoz a fájl kiterjesztése .mv.db kell, hogy legyen.");
-      alert.showAndWait();
-      return;
-    }
-    if (!path.exists()) {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle("Fájl megnyitás");
-      alert.setHeaderText("A fájl nem létezik.");
-      alert.showAndWait();
-      return;
-    }
-
-    pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
-    if (!connection.connectTo(pathString)) {
+    openedFile = path;
+    File tmpFile;
+    if ((tmpFile = connection.openDatabase(openedFile)) == null) {
       Alert alert = new Alert(AlertType.ERROR);
       alert.setTitle("Adatbázis megnyitás");
       alert.setHeaderText("Hiba az adatbázisfájl megnyitása közben.");
-      alert.setContentText("Próbálj meg minden alkalmazást bezárni,\namiben ez a fájl meg van nyitva.");
       alert.showAndWait();
       return;
     }
     closeProjectTabs();
     RefreshControlSingleton.getInstance().broadcastRefresh();
-    pathLabel.setText(pathString);
+    pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
   }
   
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Adatbázis létrehozása");
-    fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("H2 Database Files (*" + Constants.SUFFIX_PAGE_FILE + ")", "*" + Constants.SUFFIX_PAGE_FILE));
-    path = fileChooser.showSaveDialog(stage);
-    if (path == null) {
-      return;
-    }
-    String pathString = path.getAbsolutePath();
-    if (!pathString.endsWith(Constants.SUFFIX_MV_FILE)) {
-      pathString += Constants.SUFFIX_MV_FILE;
-    }
-    path = new File(pathString);
-    if (path.exists()) {
-      try {
-        Files.delete(path.toPath());
-      } catch (IOException ex) {
-        Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    }
-    
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
     connection.close();
     closeProjectTabs();
+    openedFile = null;
     
-    pathString = pathString.substring(0, pathString.length() - Constants.SUFFIX_MV_FILE.length());
-    connection.connectTo(pathString);
-
+    File tempDir = connection.createNewDatabase();
+    
     boolean result = connection.runInTransaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
@@ -151,13 +130,54 @@ public class MainPageController implements Initializable {
         return true;
       }
     });
+    System.out.println("creation transaction: " + result);
     if (!result) {
       return;
     }
     RefreshControlSingleton.getInstance().broadcastRefresh();
-    pathLabel.setText(pathString);
+    pathLabel.setText("NEW DATABASE ;  tmp= " + tempDir.getAbsolutePath());    
   }
+  
+  @FXML
+  private void handleSaveButtonAction(ActionEvent event) {
+    DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
 
+    if (openedFile == null && connection.isConnected()) {
+      FileChooser fileChooser = getFileChooser();
+      fileChooser.setTitle("Adatbázis mentése");
+      openedFile = fileChooser.showSaveDialog(stage);
+      if (!openedFile.getAbsolutePath().endsWith(".hdb")) {
+        openedFile = new File(openedFile.getAbsolutePath() + ".hdb");
+        if (openedFile.exists()) {
+          Alert alert = new Alert(AlertType.CONFIRMATION);
+          alert.setTitle("A fájl már létezik");
+          alert.setHeaderText("Felülírhatom ezt a fájlt?\n" + openedFile.getAbsolutePath());
+          if (alert.showAndWait().get() != ButtonType.OK) {
+            openedFile = null;
+          } 
+        }
+      }
+    }
+    if (openedFile == null) {
+      return;
+    }
+    // TODO: don't delete before writing.
+    if (openedFile.exists()) {
+      try {
+        Files.delete(openedFile.toPath());
+      } catch (IOException ex) {
+        Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
+    
+    try {
+      File tmpFile = connection.saveDatabase(openedFile);
+      System.out.println("saved the file");
+      pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
+    } catch (IOException ex) {
+      Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
+    }    
+  }
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {

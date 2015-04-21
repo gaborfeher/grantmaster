@@ -76,11 +76,12 @@ public class ProjectBudgetCategoriesTabController extends RefreshControlSingleto
             startDate,
             endDate);
     table.getItems().clear();
-    BudgetCategoryWrapper.createBudgetSummaryList(paymentLines, "Összes projektbevétel és -költség", table.getItems());  
-    ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) table.getItems().get(table.getItems().size() - 1);
-    
-    for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
-      lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
+    BudgetCategoryWrapper.createBudgetSummaryList(paymentLines, "Összes projektbevétel és -költség", table.getItems());
+    if (table.getItems().size() > 0) {
+      ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) table.getItems().get(table.getItems().size() - 1);
+      for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
+        lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
+      }
     }
 
     spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
