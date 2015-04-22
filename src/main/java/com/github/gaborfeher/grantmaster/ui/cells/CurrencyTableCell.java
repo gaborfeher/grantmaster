@@ -1,9 +1,11 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
+import javax.persistence.EntityManager;
 
 class CurrencyTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, Currency> {
   String property;
@@ -27,7 +29,13 @@ class CurrencyTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, C
   @Override
   public void startEdit() {
     if (getEntityWrapper().canEdit()) {
-      getItems().setAll(DatabaseConnectionSingleton.getInstance().createQuery("SELECT c FROM Currency c", Currency.class).getResultList());
+      DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+        @Override
+        public boolean run(EntityManager em) {
+          getItems().setAll(em.createQuery("SELECT c FROM Currency c", Currency.class).getResultList());
+          return true;
+        }
+      });
       super.startEdit();
     }
   }

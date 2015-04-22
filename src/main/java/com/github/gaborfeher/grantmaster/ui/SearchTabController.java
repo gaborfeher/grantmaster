@@ -1,26 +1,24 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.Callback;
+import javax.persistence.EntityManager;
 
 public class SearchTabController
     extends ControllerBase<ProjectExpenseWrapper> {
@@ -40,34 +38,44 @@ public class SearchTabController
   List<ProjectExpenseWrapper> searchResults;
   
   public void search() {
-    searchResults = ProjectExpenseWrapper.getExpenseList(
-        project.getValue(),
-        Utils.toSqlDate(startDate.getValue()),
-        Utils.toSqlDate(endDate.getValue()),
-        budgetCategory.getValue(),
-        budgetCategoryGroup.getText(),
-        accountNo.getText(),
-        partnerName.getText(),
-        comment1.getText(),
-        comment2.getText());
-    table.getItems().setAll(searchResults);
+    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+
+      @Override
+      public boolean run(EntityManager em) {
+        searchResults = ProjectExpenseWrapper.getExpenseList(
+            em,
+            project.getValue(),
+            Utils.toSqlDate(startDate.getValue()),
+            Utils.toSqlDate(endDate.getValue()),
+            budgetCategory.getValue(),
+            budgetCategoryGroup.getText(),
+            accountNo.getText(),
+            partnerName.getText(),
+            comment1.getText(),
+            comment2.getText());
+        table.getItems().setAll(searchResults);
+        return true;
+      }
+      
+    });
+    
   }
 
   @Override
-  public void refresh() {
+  public void refresh(EntityManager em) {
     budgetCategory.getItems().clear();
     budgetCategory.getItems().add(null);
-    budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(BudgetCategory.Direction.PAYMENT));
+    budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
     project.getItems().clear();
     project.getItems().add(null);
-    project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping());
+    project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping(em));
     
     tableController.accountingCurrencyAmountColumn.setCellValueFactory(
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
         String result =
-            String.format("%2.2f %s", p.getValue().getAccountingCurrencyAmount(), p.getValue().getProject().getAccountCurrency().getCode());
+            String.format("%2.2f %s", p.getValue().getProperty("accountingCurrencyAmount"), p.getValue().getProject().getAccountCurrency().getCode());
         return new ReadOnlyObjectWrapper<Object>(result);
       }
     });
@@ -84,7 +92,7 @@ public class SearchTabController
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
         String result =
-            String.format("%2.2f %s", p.getValue().getGrantCurrencyAmount(), p.getValue().getProject().getGrantCurrency().getCode());
+            String.format("%2.2f %s", p.getValue().getProperty("grantCurrencyAmount"), p.getValue().getProject().getGrantCurrency().getCode());
         return new ReadOnlyObjectWrapper<Object>(result);
       }
     });

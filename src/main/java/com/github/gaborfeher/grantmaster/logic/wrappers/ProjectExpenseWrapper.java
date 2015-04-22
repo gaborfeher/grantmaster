@@ -1,15 +1,13 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseSourceAllocation;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,98 +16,14 @@ import javax.persistence.TypedQuery;
 
 public class ProjectExpenseWrapper extends EntityWrapper {
   private ProjectExpense expense;
-  private double accountingCurrencyAmount;
-  private double grantCurrencyAmount;
-  private Double exchangeRate;
   
-  double editedAccountingCurrencyAmount;
+//  double editedAccountingCurrencyAmount;
   
   public ProjectExpenseWrapper(ProjectExpense expense, double accountingCurrencyAmount, double grantCurrencyAmount) {
     this.expense = expense;
-    this.accountingCurrencyAmount = accountingCurrencyAmount;
-    this.grantCurrencyAmount = grantCurrencyAmount;
-    this.exchangeRate = grantCurrencyAmount <= 0.0 ? null : accountingCurrencyAmount / grantCurrencyAmount;
-    this.editedAccountingCurrencyAmount = accountingCurrencyAmount;
-  }
-  
-  public Date getPaymentDate() {
-    return expense.getPaymentDate();
-  }
-  
-  public void setPaymentDate(Date date) {
-    expense.setPaymentDate(date);
-  }
-  
-  public String getAccountNo() {
-    return expense.getAccountNo();
-  }
-  
-  public void setAccountNo(String accountNo) {
-    expense.setAccountNo(accountNo);
-  }
-  
-  public String getPartnerName() {
-    return expense.getPartnerName();
-  }
-  
-  public void setPartnerName(String partnerName) {
-    expense.setPartnerName(partnerName);
-  }
-  
-  public BudgetCategory getBudgetCategory() {
-    return expense.getBudgetCategory();
-  }
-  
-  public void setBudgetCategory(BudgetCategory budgetCategory) {
-    expense.setBudgetCategory(budgetCategory);
-  }
-  
-  public Double getOriginalAmount() {
-    return expense.getOriginalAmount();
-  }
-  
-  public void setOriginalAmount(Double originalAmount) {
-    expense.setOriginalAmount(originalAmount);
-  }
-  
-  public Currency getOriginalCurrency() {
-    return expense.getOriginalCurrency();
-  }
-  
-  public void setOriginalCurrency(Currency currency) {
-    expense.setOriginalCurrency(currency);
-  }
-  
-  public double getAccountingCurrencyAmount() {
-    return accountingCurrencyAmount;
-  }
-  
-  public void setAccountingCurrencyAmount(Double accountingCurrencyAmount) {
-    this.editedAccountingCurrencyAmount = accountingCurrencyAmount;
-  }
-
-  public double getGrantCurrencyAmount() {
-    return grantCurrencyAmount;
-  }
-  
-  public Double getExchangeRate() {
-    return exchangeRate;
-  }
-
-  public String getComment1() {
-    return expense.getComment1();
-  }
-  
-  public void setComment1(String comment1) {
-    expense.setComment1(comment1);
-  }
-
-  public String getComment2() {
-    return expense.getComment2();
-  }
-  
-  public void setComment2(String comment2) {
-    expense.setComment2(comment2);
+    computedValues.put("accountingCurrencyAmount", accountingCurrencyAmount);
+    computedValues.put("grantCurrencyAmount", grantCurrencyAmount);
+    computedValues.put("exchangeRate", grantCurrencyAmount <= 0.0 ? null : accountingCurrencyAmount / grantCurrencyAmount);
   }
   
   public Project getProject() {
@@ -117,33 +31,40 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
   
   @Override
-  protected Object getEntity() {
+  protected EntityBase getEntity() {
     return expense;
   }
   
+  @Override
+  protected void setEntity(EntityBase entity) {
+    this.expense = (ProjectExpense) entity;
+  }
+  
   private void recalculateAllocations(EntityManager em) {
-    double amount = accountingCurrencyAmount;
-
-    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(expense.getProject(), null, null, null);  // TODO
-    double grantCurrencyAmount = 0.0;
+    System.out.println("recalculateAllocations");
+    
+    double accountingCurrencyAmount = (Double) getProperty("accountingCurrencyAmount");
+    
+    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null, null);  // TODO
+  //  double grantCurrencyAmount = 0.0;
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
     
     for (int i = 0; i < list.size(); ++i) {
       ProjectSourceWrapper source = list.get(i);
-      if (amount == 0.0) {
+      if (accountingCurrencyAmount == 0.0) {
         break;
       }
       if (source.getRemainingAccountingCurrencyAmount() > 0) {
-        double take = Math.min(amount, source.getRemainingAccountingCurrencyAmount());
+        double take = Math.min(accountingCurrencyAmount, source.getRemainingAccountingCurrencyAmount());
         if (i == list.size() - 1) {
-          take = amount;  // Allow of going below zero balance for the last source.
+          take = accountingCurrencyAmount;  // Allow of going below zero balance for the last source.
         }
-        amount -= take;
+        accountingCurrencyAmount -= take;
         ExpenseSourceAllocation allocation = new ExpenseSourceAllocation();
         allocation.setExpense(expense);
         allocation.setSource(source.getSource());
         allocation.setAccountingCurrencyAmount(take);
-        grantCurrencyAmount += allocation.getAccountingCurrencyAmount() / source.getExchangeRate();
+  //      grantCurrencyAmount += allocation.getAccountingCurrencyAmount() / source.getExchangeRate();
         expense.getSourceAllocations().add(allocation);
       }
     }
@@ -154,15 +75,20 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
   
   public static void updateExpenseAllocations(EntityManager em, Project project, Date startingFrom) {
+    System.out.println("updateExpenseAllocations");
+    
     // Get list of expenses to update.
     List<ProjectExpenseWrapper> expensesToUpdate;
     if (startingFrom != null) {
-        expensesToUpdate = getProjectExpenseListQuery(project, " AND e.paymentDate >= :date").
-            setParameter("date", startingFrom).
-            getResultList(null);
+      expensesToUpdate = getProjectExpenseListQuery(em, project, " AND e.paymentDate >= :date").
+          setParameter("date", startingFrom).
+          getResultList();
     } else {
-      expensesToUpdate = getProjectExpenseList(project, null);
+      expensesToUpdate = getProjectExpenseListQuery(em, project, "").getResultList();
     }
+    
+    System.out.println("expensesToUpdate.size()= " + expensesToUpdate.size());
+    
     // Delete allocations and flush this to database. (Accounting currency amounts
     // are still kept in the database.)
     for (ProjectExpenseWrapper e : expensesToUpdate) {
@@ -178,53 +104,47 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
   
   @Override
-  public void persist() {
-    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+  public boolean save(EntityManager em) {
+    double editedAccountingCurrencyAmount = -1.0;
+    if (changedValues.containsKey("accountingCurrencyAmount")) {
+      editedAccountingCurrencyAmount = (Double) changedValues.get("accountingCurrencyAmount");
+      changedValues.remove("accountingCurrencyAmount");
+    }
+    super.save(em);
+    if (editedAccountingCurrencyAmount > 0.0) {
+      // Set the allocation size to be right for this entity and flush.
+      // This is just and initial fake setting which will be removed while normalizing.
+      //double accountingCurrencyAmount = editedAccountingCurrencyAmount;
 
-      @Override
-      public boolean run(EntityManager em) {
-        em.persist(expense);
-        if (editedAccountingCurrencyAmount != accountingCurrencyAmount || expense.getSourceAllocations().isEmpty()) {
-          // Set the allocation size to be right for this entity and flush.
-          // This is just and initial fake setting which will be removed while normalizing.
-          ExpenseSourceAllocation allocation;
-          if (expense.getSourceAllocations().size() > 0) {
-            System.out.println(" updating with fake value: " + accountingCurrencyAmount + " -> " + editedAccountingCurrencyAmount);
-            allocation = expense.getSourceAllocations().get(0);
-            allocation.setAccountingCurrencyAmount(allocation.getAccountingCurrencyAmount() - accountingCurrencyAmount + editedAccountingCurrencyAmount);
-          } else {
-            System.out.println(" adding fake value: " + accountingCurrencyAmount + " -> " + editedAccountingCurrencyAmount);
-            allocation = new ExpenseSourceAllocation();
-            allocation.setExpense(expense);
-            allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
-            ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s", ProjectSource.class).
-                setMaxResults(1).
-                getSingleResult();
-            allocation.setSource(source0);
-            expense.getSourceAllocations().add(allocation);
-          }
-          em.persist(allocation);
-          em.flush();
-          updateExpenseAllocations(em, expense.getProject(), expense.getPaymentDate());
+      ExpenseSourceAllocation allocation;
+      if (expense.getSourceAllocations().size() > 0) {
+        System.out.println(" updating with fake value: "  + editedAccountingCurrencyAmount);
+        allocation = expense.getSourceAllocations().get(0);
+        allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+        while (expense.getSourceAllocations().size() > 1) {
+          expense.getSourceAllocations().remove(1);
         }
-
-        if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
-          getParent().refresh();
-          return false;
-        }
-        return true;
+      } else {
+        System.out.println(" adding fake value: " + editedAccountingCurrencyAmount);
+        allocation = new ExpenseSourceAllocation();
+        em.persist(allocation);
+        allocation.setExpense(expense);
+        allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+        ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s", ProjectSource.class).
+            setMaxResults(1).
+            getSingleResult();
+        allocation.setSource(source0);
+        expense.getSourceAllocations().add(allocation);
       }
+      em.flush();
+      updateExpenseAllocations(em, expense.getProject(), expense.getPaymentDate());
+    }
 
-      @Override
-      public void onFailure() {
-        DatabaseConnectionSingleton.getInstance().hardReset();
-      }
-
-      @Override
-      public void onSuccess() {
-        getParent().refresh();
-      }  
-    });
+    if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
+      System.out.println("save failed with empty alloc list");
+      return false;
+    }
+    return true;
   }
   
   @Override
@@ -240,7 +160,6 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       }
       @Override
       public void onFailure() {
-        DatabaseConnectionSingleton.getInstance().hardReset();
       }
       @Override
       public void onSuccess() {
@@ -249,12 +168,12 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     });
   }
   
-  public static List<ProjectExpenseWrapper> getProjectExpenseList(Project project, ControllerBase parent) {
-    return getProjectExpenseListQuery(project, "").getResultList(parent);
+  public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {
+    return getProjectExpenseListQuery(em, project, "").getResultList();
   }
   
-  public static MyQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(Project project, String extraWhere) {
-    return EntityWrapper.createQuery(
+  public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, String extraWhere) {
+    return em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
             "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
             "WHERE e.project = :project " + extraWhere + " " +
@@ -264,6 +183,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
 
   public static List<ProjectExpenseWrapper> getExpenseList(
+      EntityManager em,
       Project project,
       Date startDate,
       Date endDate,
@@ -289,7 +209,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       comment2 = null;
     }
 
-    TypedQuery<ProjectExpenseWrapper> query = DatabaseConnectionSingleton.getInstance().createQuery(
+    TypedQuery<ProjectExpenseWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
             "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
             "WHERE (e.project.id = :project OR :project IS NULL) " +

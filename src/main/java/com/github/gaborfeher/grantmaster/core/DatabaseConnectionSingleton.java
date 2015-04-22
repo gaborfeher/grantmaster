@@ -1,12 +1,14 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +26,7 @@ public class DatabaseConnectionSingleton {
   private static DatabaseConnectionSingleton instance;
   
   private EntityManagerFactory entityManagerFactory;
-  private EntityManager entityManager;
+ // private EntityManager entityManager;
   
   /**
    * Directory where the database files are stored while the database is open.
@@ -42,10 +44,10 @@ public class DatabaseConnectionSingleton {
   }
   
   public void close() {
-    if (entityManager != null) {
-      entityManager.close();
-      entityManager = null;
-    }
+ //   if (entityManager != null) {
+ //     entityManager.close();
+ //     entityManager = null;
+ //   }
     if (entityManagerFactory != null) {
       entityManagerFactory.close();
       entityManagerFactory = null;
@@ -84,7 +86,7 @@ public class DatabaseConnectionSingleton {
     try {
       entityManagerFactory = Persistence.createEntityManagerFactory(
           "LocalH2ConnectionTemplate", properties);
-      entityManager = entityManagerFactory.createEntityManager();
+   //   entityManager = entityManagerFactory.createEntityManager();
     } catch (PersistenceException ex) {
       return false;
     }
@@ -164,19 +166,21 @@ public class DatabaseConnectionSingleton {
       }
       @Override
       public void onFailure() {
-        hardReset();
+        //hardReset();
       }
     });
   }
-  
+  /*
   public void hardReset() {
     // TODO: try to figure out when this is exactly needed
     entityManager.close();
     entityManager = entityManagerFactory.createEntityManager();
     //RefreshControlSingleton.getInstance().broadcastRefresh();
   }
+  */
   
   public boolean runInTransaction(TransactionRunner runner) {
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = entityManager.getTransaction();
     try {
       transaction.begin();
@@ -194,20 +198,30 @@ public class DatabaseConnectionSingleton {
       }
       runner.onFailure();
       return false;
+    } finally {
+      entityManager.close();
     }
     runner.onSuccess();
     return true;
   }
-
-  public boolean isConnected() {
-    return entityManager != null;
+  
+  public void runWithEntityManager(TransactionRunner runner) {
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    try  {
+      runner.run(entityManager);
+    } finally {
+      entityManager.close();
+    }
+    
   }
 
-  public <T extends Object> TypedQuery<T> createQuery(String query, Class<T> resultClass) {
-    return entityManager.createQuery(query, resultClass);
+  public boolean isConnected() {
+    return entityManagerFactory != null;
   }
 
   public void refresh(Object entity) {
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
     entityManager.refresh(entity);
+    entityManager.close();
   }
 }

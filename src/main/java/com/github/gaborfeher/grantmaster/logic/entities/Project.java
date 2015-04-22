@@ -14,7 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Project implements Serializable {
+public class Project implements EntityBase, Serializable {
   @Id
   @GeneratedValue
   private Integer id;
@@ -45,7 +45,7 @@ public class Project implements Serializable {
     this.name = name;
   }
 
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 

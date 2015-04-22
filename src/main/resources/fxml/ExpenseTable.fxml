@@ -20,7 +20,7 @@
     </TableColumn>
     <TableColumn text="%ProjectName" editable="false" sortable="false" styleClass="textColumn">
       <cellValueFactory>
-        <PropertyValueFactory property="project" />
+        <EntityPropertyValueFactory property="project" />
       </cellValueFactory>
     </TableColumn> 
     <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false" styleClass="textColumn">
@@ -28,7 +28,7 @@
         <DateTableCellFactory property="paymentDate" /> 
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="paymentDate" />
+        <EntityPropertyValueFactory property="paymentDate" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseAccountNo" prefWidth="120" sortable="false" styleClass="textColumn" >
@@ -36,7 +36,7 @@
         <StringTableCellFactory property="accountNo" />
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="accountNo" /> 
+        <EntityPropertyValueFactory property="accountNo" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpensePartnerName" sortable="false" styleClass="textColumn" >
@@ -44,7 +44,7 @@
         <StringTableCellFactory property="partnerName" />
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="partnerName" /> 
+        <EntityPropertyValueFactory property="partnerName" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%BudgetCategory" sortable="false" prefWidth="150" styleClass="textColumn" >
@@ -52,7 +52,7 @@
         <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="budgetCategory" /> 
+        <EntityPropertyValueFactory property="budgetCategory" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">
@@ -60,7 +60,7 @@
         <DoubleTableCellFactory property="originalAmount" />
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="originalAmount" /> 
+        <EntityPropertyValueFactory property="originalAmount" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalCurrency" sortable="false" styleClass="textColumn" >
@@ -68,7 +68,7 @@
         <CurrencyTableCellFactory property="originalCurrency" />
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="originalCurrency" /> 
+        <EntityPropertyValueFactory property="originalCurrency" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesAmount">
@@ -78,7 +78,7 @@
             <DoubleTableCellFactory property="accountingCurrencyAmount" />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="accountingCurrencyAmount" /> 
+            <EntityPropertyValueFactory property="accountingCurrencyAmount" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn fx:id="grantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false" prefWidth="130">
@@ -86,7 +86,7 @@
             <DoubleTableCellFactory property="grantCurrencyAmount"  />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="grantCurrencyAmount" /> 
+            <EntityPropertyValueFactory property="grantCurrencyAmount" /> 
           </cellValueFactory>
         </TableColumn>
       </columns>
@@ -96,7 +96,7 @@
         <DoubleTableCellFactory property="exchangeRate" /> 
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="exchangeRate" /> 
+        <EntityPropertyValueFactory property="exchangeRate" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseComment1" editable="true" sortable="false" prefWidth="120" styleClass="textColumn" >
@@ -104,7 +104,7 @@
         <StringTableCellFactory property="comment1" /> 
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="comment1" /> 
+        <EntityPropertyValueFactory property="comment1" /> 
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseComment2" editable="true" sortable="false" prefWidth="120" styleClass="textColumn" >
@@ -112,7 +112,7 @@
         <StringTableCellFactory property="comment2" /> 
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="comment2" /> 
+        <EntityPropertyValueFactory property="comment2" /> 
       </cellValueFactory>
     </TableColumn>
   </columns>

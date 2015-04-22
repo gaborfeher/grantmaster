@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"name"}))
-public class BudgetCategory implements Serializable {
+public class BudgetCategory implements EntityBase, Serializable {
   @Id
   @GeneratedValue
   private Integer id;
@@ -63,7 +63,7 @@ public class BudgetCategory implements Serializable {
     this.name = name;
   }
 
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 

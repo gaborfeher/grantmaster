@@ -15,7 +15,7 @@ import javax.persistence.OneToMany;
 // http://svanimpe.be/blog/properties-jpa.html
 
 @Entity
-public class ProjectExpense implements Serializable {
+public class ProjectExpense implements EntityBase, Serializable {
   @Id
   @GeneratedValue
   private int id;
@@ -54,7 +54,7 @@ public class ProjectExpense implements Serializable {
   /**
    * @return the id
    */
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 

@@ -18,7 +18,7 @@ import javax.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"budgetCategory_id", "project_id"}))
-public class ProjectBudgetLimit implements Serializable {
+public class ProjectBudgetLimit implements EntityBase, Serializable {
   @Id
   @GeneratedValue
   private int id;
@@ -39,14 +39,13 @@ public class ProjectBudgetLimit implements Serializable {
   public ProjectBudgetLimit() {
   }
 
-  public Double getBudget() {
+  public Double getBudgetGrantCurrency() {
     return budget;
   }
 
-  public void setBudget(Double budget) {
+  public void setBudgetGrantCurrency(Double budget) {
     this.budget = budget;
   }
-
 
   public BudgetCategory getBudgetCategory() {
     return budgetCategory;
@@ -78,4 +77,7 @@ public class ProjectBudgetLimit implements Serializable {
     this.budgetPercentage = budgetPercentage;
   }
 
+  public Integer getId() {
+    return id;
+  }
 }

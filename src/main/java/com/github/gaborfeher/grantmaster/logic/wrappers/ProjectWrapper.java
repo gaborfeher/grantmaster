@@ -1,12 +1,9 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
-import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -21,40 +18,8 @@ public class ProjectWrapper extends EntityWrapper {
     return project.getId();
   }
   
-  public String getName() {
-    return project.getName();
-  }
-  
-  public void setName(String name) {
-    project.setName(name);
-  }
-  
-  public Currency getAccountCurrency() {
-    return project.getAccountCurrency();
-  }
-  
-  public void setAccountCurrency(Currency currency) {
-    project.setAccountCurrency(currency);
-  }
-  
-  public Currency getGrantCurrency() {
-    return project.getGrantCurrency();
-  }
-  
-  public void setGrantCurrency(Currency currency) {
-    project.setGrantCurrency(currency);
-  }
-  
-  public void setIncomeType(BudgetCategory budgetCategory) {
-    project.setIncomeType(budgetCategory);
-  }
-
-  public BudgetCategory getIncomeType() {
-    return project.getIncomeType();
-  }
-  
   @Override
-  protected Object getEntity() {
+  protected EntityBase getEntity() {
     return project;
   }
   
@@ -71,7 +36,6 @@ public class ProjectWrapper extends EntityWrapper {
       }
       @Override
       public void onFailure() {
-        DatabaseConnectionSingleton.getInstance().hardReset();
       }
       @Override
       public void onSuccess() {
@@ -84,15 +48,20 @@ public class ProjectWrapper extends EntityWrapper {
     return project;
   }
   
-  public static List<ProjectWrapper> getProjects(ControllerBase parent) {
-    return EntityWrapper.createQuery(
+  public static List<ProjectWrapper> getProjects(EntityManager em) {
+    return em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p",
         ProjectWrapper.class).
-            getResultList(parent);
+            getResultList();
   }
   
-  public static List<Project> getProjectsWithoutWrapping() {
-    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT p FROM Project p", Project.class).getResultList();
+  public static List<Project> getProjectsWithoutWrapping(EntityManager em) {
+    return em.createQuery("SELECT p FROM Project p", Project.class).getResultList();
+  }
+
+  @Override
+  protected void setEntity(EntityBase entity) {
+    this.project = (Project) entity;
   }
 
 }

@@ -1,11 +1,12 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
-import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.EntityManager;
 
 public class ProjectNoteWrapper extends EntityWrapper {
   private ProjectNote note;
@@ -14,32 +15,25 @@ public class ProjectNoteWrapper extends EntityWrapper {
     this.note = note;
   }
   
-  public String getNote() {
-    return note.getNote();
-  }
-  
-  public void setNote(String note) {
-    this.note.setNote(note);
-  }
-  
-  public Timestamp getEntryTime() {
-    return note.getEntryTime();
-  }
-  
   @Override
-  protected Object getEntity() {
+  protected EntityBase getEntity() {
     return note;
   }
   
-  public static List<ProjectNoteWrapper> getNotes(Project project, ControllerBase parent) {
-    return EntityWrapper.createQuery(
+  @Override
+  protected void setEntity(EntityBase entity) {
+    this.note = (ProjectNote) entity;
+  }
+  
+  public static List<ProjectNoteWrapper> getNotes(EntityManager em, Project project) {
+    return em.createQuery(
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper(n) " +
             "FROM ProjectNote n " +
             "WHERE n.project = :project " +
             "ORDER BY n.entryTime",
             ProjectNoteWrapper.class).
         setParameter("project", project).
-        getResultList(parent);
+        getResultList();
   }
   
 }

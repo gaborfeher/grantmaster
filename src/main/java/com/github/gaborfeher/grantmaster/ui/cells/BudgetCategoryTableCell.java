@@ -1,10 +1,12 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
+import javax.persistence.EntityManager;
 
 class BudgetCategoryTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, Object> {
   String property;
@@ -30,7 +32,14 @@ class BudgetCategoryTableCell<S extends EntityWrapper> extends ChoiceBoxTableCel
   @Override
   public void startEdit() {
     if (getEntityWrapper() != null && getEntityWrapper().canEdit()) {
-      getItems().setAll(BudgetCategoryWrapper.getBudgetCategories(direction));
+      DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+
+        @Override
+        public boolean run(EntityManager em) {
+          getItems().setAll(BudgetCategoryWrapper.getBudgetCategories(em, direction));
+          return true;
+        }
+      });
       super.startEdit();
     }
   }

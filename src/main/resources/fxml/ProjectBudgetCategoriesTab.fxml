@@ -38,7 +38,7 @@
             <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>  
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="budgetCategory" /> 
+            <EntityPropertyValueFactory property="budgetCategory" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">
@@ -46,7 +46,7 @@
             <DoubleTableCellFactory property="budgetPercentage" />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="budgetPercentage" /> 
+            <EntityPropertyValueFactory property="budgetPercentage" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn prefWidth="350" text="%BudgetLimitValueColumn">
@@ -56,7 +56,7 @@
                 <DoubleTableCellFactory property="budgetAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="budgetAccountingCurrency" />
+                <EntityPropertyValueFactory property="budgetAccountingCurrency" />
               </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true" prefWidth="120">
@@ -64,7 +64,7 @@
                 <DoubleTableCellFactory property="budgetGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="budgetGrantCurrency" />
+                <EntityPropertyValueFactory property="budgetGrantCurrency" />
               </cellValueFactory>
             </TableColumn>
           </columns>
@@ -76,7 +76,7 @@
                 <DoubleTableCellFactory property="spentAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="spentAccountingCurrency" />
+                <EntityPropertyValueFactory property="spentAccountingCurrency" />
               </cellValueFactory>              
             </TableColumn>
             <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
@@ -84,7 +84,7 @@
                 <DoubleTableCellFactory property="spentGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="spentGrantCurrency" />
+                <EntityPropertyValueFactory property="spentGrantCurrency" />
               </cellValueFactory>              
             </TableColumn>
           </columns>
@@ -96,7 +96,7 @@
                 <DoubleTableCellFactory property="remainingAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="remainingAccountingCurrency" />
+                <EntityPropertyValueFactory property="remainingAccountingCurrency" />
               </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
@@ -104,7 +104,7 @@
                 <DoubleTableCellFactory property="remainingGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
-                <PropertyValueFactory property="remainingGrantCurrency" />
+                <EntityPropertyValueFactory property="remainingGrantCurrency" />
               </cellValueFactory>
             </TableColumn>
           </columns>

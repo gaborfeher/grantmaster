@@ -3,12 +3,11 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
+import javax.persistence.EntityManager;
 
 public class ProjectSourceTabController extends ControllerBase {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
@@ -28,8 +27,8 @@ public class ProjectSourceTabController extends ControllerBase {
   }
 
   @Override
-  public void refresh() {
-    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project, null, null, this);
+  public void refresh(EntityManager em) {
+    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null, null);
     table.getItems().setAll(projectTransfers);
     
     String grantCurrency = project.getGrantCurrency().getCode();

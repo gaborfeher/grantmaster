@@ -2,11 +2,9 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
+import javax.persistence.EntityManager;
 
 public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> {
   @FXML ExpenseTableController tableController;
@@ -22,16 +20,16 @@ public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWr
   }
   
   @Override
-  public void refresh() {
-    table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(project, this));
+  public void refresh(EntityManager em) {
+    table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(em, project));
   }
 
   @Override
   public ProjectExpenseWrapper createNewEntity() {
     ProjectExpense expense = new ProjectExpense();
     expense.setProject(project);
+    expense.setOriginalCurrency(project.getAccountCurrency());
     ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense, 0.0, 0.0);
-    wrapper.setOriginalCurrency(project.getAccountCurrency());
     return wrapper;
   }
 

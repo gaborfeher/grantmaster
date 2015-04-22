@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 @Entity
-public class ProjectSource implements Serializable {
+public class ProjectSource implements EntityBase, Serializable {
   @Id
   @GeneratedValue
   private int id;
@@ -22,7 +22,7 @@ public class ProjectSource implements Serializable {
   private Project project;
 
   @Column(nullable = false)
-  private double amount;
+  private double amount;  // TODO: rename
       
   @Column(nullable = false)
   private double exchangeRate;
@@ -36,7 +36,7 @@ public class ProjectSource implements Serializable {
   /**
    * @return the id
    */
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 
@@ -64,14 +64,14 @@ public class ProjectSource implements Serializable {
   /**
    * @return the amount
    */
-  public double getAmount() {
+  public double getGrantCurrencyAmount() {
     return amount;
   }
 
   /**
    * @param amount the amount to set
    */
-  public void setAmount(Double amount) {
+  public void setGrantCurrencyAmount(Double amount) {
     this.amount = amount;
   }
 

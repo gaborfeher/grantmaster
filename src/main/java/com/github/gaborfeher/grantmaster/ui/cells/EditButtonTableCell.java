@@ -1,5 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
+import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.Optional;
@@ -10,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
+import javax.persistence.EntityManager;
 
 public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
   final Button saveButton = new Button("Ment");
@@ -56,7 +59,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   protected void updateItem(EntityWrapper.State state, boolean empty) {
     super.updateItem(state, empty);
     EntityWrapper e = getEntityWrapper();
-    if (empty || e == null || e.isFake() || state == null) {
+    if (empty || e == null || state == null) {
       setGraphic(null);
       setText(null);
       return;
@@ -73,8 +76,22 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   void handleSaveButtonClick() {
-    EntityWrapper entityWrapper = getEntityWrapper();
-    entityWrapper.persist();
+    final EntityWrapper entityWrapper = getEntityWrapper();
+    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+
+      @Override
+      public boolean run(EntityManager em) {
+        return entityWrapper.save(em);
+      }
+
+      @Override
+      public void onSuccess() {
+        entityWrapper.refresh();
+      }
+
+    });
+    
+    
     entityWrapper.setState(EntityWrapper.State.SAVED);
     updateItem(entityWrapper.getState(), false);
   }

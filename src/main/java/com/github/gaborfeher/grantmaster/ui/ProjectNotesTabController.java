@@ -5,6 +5,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper;
 import java.sql.Timestamp;
 import java.util.Date;
+import javax.persistence.EntityManager;
 
 public class ProjectNotesTabController extends ControllerBase<ProjectNoteWrapper> {
   
@@ -15,8 +16,8 @@ public class ProjectNotesTabController extends ControllerBase<ProjectNoteWrapper
   }
 
   @Override
-  public void refresh() {
-    table.getItems().setAll(ProjectNoteWrapper.getNotes(project, this));
+  public void refresh(EntityManager em) {
+    table.getItems().setAll(ProjectNoteWrapper.getNotes(em, project));
   }
 
   @Override

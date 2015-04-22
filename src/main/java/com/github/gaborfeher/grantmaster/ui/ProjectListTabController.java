@@ -5,14 +5,14 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.io.IOException;
 import javafx.event.ActionEvent;
-import javafx.fxml.Initializable;
+import javax.persistence.EntityManager;
 
 public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
   MainPageController parent;
   
   @Override
-  public void refresh() {
-    table.getItems().setAll(ProjectWrapper.getProjects(this));
+  public void refresh(EntityManager em) {
+    table.getItems().setAll(ProjectWrapper.getProjects(em));
   }
   
   public void handleOpenButtonAction(ActionEvent event) throws IOException {

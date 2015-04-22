@@ -23,7 +23,7 @@
         </TableColumn> 
         <TableColumn text="%ProjectNotesEntryTime" editable="false" prefWidth="200" styleClass="textColumn">
           <cellValueFactory>
-            <PropertyValueFactory property="entryTime" />
+            <EntityPropertyValueFactory property="entryTime" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectNotesNote" prefWidth="700" styleClass="textColumn">
@@ -31,7 +31,7 @@
             <StringTableCellFactory property="note" /> 
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="note" /> 
+            <EntityPropertyValueFactory property="note" /> 
           </cellValueFactory>
         </TableColumn>
       </columns>

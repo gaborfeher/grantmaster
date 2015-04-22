@@ -1,8 +1,11 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;
+import com.github.gaborfeher.grantmaster.ui.cells.EntityPropertyValueFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +14,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
+import javax.persistence.EntityManager;
 
 public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> {
 
@@ -18,24 +22,18 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
   }
   
   @Override
-  public void refresh() {
+  protected void refresh(EntityManager em) {
     List<BudgetCategoryWrapper> paymentCategories = new ArrayList<>();
     List<BudgetCategoryWrapper> incomeCategories = new ArrayList<>();
     Set<String> columnNames = new TreeSet<>();
-    BudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
-        paymentCategories, incomeCategories, columnNames, this);
-
+        BudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
+            em, paymentCategories, incomeCategories, columnNames);
+    
     // Initialize table columns.
     table.getColumns().remove(4, table.getColumns().size());
     for (final String columnName : columnNames) {
       TableColumn column = new TableColumn<BudgetCategoryWrapper, Double>(columnName);
-      column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<BudgetCategoryWrapper, Double>,ObservableValue<Double>>() {
-        @Override
-        public ObservableValue<Double> call(TableColumn.CellDataFeatures<BudgetCategoryWrapper, Double> p) {
-          Double value = p.getValue().getSummaryValue(columnName);
-          return new ReadOnlyObjectWrapper<Double>(value);
-        }
-      });
+      column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
       column.setCellFactory(new DoubleTableCellFactory());
       column.getStyleClass().add("numColumn");
       column.setSortable(false);
@@ -44,6 +42,7 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
     }
     
     BudgetCategoryWrapper.createBudgetSummaryList(
+        em,
         paymentCategories,
         incomeCategories,
         table.getItems());

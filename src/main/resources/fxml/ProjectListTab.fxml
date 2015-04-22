@@ -29,7 +29,7 @@
             <StringTableCellFactory property="name" /> 
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="name" />
+            <EntityPropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectAccountCurrency" prefWidth="150" styleClass="textColumn">
@@ -37,7 +37,7 @@
             <CurrencyTableCellFactory property="accountCurrency" />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="accountCurrency" />
+            <EntityPropertyValueFactory property="accountCurrency" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectGrantCurrency" prefWidth="150" styleClass="textColumn">
@@ -45,7 +45,7 @@
             <CurrencyTableCellFactory property="grantCurrency" /> 
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="grantCurrency" />
+            <EntityPropertyValueFactory property="grantCurrency" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectIncomeType" prefWidth="300" styleClass="textColumn">
@@ -53,7 +53,7 @@
             <BudgetCategoryTableCellFactory property="incomeType" direction="INCOME" />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="incomeType" />
+            <EntityPropertyValueFactory property="incomeType" />
           </cellValueFactory>
         </TableColumn>
         

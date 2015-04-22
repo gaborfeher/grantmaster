@@ -1,17 +1,15 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javax.persistence.EntityManager;
 
 public class CurrenciesTabController extends ControllerBase {
   @FXML TextField codeEntry;
@@ -20,9 +18,15 @@ public class CurrenciesTabController extends ControllerBase {
 
   @Override
   public void refresh() {
-    List<Currency> list = DatabaseConnectionSingleton.getInstance().createQuery(
-        "SELECT c FROM Currency c", Currency.class).getResultList();
-    currencyTable.getItems().setAll(list);
+    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        List<Currency> list = em.createQuery(
+            "SELECT c FROM Currency c", Currency.class).getResultList();
+        currencyTable.getItems().setAll(list);
+        return true;
+      }
+    });
   }
 
   public void addCurrencyButtonAction(ActionEvent e) {
@@ -41,6 +45,11 @@ public class CurrenciesTabController extends ControllerBase {
 
   @Override
   protected EntityWrapper createNewEntity() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  protected void refresh(EntityManager em) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

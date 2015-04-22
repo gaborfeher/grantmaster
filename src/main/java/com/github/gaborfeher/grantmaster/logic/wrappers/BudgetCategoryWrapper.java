@@ -1,8 +1,7 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,26 +10,21 @@ import javax.persistence.EntityManager;
 
 public class BudgetCategoryWrapper extends EntityWrapper {
   protected BudgetCategory budgetCategory;
-  protected final HashMap<String, Double> summaryValues;
-  private final String fakeName;
-  private boolean summary;
 
   public BudgetCategoryWrapper(BudgetCategory budgetCategory) {
     this.budgetCategory = budgetCategory;
-    this.summaryValues = new HashMap<>();
-    this.fakeName = null;
   }
   
   protected BudgetCategoryWrapper(String fakeName) {
     this.budgetCategory = null;
-    this.summaryValues = new HashMap<>();
-    this.fakeName = fakeName;
+    this.computedValues.put("name", fakeName);
   }
   
   public BudgetCategoryWrapper createFakeCopy(String fakeName) {
     BudgetCategoryWrapper copy = new BudgetCategoryWrapper(fakeName);
     copy.addSummaryValues(this, 1.0);
     copy.setIsSummary(true);
+    copy.setState(null);
     return copy;
   }
   
@@ -38,85 +32,60 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return budgetCategory.getId();
   }
   
-  public String getName() {
-    if (fakeName != null) {
-      return fakeName;
+  @Override
+  public Object getProperty(String name) {
+    if (computedValues.containsKey(name)) {
+      return computedValues.get(name);
+    } else if (getEntity() != null) {
+      return super.getProperty(name);
     }
-    return budgetCategory.getName();
-  }
-  
-  public void setName(String name) {
-    budgetCategory.setName(name);
+    return null;
   }
 
-  public BudgetCategory.Direction getDirection() {
-    if (budgetCategory == null) {
-      return null;
-    }
-    return budgetCategory.getDirection();
-  }
-  
-  public void setDirection(BudgetCategory.Direction direction) {
-    budgetCategory.setDirection(direction);
-  }
-  
-  public String getGroupName() {
+   public String getGroupName() {
     if (budgetCategory == null) {
       return null;
     }
     return budgetCategory.getGroupName();
   }
-  
-  public void setGroupName(String groupName) {
-    budgetCategory.setGroupName(groupName);
+   
+  public BudgetCategory getBudgetCategory() {
+    return budgetCategory;
   }
   
-  public Object getBudgetCategory() {
-    if (fakeName != null) {
-      return fakeName;
-    }
-    return budgetCategory;
+  protected void addSummaryValue(BudgetCategoryWrapper other, String key, double multiplier) {
+    Double value = (Double)other.computedValues.get(key) * multiplier;
+    computedValues.put(key, value + (Double) computedValues.getOrDefault(key, 0.0));
   }
   
   public void addSummaryValues(BudgetCategoryWrapper other, double multiplier) {
-    for (Map.Entry<String, Double> summaryEntry : other.summaryValues.entrySet()) {
+    for (Map.Entry<String, Object> summaryEntry : other.computedValues.entrySet()) {
       String key = summaryEntry.getKey();
-      Double value = summaryEntry.getValue() * multiplier;
-      summaryValues.put(key, value + summaryValues.getOrDefault(key, 0.0));
+      Object entryValue = summaryEntry.getValue();
+      if (entryValue != null && entryValue instanceof Double) {
+        addSummaryValue(other, key, multiplier);
+      }
     }
   }
   
   @Override
-  public boolean isFake() {
-    return fakeName != null;
-  }
-  
-  @Override
-  protected Object getEntity() {
+  protected EntityBase getEntity() {
     return budgetCategory;
   }
 
-  public void addSummaryValue(String header, Double value) {
-    summaryValues.put(header, value);
-  }
-
-  public Double getSummaryValue(String columnName) {
-    return summaryValues.get(columnName);
-  }
-
-  public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(BudgetCategory.Direction direction, ControllerBase parent) {
-    return EntityWrapper.createQuery(
+  public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(EntityManager em, BudgetCategory.Direction direction) {
+    return em.createQuery(
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper(c) " +
             "FROM BudgetCategory c " +
             "WHERE :direction IS NULL OR c.direction = :direction " +
             "ORDER BY c.direction, c.groupName NULLS LAST, c.name",
         BudgetCategoryWrapper.class).
             setParameter("direction", direction).
-            getResultList(parent);
+            getResultList();
   }
   
-  public static List<BudgetCategory> getBudgetCategories(BudgetCategory.Direction direction) {
-    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT c " +
+  public static List<BudgetCategory> getBudgetCategories(EntityManager em, BudgetCategory.Direction direction) {
+    return em.createQuery("SELECT c " +
             "FROM BudgetCategory c " +
             "WHERE c.direction = :direction " +
             "ORDER BY c.groupName NULLS LAST, c.name",
@@ -126,16 +95,17 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   }
   
   private static void getYearlyBudgetCategorySummaryMap(
+      EntityManager em,
       String query,
       Map<Integer, BudgetCategoryWrapper> map,
       Set<String> columnNames) {
-    List<Object[]> summaryList = DatabaseConnectionSingleton.getInstance().createQuery(query, Object[].class).getResultList();
+    List<Object[]> summaryList = em.createQuery(query, Object[].class).getResultList();
     for (Object[] line : summaryList) {
       BudgetCategoryWrapper budgetCategoryWrapper = map.get(((BudgetCategory)line[0]).getId());
       int year = (Integer)line[2];
       String header = String.format("%d (%s)", year, (String)line[1]);
       columnNames.add(header);
-      budgetCategoryWrapper.addSummaryValue(header, (Double)line[3]);
+      budgetCategoryWrapper.computedValues.put(header, (Double)line[3]);
     }
   }
   
@@ -146,16 +116,16 @@ public class BudgetCategoryWrapper extends EntityWrapper {
    * @param incomeCategories 
    */
   public static void getYearlyBudgetCategorySummaries(
+      EntityManager em,
       List<BudgetCategoryWrapper> paymentCategories,
       List<BudgetCategoryWrapper> incomeCategories,
-      Set<String> columnNames,
-      ControllerBase parent) {
+      Set<String> columnNames) {
     paymentCategories.clear();
     paymentCategories.addAll(getBudgetCategoryWrappers(
-        BudgetCategory.Direction.PAYMENT, parent));
+        em, BudgetCategory.Direction.PAYMENT));
     incomeCategories.clear();
     incomeCategories.addAll(getBudgetCategoryWrappers(
-        BudgetCategory.Direction.INCOME, parent));
+        em, BudgetCategory.Direction.INCOME));
     
     Map<Integer, BudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
     for (BudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {
@@ -167,6 +137,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     
     // Collect expense summaries.
     getYearlyBudgetCategorySummaryMap(
+        em,
         "SELECT e.budgetCategory, e.project.accountCurrency.code AS currency, FUNCTION('YEAR', e.paymentDate) AS year, SUM(a.accountingCurrencyAmount) " +
         "FROM ProjectExpense e, ExpenseSourceAllocation a " +
         "WHERE a.expense = e " +
@@ -176,6 +147,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
 
     // Collect income summaries.
     getYearlyBudgetCategorySummaryMap(
+        em,
         "SELECT s.project.incomeType AS incomeType, s.project.accountCurrency.code AS currency, FUNCTION('YEAR', s.availabilityDate) AS year, SUM(s.amount * s.exchangeRate) " +
         "FROM ProjectSource s " +
         "GROUP BY incomeType, year, currency",
@@ -184,6 +156,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   }
   
   public static BudgetCategoryWrapper createBudgetSummaryList(
+      EntityManager em,
       List<BudgetCategoryWrapper> rawLines,
       String summaryTitle,
       List<BudgetCategoryWrapper> summary) {
@@ -235,14 +208,15 @@ public class BudgetCategoryWrapper extends EntityWrapper {
    * @param output 
    */
   public static void createBudgetSummaryList(
+      EntityManager em,
       List<BudgetCategoryWrapper> paymentCategories,
       List<BudgetCategoryWrapper> incomeCategories,
       List<BudgetCategoryWrapper> output) {
     output.clear();
     BudgetCategoryWrapper expenseSum =
-        createBudgetSummaryList(paymentCategories, "Költségek mindösszesen", output);
+        createBudgetSummaryList(em, paymentCategories, "Költségek mindösszesen", output);
     BudgetCategoryWrapper incomeSum = 
-        createBudgetSummaryList(incomeCategories, "Bevételek mindösszesen", output);
+        createBudgetSummaryList(em, incomeCategories, "Bevételek mindösszesen", output);
     BudgetCategoryWrapper finalSum = incomeSum.createFakeCopy("Különbség");
     if (expenseSum != null) {
       finalSum.addSummaryValues(expenseSum, -1.0);
@@ -315,6 +289,11 @@ public class BudgetCategoryWrapper extends EntityWrapper {
             "Egyéb bevételek"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
+  }
+
+  @Override
+  protected void setEntity(EntityBase entity) {
+    this.budgetCategory = (BudgetCategory) entity;
   }
 
 
