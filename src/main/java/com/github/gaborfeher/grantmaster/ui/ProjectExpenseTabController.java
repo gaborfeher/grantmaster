@@ -8,7 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 
-public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> implements Initializable {
+public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> {
   @FXML ExpenseTableController tableController;
   
   Project project;
@@ -19,16 +19,11 @@ public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWr
   void init(Project project) {
     this.project = project;
     tableController.init(project);
-    subscribe();
   }
   
   @Override
   public void refresh() {
-    table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(project));
-  }
-
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
+    table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(project, this));
   }
 
   @Override

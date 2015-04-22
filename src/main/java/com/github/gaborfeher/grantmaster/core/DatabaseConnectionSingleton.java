@@ -109,7 +109,6 @@ public class DatabaseConnectionSingleton {
     }
     
     connectTo(tempFile.getAbsolutePath());
-    RefreshControlSingleton.getInstance().broadcastRefresh();
     return tempFile;
   }
   
@@ -174,7 +173,7 @@ public class DatabaseConnectionSingleton {
     // TODO: try to figure out when this is exactly needed
     entityManager.close();
     entityManager = entityManagerFactory.createEntityManager();
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    //RefreshControlSingleton.getInstance().broadcastRefresh();
   }
   
   public boolean runInTransaction(TransactionRunner runner) {

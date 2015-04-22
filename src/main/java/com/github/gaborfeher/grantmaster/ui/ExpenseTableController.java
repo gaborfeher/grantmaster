@@ -9,7 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 
-public class ExpenseTableController extends RefreshControlSingleton.MessageObserver implements Initializable {
+public class ExpenseTableController implements Initializable {
   Project project;
   
   @FXML TableColumn<ProjectExpenseWrapper, Object> accountingCurrencyAmountColumn;
@@ -21,10 +21,8 @@ public class ExpenseTableController extends RefreshControlSingleton.MessageObser
 
   public void init(Project project) {
     this.project = project;
-    subscribe();
   }
 
-  @Override
   public void refresh() {
     if (project != null) {
       accountingCurrencyAmountColumn.setText(project.getAccountCurrency().toString());

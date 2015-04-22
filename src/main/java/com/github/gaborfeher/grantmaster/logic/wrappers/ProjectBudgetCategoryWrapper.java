@@ -5,6 +5,7 @@ import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.sql.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -191,14 +192,15 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
       Project project,
       Date filterStartDate,
-      Date filterEndDate) {
+      Date filterEndDate,
+      ControllerBase parent) {
     DatabaseConnectionSingleton conn = DatabaseConnectionSingleton.getInstance();
     Double total = 
         Utils.getSingleResultWithDefault(0.0,
             conn.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
             setParameter("project", project));
         
-    List<ProjectBudgetCategoryWrapper> list = conn.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
+    List<ProjectBudgetCategoryWrapper> list = EntityWrapper.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
         "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
             "WHERE c.direction = :direction " +
             " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
@@ -210,7 +212,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
             setParameter("direction", BudgetCategory.Direction.PAYMENT).
             setParameter("filterStartDate", filterStartDate).
             setParameter("filterEndDate", filterEndDate).
-            getResultList();
+            getResultList(parent);
     
     Iterator<ProjectBudgetCategoryWrapper> iterator = list.iterator();
     while (iterator.hasNext()) {

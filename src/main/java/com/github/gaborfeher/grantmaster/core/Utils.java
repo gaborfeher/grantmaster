@@ -29,7 +29,7 @@ public class Utils {
   }
 
   public static boolean prepareForEditing() {
-    if (RefreshControlSingleton.getInstance().isEditingActive()) {
+ /*   if (RefreshControlSingleton.getInstance().isEditingActive()) {
       Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
       alert.setTitle("Szerkesztés");
       alert.setHeaderText("Egyszerre egy dolgot lehet szerkeszteni");
@@ -41,7 +41,7 @@ public class Utils {
         return false;
       }
     }
-    RefreshControlSingleton.getInstance().setEditingActive(true);
+    RefreshControlSingleton.getInstance().setEditingActive(true); */
     return true;
   }
 

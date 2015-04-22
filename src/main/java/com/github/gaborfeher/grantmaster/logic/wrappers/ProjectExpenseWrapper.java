@@ -9,6 +9,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   private void recalculateAllocations(EntityManager em) {
     double amount = accountingCurrencyAmount;
 
-    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(expense.getProject(), null, null);  // TODO
+    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(expense.getProject(), null, null, null);  // TODO
     double grantCurrencyAmount = 0.0;
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
     
@@ -158,9 +159,9 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     if (startingFrom != null) {
         expensesToUpdate = getProjectExpenseListQuery(project, " AND e.paymentDate >= :date").
             setParameter("date", startingFrom).
-            getResultList();
+            getResultList(null);
     } else {
-      expensesToUpdate = getProjectExpenseList(project);
+      expensesToUpdate = getProjectExpenseList(project, null);
     }
     // Delete allocations and flush this to database. (Accounting currency amounts
     // are still kept in the database.)
@@ -208,7 +209,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
         }
 
         if (expense.getSourceAllocations() == null || expense.getSourceAllocations().isEmpty()) {
-          RefreshControlSingleton.getInstance().broadcastRefresh();  // TODO: keep editing instead of this
+          getParent().refresh();
           return false;
         }
         return true;
@@ -221,7 +222,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
 
       @Override
       public void onSuccess() {
-        RefreshControlSingleton.getInstance().broadcastRefresh();
+        getParent().refresh();
       }  
     });
   }
@@ -243,17 +244,17 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       }
       @Override
       public void onSuccess() {
-        RefreshControlSingleton.getInstance().broadcastRefresh();
+        getParent().refresh();
       }
     });
   }
   
-  public static List<ProjectExpenseWrapper> getProjectExpenseList(Project project) {
-    return getProjectExpenseListQuery(project, "").getResultList();
+  public static List<ProjectExpenseWrapper> getProjectExpenseList(Project project, ControllerBase parent) {
+    return getProjectExpenseListQuery(project, "").getResultList(parent);
   }
   
-  public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(Project project, String extraWhere) {
-    return DatabaseConnectionSingleton.getInstance().createQuery(
+  public static MyQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(Project project, String extraWhere) {
+    return EntityWrapper.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
             "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
             "WHERE e.project = :project " + extraWhere + " " +

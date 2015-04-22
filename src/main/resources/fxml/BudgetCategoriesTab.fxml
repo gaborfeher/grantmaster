@@ -8,7 +8,7 @@
 <?import javafx.scene.control.cell.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.BudgetCategoriesTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.BudgetCategoriesTabController">
   <children>
     <Button text="%AddBudgetCategoryButtonLabel" onAction="#addButtonAction" />
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">

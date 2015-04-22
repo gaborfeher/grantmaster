@@ -5,10 +5,10 @@ import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.sql.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 public class ProjectSourceWrapper extends EntityWrapper {
   private ProjectSource source;
@@ -86,8 +86,8 @@ public class ProjectSourceWrapper extends EntityWrapper {
   }
   
   public static List<ProjectSourceWrapper> getProjectSources(
-      Project project, Date filterStartDate, Date filterEndDate) {
-    TypedQuery<ProjectSourceWrapper> query = DatabaseConnectionSingleton.getInstance().createQuery(
+      Project project, Date filterStartDate, Date filterEndDate, ControllerBase parent) {
+    MyQuery<ProjectSourceWrapper> query = EntityWrapper.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +
             "WHERE s.project = :project " +
@@ -98,7 +98,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
     query.setParameter("project", project);
     query.setParameter("filterStartDate", filterStartDate);
     query.setParameter("filterEndDate", filterEndDate);
-    return query.getResultList();
+    return query.getResultList(parent);
   }
   
   static void removeProjectSources(EntityManager em, Project project) {
@@ -127,7 +127,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
 
       @Override
       public void onSuccess() {
-        RefreshControlSingleton.getInstance().broadcastRefresh();
+        getParent().refresh();
       }
       
     });

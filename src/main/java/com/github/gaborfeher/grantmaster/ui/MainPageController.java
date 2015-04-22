@@ -15,12 +15,15 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -59,6 +62,12 @@ public class MainPageController implements Initializable {
     mainTabs.getSelectionModel().selectFirst();
     mainTabs.getTabs().remove(4, mainTabs.getTabs().size());
   }
+  
+  private void resetAndRefreshTabs() {
+    closeProjectTabs();
+    mainTabs.getSelectionModel().selectFirst();
+    TabSelectionChangeListener.refreshTab(mainTabs.getTabs().get(0));
+  }
  
   public void addProjectTab(final Project project) throws IOException {
     Tab newTab = new Tab(project.getName());
@@ -67,17 +76,19 @@ public class MainPageController implements Initializable {
     final ProjectTabController controller;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
     loader.setResources(ResourceBundle.getBundle("bundles.MainPage", new Locale("hu")));
-    Parent root1 = loader.load();
+    Parent projectPage = loader.load();
     controller = loader.getController();
     controller.init(project);
-    newTab.setContent(root1);
+    newTab.setContent(projectPage);
     
-    newTab.setOnClosed(new EventHandler<Event>() {
-      @Override
-      public void handle(Event t) {
-        controller.destroy();
+    for (Node child : projectPage.getChildrenUnmodifiable()) {
+      if (child instanceof TabPane) {
+        // TODO(gaborfeher): find by id.
+        ((TabPane) child).getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
       }
-    });
+    }
+    
+    mainTabs.getSelectionModel().select(newTab);
   }
   
   private FileChooser getFileChooser() {
@@ -91,7 +102,6 @@ public class MainPageController implements Initializable {
   private void handleOpenButtonAction(ActionEvent event) {
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
     connection.close();
-    closeProjectTabs();
     FileChooser fileChooser = getFileChooser();
     fileChooser.setTitle("Adatbázis megnyitása");
     
@@ -108,8 +118,7 @@ public class MainPageController implements Initializable {
       alert.showAndWait();
       return;
     }
-    closeProjectTabs();
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    resetAndRefreshTabs();
     pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
   }
   
@@ -134,7 +143,7 @@ public class MainPageController implements Initializable {
     if (!result) {
       return;
     }
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    resetAndRefreshTabs();
     pathLabel.setText("NEW DATABASE ;  tmp= " + tempDir.getAbsolutePath());    
   }
   
@@ -182,6 +191,7 @@ public class MainPageController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     projectListTabController.init(this);
+    mainTabs.getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
   }    
 
   void setStage(Stage stage) {

@@ -1,20 +1,14 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import java.net.URL;
-import java.util.ResourceBundle;
+import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 
-public class ProjectTabController implements Initializable {
+public class ProjectTabController extends ControllerBase {
   @FXML ProjectExpenseTabController projectExpenseTabController;
   @FXML ProjectSourceTabController projectSourceTabController;
   @FXML ProjectBudgetCategoriesTabController projectBudgetCategoriesTabController;
   @FXML ProjectNotesTabController projectNotesTabController;
-
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
-  }
 
   void init(Project project) {   
     this.projectExpenseTabController.init(project);
@@ -23,10 +17,17 @@ public class ProjectTabController implements Initializable {
     this.projectNotesTabController.init(project);
   }
 
-  void destroy() {
-    this.projectExpenseTabController.unsubscribe();
-    this.projectSourceTabController.unsubscribe();
-    this.projectBudgetCategoriesTabController.unsubscribe();
-    this.projectNotesTabController.unsubscribe();
+  @Override
+  protected EntityWrapper createNewEntity() {
+    throw new UnsupportedOperationException("Not supported.");
   }
+
+  @Override
+  public void refresh() {
+    this.projectExpenseTabController.refresh();
+    this.projectSourceTabController.refresh();
+    this.projectBudgetCategoriesTabController.refresh();
+    this.projectNotesTabController.refresh();
+  }
+
 }

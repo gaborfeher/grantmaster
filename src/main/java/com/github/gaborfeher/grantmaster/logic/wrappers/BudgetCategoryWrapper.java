@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,15 +104,15 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return summaryValues.get(columnName);
   }
 
-  public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(BudgetCategory.Direction direction) {
-    return DatabaseConnectionSingleton.getInstance().createQuery(
+  public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(BudgetCategory.Direction direction, ControllerBase parent) {
+    return EntityWrapper.createQuery(
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper(c) " +
             "FROM BudgetCategory c " +
             "WHERE :direction IS NULL OR c.direction = :direction " +
             "ORDER BY c.direction, c.groupName NULLS LAST, c.name",
         BudgetCategoryWrapper.class).
             setParameter("direction", direction).
-            getResultList();
+            getResultList(parent);
   }
   
   public static List<BudgetCategory> getBudgetCategories(BudgetCategory.Direction direction) {
@@ -147,13 +148,14 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   public static void getYearlyBudgetCategorySummaries(
       List<BudgetCategoryWrapper> paymentCategories,
       List<BudgetCategoryWrapper> incomeCategories,
-      Set<String> columnNames) {
+      Set<String> columnNames,
+      ControllerBase parent) {
     paymentCategories.clear();
     paymentCategories.addAll(getBudgetCategoryWrappers(
-        BudgetCategory.Direction.PAYMENT));
+        BudgetCategory.Direction.PAYMENT, parent));
     incomeCategories.clear();
     incomeCategories.addAll(getBudgetCategoryWrappers(
-        BudgetCategory.Direction.INCOME));
+        BudgetCategory.Direction.INCOME, parent));
     
     Map<Integer, BudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
     for (BudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {

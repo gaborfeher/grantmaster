@@ -2,18 +2,15 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 
-public class ProjectSourceTabController extends ControllerBase implements Initializable {
+public class ProjectSourceTabController extends ControllerBase {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> grantCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> usedAccountingCurrencyAmountColumn;
@@ -26,18 +23,13 @@ public class ProjectSourceTabController extends ControllerBase implements Initia
   public ProjectSourceTabController() {
   }
 
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
-  }  
-
   void init(Project project) {
     this.project = project;
-    subscribe();
   }
 
   @Override
   public void refresh() {
-    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project, null, null);
+    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(project, null, null, this);
     table.getItems().setAll(projectTransfers);
     
     String grantCurrency = project.getGrantCurrency().getCode();

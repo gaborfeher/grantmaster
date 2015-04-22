@@ -17,7 +17,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.sql.Date;
 import javafx.scene.control.DatePicker;
 
-public class ProjectBudgetCategoriesTabController extends ControllerBase implements Initializable {  
+public class ProjectBudgetCategoriesTabController extends ControllerBase {  
   @FXML TableColumn<BudgetCategoryWrapper, Double> spentGrantCurrencyColumn;
   @FXML TableColumn<BudgetCategoryWrapper, Double> spentAccountingCurrencyColumn;  
   @FXML TableColumn<BudgetCategoryWrapper, Double> remainingGrantCurrencyColumn;
@@ -55,11 +55,6 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase impleme
   
   void init(Project project) {
     this.project = project;
-    subscribe();
-  }
-  
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
   }
   
   @Override
@@ -71,12 +66,13 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase impleme
         ProjectBudgetCategoryWrapper.getProjectBudgetLimits(
             project,
             startDate,
-            endDate);
+            endDate,
+            this);
     table.getItems().clear();
     BudgetCategoryWrapper.createBudgetSummaryList(paymentLines, "Összes projektbevétel és -költség", table.getItems());
     if (table.getItems().size() > 0) {
       ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) table.getItems().get(table.getItems().size() - 1);
-      for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate)) {
+      for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(project, startDate, endDate, this)) {
         lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
       }
     }

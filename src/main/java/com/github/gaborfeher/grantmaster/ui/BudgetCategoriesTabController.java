@@ -1,26 +1,18 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
-import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 
-public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> implements Initializable {
+public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> {
 
   public BudgetCategoriesTabController() {
   }
@@ -31,7 +23,7 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
     List<BudgetCategoryWrapper> incomeCategories = new ArrayList<>();
     Set<String> columnNames = new TreeSet<>();
     BudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
-        paymentCategories, incomeCategories, columnNames);
+        paymentCategories, incomeCategories, columnNames, this);
 
     // Initialize table columns.
     table.getColumns().remove(4, table.getColumns().size());
@@ -56,14 +48,6 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
         incomeCategories,
         table.getItems());
   }
-
-  /**
-   * Initializes the controller class.
-   */
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
-    subscribe();
-  }  
 
   @Override
   public BudgetCategoryWrapper createNewEntity() {

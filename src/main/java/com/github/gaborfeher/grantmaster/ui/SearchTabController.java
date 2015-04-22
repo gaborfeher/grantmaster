@@ -23,10 +23,8 @@ import javafx.scene.control.TextField;
 import javafx.util.Callback;
 
 public class SearchTabController
-    extends RefreshControlSingleton.MessageObserver
-    implements Initializable {
+    extends ControllerBase<ProjectExpenseWrapper> {
 
-  @FXML TableView<ProjectExpenseWrapper> table;
   @FXML ExpenseTableController tableController;
   
   @FXML ChoiceBox<Project> project;
@@ -40,11 +38,6 @@ public class SearchTabController
   @FXML TextField comment2;
   
   List<ProjectExpenseWrapper> searchResults;
-  
-  @Override
-  public void initialize(URL url, ResourceBundle rb) {
-    subscribe();
-  }
   
   public void search() {
     searchResults = ProjectExpenseWrapper.getExpenseList(
@@ -108,6 +101,11 @@ public class SearchTabController
     } else {
       table.getItems().clear();
     }
+  }
+
+  @Override
+  protected ProjectExpenseWrapper createNewEntity() {
+    throw new UnsupportedOperationException("Not supported.");
   }
   
 }

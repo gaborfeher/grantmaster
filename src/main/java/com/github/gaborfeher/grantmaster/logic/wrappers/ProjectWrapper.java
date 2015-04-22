@@ -6,6 +6,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -74,7 +75,7 @@ public class ProjectWrapper extends EntityWrapper {
       }
       @Override
       public void onSuccess() {
-        RefreshControlSingleton.getInstance().broadcastRefresh();
+        getParent().refresh();
       }
     });
   }
@@ -83,13 +84,15 @@ public class ProjectWrapper extends EntityWrapper {
     return project;
   }
   
-  public static List<ProjectWrapper> getProjects() {
-    return DatabaseConnectionSingleton.getInstance().createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p", ProjectWrapper.class).getResultList();
+  public static List<ProjectWrapper> getProjects(ControllerBase parent) {
+    return EntityWrapper.createQuery(
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p",
+        ProjectWrapper.class).
+            getResultList(parent);
   }
   
   public static List<Project> getProjectsWithoutWrapping() {
     return DatabaseConnectionSingleton.getInstance().createQuery("SELECT p FROM Project p", Project.class).getResultList();
   }
-  
- 
+
 }

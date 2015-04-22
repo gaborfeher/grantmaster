@@ -8,15 +8,15 @@
 <?import javafx.scene.control.cell.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.CurrenciesTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.CurrenciesTabController">
   <children>
     <GridPane>
       <Label text="%CurrencyNameEntry" GridPane.rowIndex="0" GridPane.columnIndex="0"  /> 
       <TextField fx:id="codeEntry" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
-      <Button text="%CurrencyAddButton" onAction="#handleAddButtonAction" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
+      <Button text="%CurrencyAddButton" onAction="#addCurrencyButtonAction" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
     </GridPane>
-    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+    <TableView fx:id="currencyTable" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn text="%CurrencyNameColumn" prefWidth="150">
           <cellValueFactory>

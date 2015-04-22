@@ -1,17 +1,15 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
-/**
- *
- * @author gabor
- */
 public abstract class EntityWrapper {
+
   public static enum State {
     EDITING,
     EDITING_NEW,
@@ -20,6 +18,7 @@ public abstract class EntityWrapper {
   
   private State state;
   private boolean isSummary;
+  private ControllerBase parent;
   
   public EntityWrapper() {
     state = State.SAVED;
@@ -55,12 +54,12 @@ public abstract class EntityWrapper {
 
   public void persist() {
     DatabaseConnectionSingleton.getInstance().persist(getEntity());
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    parent.refresh();
   }
   
   public void delete() {
     DatabaseConnectionSingleton.getInstance().remove(getEntity());
-    RefreshControlSingleton.getInstance().broadcastRefresh();
+    parent.refresh();
   }
   
   public void discardEdits() {
@@ -70,7 +69,7 @@ public abstract class EntityWrapper {
     } else if (state == State.EDITING_NEW) {
       // This thing will just go away at next refresh.
     }
-    RefreshControlSingleton.getInstance().broadcastRefresh();  // TODO: narrower refresh
+    parent.refresh();
   }
   
   public boolean getIsSummary() {
@@ -80,6 +79,41 @@ public abstract class EntityWrapper {
   public void setIsSummary(boolean isSummary) {
     this.isSummary = isSummary;
   }
+
+  public ControllerBase getParent() {
+    return parent;
+  }
   
+  public void setParent(ControllerBase parent) {
+    this.parent = parent;
+  }
+
   protected abstract Object getEntity();
+  
+  private static <T extends EntityWrapper> List<T> initEntityWrappers(List<T> list, ControllerBase parent) {
+    for (T wrapper : list) {
+      wrapper.setParent(parent);
+    }
+    return list;
+  }
+  
+  static class MyQuery <T extends EntityWrapper> {
+    TypedQuery<T> query;
+    public MyQuery(String queryString, Class<T> resultClass) {
+      this.query = DatabaseConnectionSingleton.getInstance().createQuery(queryString, resultClass);
+    }
+    
+    public MyQuery setParameter(String paramName, Object paramValue) {
+      query.setParameter(paramName, paramValue);
+      return this;
+    }
+    
+    public List<T> getResultList(ControllerBase parent) {
+      return initEntityWrappers(query.getResultList(), parent);
+    }
+  }
+
+  public static <T extends EntityWrapper> MyQuery<T> createQuery(String queryString, Class<T> resultClass) {
+    return new MyQuery(queryString, resultClass);
+  }
 }

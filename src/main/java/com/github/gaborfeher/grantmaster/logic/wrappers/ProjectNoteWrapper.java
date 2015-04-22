@@ -3,6 +3,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
+import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -30,16 +31,15 @@ public class ProjectNoteWrapper extends EntityWrapper {
     return note;
   }
   
-  public static List<ProjectNoteWrapper> getNotes(Project project) {
-    return DatabaseConnectionSingleton.getInstance().
-        createQuery(
+  public static List<ProjectNoteWrapper> getNotes(Project project, ControllerBase parent) {
+    return EntityWrapper.createQuery(
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper(n) " +
             "FROM ProjectNote n " +
             "WHERE n.project = :project " +
             "ORDER BY n.entryTime",
             ProjectNoteWrapper.class).
         setParameter("project", project).
-        getResultList();
+        getResultList(parent);
   }
   
 }
