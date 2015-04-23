@@ -1,9 +1,11 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -11,30 +13,33 @@ import javax.persistence.TypedQuery;
 public class ProjectSourceWrapper extends EntityWrapper {
   private ProjectSource source;
   
-  public ProjectSourceWrapper(ProjectSource source, double usedAccountingCurrencyAmount) {
+  public ProjectSourceWrapper(ProjectSource source, BigDecimal usedAccountingCurrencyAmount) {
     this.source = source;
+    if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
+      return;
+    }
     computedValues.put("usedAccountingCurrencyAmount", usedAccountingCurrencyAmount);
-    double accountingCurrencyAmount = source.getGrantCurrencyAmount() * source.getExchangeRate();
+    BigDecimal accountingCurrencyAmount = source.getGrantCurrencyAmount().multiply(source.getExchangeRate(), Utils.MC);
     computedValues.put("accountingCurrencyAmount", accountingCurrencyAmount);
-    computedValues.put("remainingAccountingCurrencyAmount", accountingCurrencyAmount - usedAccountingCurrencyAmount);
-    if (source.getExchangeRate() > 0.0) {
-      double usedGrantCurrencyAmount = usedAccountingCurrencyAmount / source.getExchangeRate();
+    computedValues.put("remainingAccountingCurrencyAmount", accountingCurrencyAmount.subtract(usedAccountingCurrencyAmount, Utils.MC));
+    if (source.getExchangeRate().compareTo(BigDecimal.ZERO) > 0) {
+      BigDecimal usedGrantCurrencyAmount = usedAccountingCurrencyAmount.divide(source.getExchangeRate(), Utils.MC);
       computedValues.put("usedGrantCurrencyAmount", usedGrantCurrencyAmount);
-      computedValues.put("remainingGrantCurrencyAmount", source.getGrantCurrencyAmount() - usedGrantCurrencyAmount);
+      computedValues.put("remainingGrantCurrencyAmount", source.getGrantCurrencyAmount().subtract(usedGrantCurrencyAmount, Utils.MC));
     }
   }
   
   // TODO(gaborfeher): Eliminate below getters?
   
-  public Double getRemainingAccountingCurrencyAmount() {
-    return (Double) computedValues.get("remainingAccountingCurrencyAmount");
+  public BigDecimal getRemainingAccountingCurrencyAmount() {
+    return (BigDecimal) computedValues.get("remainingAccountingCurrencyAmount");
   }
 
-  public Double getAccountingCurrencyAmount() {
-    return (Double) computedValues.get("accountingCurrencyAmount");
+  public BigDecimal getAccountingCurrencyAmount() {
+    return (BigDecimal) computedValues.get("accountingCurrencyAmount");
   }
   
-  public Double getGrantCurrencyAmount() {
+  public BigDecimal getGrantCurrencyAmount() {
     return source.getGrantCurrencyAmount();
   }
   
@@ -51,7 +56,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
   }
 
   public static List<ProjectSourceWrapper> getProjectSources(
-      EntityManager em, Project project, Date filterStartDate, Date filterEndDate) {
+      EntityManager em, Project project, LocalDate filterStartDate, LocalDate filterEndDate) {
     TypedQuery<ProjectSourceWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +

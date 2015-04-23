@@ -91,10 +91,10 @@ public abstract class EntityWrapper {
       entity = em.merge(getEntity());  // TODO(gaborfeher): build new entity from scratch here
     }
     for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
-      System.out.println(entry.getKey() + " <- " + entry.getValue());
       setEntityPropeprty(entity, entry.getKey(), entry.getValue());
     }
     changedValues.clear();
+    setState(State.SAVED);
     setEntity(entity);
     return true;
   }

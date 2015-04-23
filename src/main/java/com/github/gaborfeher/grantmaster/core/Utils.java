@@ -1,11 +1,13 @@
 package com.github.gaborfeher.grantmaster.core;
 
-import java.sql.Date;
-import java.time.LocalDate;
+import java.math.MathContext;
 import java.util.List;
 import javax.persistence.TypedQuery;
 
 public class Utils {
+  // Note: the database has a different scale/precision setting for bigdecimals,
+  // and possible different rounding rules.
+  public static MathContext MC = MathContext.DECIMAL128;
 
   public static <T extends Object> T getSingleResultWithDefault(T defaultValue, TypedQuery<T> query) {
     List<T> list = query.getResultList();
@@ -16,13 +18,6 @@ public class Utils {
       System.err.println("too long list");
     }
     return list.get(0);    
-  }
-  
-  public static Date toSqlDate(LocalDate date) {
-    if (date == null) {
-      return null;
-    }
-    return new Date(date.toEpochDay() * 24 * 60 * 60 * 1000);
   }
 
   public static boolean prepareForEditing() {

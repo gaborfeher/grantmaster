@@ -43,7 +43,7 @@
         </TableColumn>
         <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">
           <cellFactory>
-            <DoubleTableCellFactory property="budgetPercentage" />
+            <BigDecimalTableCellFactory property="budgetPercentage" />
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="budgetPercentage" /> 
@@ -53,7 +53,7 @@
           <columns>
             <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="budgetAccountingCurrency" /> 
+                <BigDecimalTableCellFactory property="budgetAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="budgetAccountingCurrency" />
@@ -61,7 +61,7 @@
             </TableColumn>
             <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="budgetGrantCurrency" /> 
+                <BigDecimalTableCellFactory property="budgetGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="budgetGrantCurrency" />
@@ -73,7 +73,7 @@
           <columns>
             <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="spentAccountingCurrency" /> 
+                <BigDecimalTableCellFactory property="spentAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="spentAccountingCurrency" />
@@ -81,7 +81,7 @@
             </TableColumn>
             <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="spentGrantCurrency" /> 
+                <BigDecimalTableCellFactory property="spentGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="spentGrantCurrency" />
@@ -93,7 +93,7 @@
           <columns>
             <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="remainingAccountingCurrency" /> 
+                <BigDecimalTableCellFactory property="remainingAccountingCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="remainingAccountingCurrency" />
@@ -101,7 +101,7 @@
             </TableColumn>
             <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
               <cellFactory>
-                <DoubleTableCellFactory property="remainingGrantCurrency" /> 
+                <BigDecimalTableCellFactory property="remainingGrantCurrency" /> 
               </cellFactory>
               <cellValueFactory>
                 <EntityPropertyValueFactory property="remainingGrantCurrency" />

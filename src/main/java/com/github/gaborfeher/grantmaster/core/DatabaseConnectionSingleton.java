@@ -1,14 +1,11 @@
 package com.github.gaborfeher.grantmaster.core;
 
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +17,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
 
 public class DatabaseConnectionSingleton {
   private static DatabaseConnectionSingleton instance;
@@ -73,25 +69,36 @@ public class DatabaseConnectionSingleton {
   
   public File createNewDatabase() {
     tempFile = createTempDir();
-    System.out.println("tempFile= " + tempFile);
     if (connectTo(tempFile.getAbsolutePath())) {
       return tempFile;
     }
     return null;
   }
   
-  private boolean connectTo(String pathString) {
+  private EntityManagerFactory connectToJdbcUrl(String jdbcUrl) {
     Map<String, String> properties = new HashMap<>();
-    properties.put("javax.persistence.jdbc.url", "jdbc:hsqldb:file:" + new File(pathString, "database") +";shutdown=true");
+    properties.put("javax.persistence.jdbc.url", jdbcUrl);
     try {
-      entityManagerFactory = Persistence.createEntityManagerFactory(
+      return Persistence.createEntityManagerFactory(
           "LocalH2ConnectionTemplate", properties);
-   //   entityManager = entityManagerFactory.createEntityManager();
     } catch (PersistenceException ex) {
-      return false;
+      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, ex);
     }
-    System.out.println("Successful JPA connection");
-    return true;
+    return null;
+
+  }
+  
+  public boolean connectToMemoryFileForTesting() {
+    if (entityManagerFactory != null) {
+      entityManagerFactory.close();
+    }
+    entityManagerFactory = connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
+    return entityManagerFactory != null;
+  }
+  
+  private boolean connectTo(String pathString) {
+    entityManagerFactory = connectToJdbcUrl("jdbc:hsqldb:file:" + new File(pathString, "database") +";shutdown=true");
+    return entityManagerFactory != null;
   }
   
   public File saveDatabase(File path) throws IOException {
@@ -102,7 +109,6 @@ public class DatabaseConnectionSingleton {
         FileOutputStream fileOutputStream = new FileOutputStream(path);
         ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
       for (File item : tempFile.listFiles()) {
-        System.out.println("Adding: " + item.getAbsoluteFile());
         ZipEntry entry = new ZipEntry(item.getName());
         zipOutputStream.putNextEntry(entry);
         zipOutputStream.write(Files.readAllBytes(item.toPath()));

@@ -1,13 +1,17 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 @Entity
@@ -21,14 +25,15 @@ public class ProjectSource implements EntityBase, Serializable {
   @CascadeOnDelete
   private Project project;
 
-  @Column(nullable = false)
-  private double amount;  // TODO: rename
+  @Column(nullable = false, scale = 10, precision = 25)
+  private BigDecimal grantCurrencyAmount;
       
-  @Column(nullable = false)
-  private double exchangeRate;
+  @Column(nullable = false, scale = 10, precision = 25)
+  private BigDecimal exchangeRate;
 
   @Column(nullable = false)
-  private Date availabilityDate;
+  @Temporal(TemporalType.DATE)
+  private LocalDate availabilityDate;
   
   public ProjectSource() {
   }
@@ -64,42 +69,42 @@ public class ProjectSource implements EntityBase, Serializable {
   /**
    * @return the amount
    */
-  public double getGrantCurrencyAmount() {
-    return amount;
+  public BigDecimal getGrantCurrencyAmount() {
+    return grantCurrencyAmount;
   }
 
   /**
    * @param amount the amount to set
    */
-  public void setGrantCurrencyAmount(Double amount) {
-    this.amount = amount;
+  public void setGrantCurrencyAmount(BigDecimal amount) {
+    this.grantCurrencyAmount = amount;
   }
 
   /**
    * @return the exchangeRate
    */
-  public double getExchangeRate() {
+  public BigDecimal getExchangeRate() {
     return exchangeRate;
   }
 
   /**
    * @param exchangeRate the exchangeRate to set
    */
-  public void setExchangeRate(Double exchangeRate) {
+  public void setExchangeRate(BigDecimal exchangeRate) {
     this.exchangeRate = exchangeRate;
   }
 
   /**
    * @return the availabilityDate
    */
-  public Date getAvailabilityDate() {
+  public LocalDate getAvailabilityDate() {
     return availabilityDate;
   }
 
   /**
    * @param availabilityDate the availabilityDate to set
    */
-  public void setAvailabilityDate(Date availabilityDate) {
+  public void setAvailabilityDate(LocalDate availabilityDate) {
     this.availabilityDate = availabilityDate;
   }
   

@@ -106,7 +106,6 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   void handleDiscardButtonClick() {
-    System.out.println("discarding edits");
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.discardEdits();
   }

@@ -57,7 +57,7 @@
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">
       <cellFactory>
-        <DoubleTableCellFactory property="originalAmount" />
+        <BigDecimalTableCellFactory property="originalAmount" />
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="originalAmount" /> 
@@ -75,7 +75,7 @@
       <columns>
         <TableColumn fx:id="accountingCurrencyAmountColumn" styleClass="numColumn" sortable="false" prefWidth="130">
           <cellFactory>
-            <DoubleTableCellFactory property="accountingCurrencyAmount" />
+            <BigDecimalTableCellFactory property="accountingCurrencyAmount" />
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="accountingCurrencyAmount" /> 
@@ -83,7 +83,7 @@
         </TableColumn>
         <TableColumn fx:id="grantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false" prefWidth="130">
           <cellFactory>
-            <DoubleTableCellFactory property="grantCurrencyAmount"  />
+            <BigDecimalTableCellFactory property="grantCurrencyAmount"  />
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="grantCurrencyAmount" /> 
@@ -93,7 +93,7 @@
     </TableColumn> 
     <TableColumn text="%ExpensesExchangeRate" editable="false" styleClass="numColumn" sortable="false">
       <cellFactory>
-        <DoubleTableCellFactory property="exchangeRate" /> 
+        <BigDecimalTableCellFactory property="exchangeRate" /> 
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="exchangeRate" /> 

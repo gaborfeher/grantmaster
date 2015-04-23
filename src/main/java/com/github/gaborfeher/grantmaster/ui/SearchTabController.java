@@ -45,8 +45,8 @@ public class SearchTabController
         searchResults = ProjectExpenseWrapper.getExpenseList(
             em,
             project.getValue(),
-            Utils.toSqlDate(startDate.getValue()),
-            Utils.toSqlDate(endDate.getValue()),
+            startDate.getValue(),
+            endDate.getValue(),
             budgetCategory.getValue(),
             budgetCategoryGroup.getText(),
             accountNo.getText(),

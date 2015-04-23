@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.core.RefreshControlSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
@@ -15,11 +14,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -28,15 +23,15 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.persistence.EntityManager;
 
 public class MainPageController implements Initializable {
-  @FXML private Label pathLabel;
+  @FXML private TextField pathLabel;
   @FXML Parent root;
   @FXML TabPane mainTabs;
 
@@ -139,7 +134,6 @@ public class MainPageController implements Initializable {
         return true;
       }
     });
-    System.out.println("creation transaction: " + result);
     if (!result) {
       return;
     }
@@ -181,7 +175,6 @@ public class MainPageController implements Initializable {
     
     try {
       File tmpFile = connection.saveDatabase(openedFile);
-      System.out.println("saved the file");
       pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
     } catch (IOException ex) {
       Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);

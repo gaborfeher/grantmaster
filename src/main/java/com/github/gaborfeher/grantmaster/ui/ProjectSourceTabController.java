@@ -7,6 +7,7 @@ import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
+import java.math.BigDecimal;
 import javax.persistence.EntityManager;
 
 public class ProjectSourceTabController extends ControllerBase {
@@ -46,6 +47,6 @@ public class ProjectSourceTabController extends ControllerBase {
   protected EntityWrapper createNewEntity() {
     ProjectSource newSource = new ProjectSource();
     newSource.setProject(project);
-    return new ProjectSourceWrapper(newSource, 0.0);
+    return new ProjectSourceWrapper(newSource, BigDecimal.ZERO);
   }
 }

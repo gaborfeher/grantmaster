@@ -6,6 +6,8 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,9 +25,11 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
   @GeneratedValue
   private int id;
   
-  private Double budget;
+  @Column(nullable = true, scale = 10, precision = 25)
+  private BigDecimal budgetGrantCurrency;
   
-  private Double budgetPercentage;
+  @Column(nullable = true, scale = 10, precision = 25)
+  private BigDecimal budgetPercentage;
   
   @ManyToOne
   @JoinColumn(nullable = false)
@@ -39,12 +43,12 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
   public ProjectBudgetLimit() {
   }
 
-  public Double getBudgetGrantCurrency() {
-    return budget;
+  public BigDecimal getBudgetGrantCurrency() {
+    return budgetGrantCurrency;
   }
 
-  public void setBudgetGrantCurrency(Double budget) {
-    this.budget = budget;
+  public void setBudgetGrantCurrency(BigDecimal budget) {
+    this.budgetGrantCurrency = budget;
   }
 
   public BudgetCategory getBudgetCategory() {
@@ -66,14 +70,14 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
   /**
    * @return the budgetPercentage
    */
-  public Double getBudgetPercentage() {
+  public BigDecimal getBudgetPercentage() {
     return budgetPercentage;
   }
 
   /**
    * @param budgetPercentage the budgetPercentage to set
    */
-  public void setBudgetPercentage(Double budgetPercentage) {
+  public void setBudgetPercentage(BigDecimal budgetPercentage) {
     this.budgetPercentage = budgetPercentage;
   }
 

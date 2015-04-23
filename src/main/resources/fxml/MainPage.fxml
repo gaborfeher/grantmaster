@@ -15,7 +15,7 @@
         <Button text="%NewDatabase" onAction="#handleNewButtonAction" />  
       </children>
     </HBox>
-    <Label fx:id="pathLabel" />
+    <TextField fx:id="pathLabel" editable="false" />
     <TabPane VBox.vgrow="ALWAYS" fx:id="mainTabs">
       <tabs>
         <Tab text="%ProjectsTabName" closable="false">

@@ -1,18 +1,18 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  *
  * @author gabor
  */
-class DateStringConverter extends MultiStringConverter<Date> {
+class DateStringConverter extends MultiStringConverter<LocalDate> {
   
   public DateStringConverter() {
   }
 
   @Override
-  public String toString(Date date) {
+  public String toString(LocalDate date) {
     if (date == null) {
       return "";
     }
@@ -20,8 +20,8 @@ class DateStringConverter extends MultiStringConverter<Date> {
   }
 
   @Override
-  public Date fromString(String string) {
-    return Date.valueOf(string);
+  public LocalDate fromString(String string) {
+    return LocalDate.parse(string);
   }
   
 }

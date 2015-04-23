@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 public class ProjectWrapper extends EntityWrapper {
+
   Project project;
 
   public ProjectWrapper(Project project) {
@@ -57,6 +58,11 @@ public class ProjectWrapper extends EntityWrapper {
   
   public static List<Project> getProjectsWithoutWrapping(EntityManager em) {
     return em.createQuery("SELECT p FROM Project p", Project.class).getResultList();
+  }
+  
+  public static ProjectWrapper createNew() {
+    Project newProject = new Project();
+    return new ProjectWrapper(newProject);
   }
 
   @Override

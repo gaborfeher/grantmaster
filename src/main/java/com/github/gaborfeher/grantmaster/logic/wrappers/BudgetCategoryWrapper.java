@@ -1,7 +1,9 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   
   public BudgetCategoryWrapper createFakeCopy(String fakeName) {
     BudgetCategoryWrapper copy = new BudgetCategoryWrapper(fakeName);
-    copy.addSummaryValues(this, 1.0);
+    copy.addSummaryValues(this, BigDecimal.ONE);
     copy.setIsSummary(true);
     copy.setState(null);
     return copy;
@@ -53,16 +55,16 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return budgetCategory;
   }
   
-  protected void addSummaryValue(BudgetCategoryWrapper other, String key, double multiplier) {
-    Double value = (Double)other.computedValues.get(key) * multiplier;
-    computedValues.put(key, value + (Double) computedValues.getOrDefault(key, 0.0));
+  protected void addSummaryValue(BudgetCategoryWrapper other, String key, BigDecimal multiplier) {
+    BigDecimal value = multiplier.multiply((BigDecimal)other.computedValues.get(key), Utils.MC);
+    computedValues.put(key, value.add((BigDecimal) computedValues.getOrDefault(key, BigDecimal.ZERO), Utils.MC));
   }
   
-  public void addSummaryValues(BudgetCategoryWrapper other, double multiplier) {
+  public void addSummaryValues(BudgetCategoryWrapper other, BigDecimal multiplier) {
     for (Map.Entry<String, Object> summaryEntry : other.computedValues.entrySet()) {
       String key = summaryEntry.getKey();
       Object entryValue = summaryEntry.getValue();
-      if (entryValue != null && entryValue instanceof Double) {
+      if (entryValue != null && entryValue instanceof BigDecimal) {
         addSummaryValue(other, key, multiplier);
       }
     }
@@ -105,7 +107,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       int year = (Integer)line[2];
       String header = String.format("%d (%s)", year, (String)line[1]);
       columnNames.add(header);
-      budgetCategoryWrapper.computedValues.put(header, (Double)line[3]);
+      budgetCategoryWrapper.computedValues.put(header, (BigDecimal)line[3]);
     }
   }
   
@@ -148,7 +150,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     // Collect income summaries.
     getYearlyBudgetCategorySummaryMap(
         em,
-        "SELECT s.project.incomeType AS incomeType, s.project.accountCurrency.code AS currency, FUNCTION('YEAR', s.availabilityDate) AS year, SUM(s.amount * s.exchangeRate) " +
+        "SELECT s.project.incomeType AS incomeType, s.project.accountCurrency.code AS currency, FUNCTION('YEAR', s.availabilityDate) AS year, SUM(s.grantCurrencyAmount * s.exchangeRate) " +
         "FROM ProjectSource s " +
         "GROUP BY incomeType, year, currency",
         budgetCategoryMap,
@@ -178,13 +180,13 @@ public class BudgetCategoryWrapper extends EntityWrapper {
           currentGroupName = current.getGroupName();
           groupSum = current.createFakeCopy(current.getGroupName() + " mindösszesen");
         } else {
-          groupSum.addSummaryValues(current, 1.0);
+          groupSum.addSummaryValues(current, BigDecimal.ONE);
         }
       }
       
       summary.add(current);
       if (totalSum != null) {
-        totalSum.addSummaryValues(current, 1.0);
+        totalSum.addSummaryValues(current, BigDecimal.ONE);
       } else {
         totalSum = current.createFakeCopy(summaryTitle);
       }
@@ -219,7 +221,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
         createBudgetSummaryList(em, incomeCategories, "Bevételek mindösszesen", output);
     BudgetCategoryWrapper finalSum = incomeSum.createFakeCopy("Különbség");
     if (expenseSum != null) {
-      finalSum.addSummaryValues(expenseSum, -1.0);
+      finalSum.addSummaryValues(expenseSum, new BigDecimal(-1));
     }
     output.add(finalSum);
   }

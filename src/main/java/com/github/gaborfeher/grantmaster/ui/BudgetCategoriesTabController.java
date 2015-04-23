@@ -1,19 +1,15 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
-import com.github.gaborfeher.grantmaster.ui.cells.DoubleTableCellFactory;
+import com.github.gaborfeher.grantmaster.ui.cells.BigDecimalTableCellFactory;
 import com.github.gaborfeher.grantmaster.ui.cells.EntityPropertyValueFactory;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
-import javafx.util.Callback;
 import javax.persistence.EntityManager;
 
 public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> {
@@ -32,12 +28,13 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
     // Initialize table columns.
     table.getColumns().remove(4, table.getColumns().size());
     for (final String columnName : columnNames) {
-      TableColumn column = new TableColumn<BudgetCategoryWrapper, Double>(columnName);
+      TableColumn column = new TableColumn<BudgetCategoryWrapper, BigDecimal>(columnName);
       column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
-      column.setCellFactory(new DoubleTableCellFactory());
+      column.setCellFactory(new BigDecimalTableCellFactory());
       column.getStyleClass().add("numColumn");
       column.setSortable(false);
       column.setEditable(false);
+      column.setPrefWidth(130.0);
       table.getColumns().add(column);
     }
     

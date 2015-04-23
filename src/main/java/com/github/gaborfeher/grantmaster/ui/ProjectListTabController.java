@@ -33,7 +33,6 @@ public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
 
   @Override
   protected ProjectWrapper createNewEntity() {
-    Project newProject = new Project();
-    return new ProjectWrapper(newProject);
+    return ProjectWrapper.createNew();
   }
 }

@@ -11,17 +11,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import javafx.scene.control.DatePicker;
 import javax.persistence.EntityManager;
 
 public class ProjectBudgetCategoriesTabController extends ControllerBase {  
-  @FXML TableColumn<BudgetCategoryWrapper, Double> spentGrantCurrencyColumn;
-  @FXML TableColumn<BudgetCategoryWrapper, Double> spentAccountingCurrencyColumn;  
-  @FXML TableColumn<BudgetCategoryWrapper, Double> remainingGrantCurrencyColumn;
-  @FXML TableColumn<BudgetCategoryWrapper, Double> remainingAccountingCurrencyColumn;
-  @FXML TableColumn<BudgetCategoryWrapper, Double> budgetGrantCurrencyColumn;
-  @FXML TableColumn<BudgetCategoryWrapper, Double> budgetAccountingCurrencyColumn;
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> spentGrantCurrencyColumn;
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> spentAccountingCurrencyColumn;  
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> remainingGrantCurrencyColumn;
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> remainingAccountingCurrencyColumn;
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> budgetGrantCurrencyColumn;
+  @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> budgetAccountingCurrencyColumn;
   
   @FXML DatePicker filterStartDate;
   @FXML DatePicker filterEndDate;
@@ -35,9 +36,9 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase {
   protected EntityWrapper createNewEntity() {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
-    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), 0.0, 0.0);
+    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
     wrapper.setProject(project);
-    wrapper.setLimit(0.0, limit);
+    wrapper.setLimit(BigDecimal.ZERO, limit);
     return wrapper;
   }
   
@@ -57,8 +58,8 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase {
   
   @Override
   public void refresh(EntityManager em) {
-    Date startDate = Utils.toSqlDate(filterStartDate.getValue());
-    Date endDate = Utils.toSqlDate(filterEndDate.getValue());
+    LocalDate startDate = filterStartDate.getValue();
+    LocalDate endDate = filterEndDate.getValue();
     
     List paymentLines = 
         ProjectBudgetCategoryWrapper.getProjectBudgetLimits(

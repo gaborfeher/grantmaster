@@ -1,16 +1,20 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 // http://svanimpe.be/blog/properties-jpa.html
 
@@ -25,7 +29,8 @@ public class ProjectExpense implements EntityBase, Serializable {
   private Project project;
   
   @Column(nullable = false)
-  private Date paymentDate;
+  @Temporal(TemporalType.DATE)
+  private LocalDate paymentDate;
   
   private String accountNo;
   private String partnerName;
@@ -34,8 +39,8 @@ public class ProjectExpense implements EntityBase, Serializable {
   @JoinColumn(nullable = false)
   private BudgetCategory budgetCategory;
   
-  @Column(nullable = false)
-  private Double originalAmount;
+  @Column(nullable = false, scale = 10, precision = 25)
+  private BigDecimal originalAmount;
   
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
@@ -68,14 +73,14 @@ public class ProjectExpense implements EntityBase, Serializable {
   /**
    * @return the paymentDate
    */
-  public Date getPaymentDate() {
+  public LocalDate getPaymentDate() {
     return paymentDate;
   }
 
   /**
    * @param paymentDate the paymentDate to set
    */
-  public void setPaymentDate(Date paymentDate) {
+  public void setPaymentDate(LocalDate paymentDate) {
     this.paymentDate = paymentDate;
   }
 
@@ -126,14 +131,14 @@ public class ProjectExpense implements EntityBase, Serializable {
   /**
    * @return the originalAmount
    */
-  public Double getOriginalAmount() {
+  public BigDecimal getOriginalAmount() {
     return originalAmount;
   }
 
   /**
    * @param originalAmount the originalAmount to set
    */
-  public void setOriginalAmount(Double originalAmount) {
+  public void setOriginalAmount(BigDecimal originalAmount) {
     this.originalAmount = originalAmount;
   }
 

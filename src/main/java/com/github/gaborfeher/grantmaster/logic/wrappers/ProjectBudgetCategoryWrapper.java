@@ -5,7 +5,8 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   private ProjectBudgetLimit limit;
   private Project project;
   
-  public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, Double spentAccountingCurrency, Double spentGrantCurrency) {
+  public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, BigDecimal spentAccountingCurrency, BigDecimal spentGrantCurrency) {
     super(budgetCategory);
     this.computedValues.put("spentGrantCurrency", spentGrantCurrency);
     this.computedValues.put("spentAccountingCurrency", spentAccountingCurrency);
@@ -26,8 +27,8 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   public ProjectBudgetCategoryWrapper(String fakeName) {
     super(fakeName);
     this.computedValues.put("budgetCategory", fakeName);
-    this.computedValues.put("spentGrantCurrency", 0.0);
-    this.computedValues.put("spentAccountingCurrency", 0.0);
+    this.computedValues.put("spentGrantCurrency", BigDecimal.ZERO);
+    this.computedValues.put("spentAccountingCurrency", BigDecimal.ZERO);
     this.computedValues.put("remainingAccountingCurrency", null);
     this.computedValues.put("budgetAccountingCurrency", null);
 
@@ -36,7 +37,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   @Override
   public BudgetCategoryWrapper createFakeCopy(String fakeTitle) {
     BudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
-    copy.addSummaryValues(this, 1.0);
+    copy.addSummaryValues(this, BigDecimal.ONE);
     copy.setIsSummary(true);
     copy.setState(null);
     return copy;
@@ -46,7 +47,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     this.project = project;
   }
   
-  public void setLimit(double total, ProjectBudgetLimit limit) {
+  public void setLimit(BigDecimal total, ProjectBudgetLimit limit) {
     this.limit = limit;
     if (limit == null) {
       return;
@@ -60,13 +61,13 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     }
     
     if (limit.getBudgetPercentage() != null) {
-      limit.setBudgetGrantCurrency(total * limit.getBudgetPercentage() / 100.0);
+      limit.setBudgetGrantCurrency(total.multiply(limit.getBudgetPercentage()).divide(new BigDecimal("100"), Utils.MC));
     }
     if (limit.getBudgetGrantCurrency() != null) {
-      double remainingGrantCurrency = limit.getBudgetGrantCurrency();
-      Double spentGrantCurrency = (Double) computedValues.get("spentGrantCurrency");
+      BigDecimal remainingGrantCurrency = limit.getBudgetGrantCurrency();
+      BigDecimal spentGrantCurrency = (BigDecimal) computedValues.get("spentGrantCurrency");
       if (spentGrantCurrency != null) {
-        remainingGrantCurrency -= spentGrantCurrency;
+        remainingGrantCurrency = remainingGrantCurrency.subtract(spentGrantCurrency, Utils.MC);
       }
       this.computedValues.put("remainingGrantCurrency", remainingGrantCurrency);
     }
@@ -78,28 +79,28 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   }
 
   @Override
-  public void addSummaryValues(BudgetCategoryWrapper other, double multiplier) {
+  public void addSummaryValues(BudgetCategoryWrapper other, BigDecimal multiplier) {
     addSummaryValue(other, "spentGrantCurrency", multiplier);
     addSummaryValue(other, "spentAccountingCurrency", multiplier);
   }
   
-  public void addBudgetAmounts(double accountingCurrencyAmount, double grantCurrencyAmount) {
+  public void addBudgetAmounts(BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     if (limit == null) {
       limit = new ProjectBudgetLimit();
     }
     if (limit.getBudgetGrantCurrency() == null) {
       limit.setBudgetGrantCurrency(grantCurrencyAmount);
     } else {
-      limit.setBudgetGrantCurrency(limit.getBudgetGrantCurrency() + grantCurrencyAmount);
+      limit.setBudgetGrantCurrency(limit.getBudgetGrantCurrency().add(grantCurrencyAmount, Utils.MC));
     }
-    Double budgetAccountingCurrency = (Double) computedValues.get("budgetAccountingCurrency");
+    BigDecimal budgetAccountingCurrency = (BigDecimal) computedValues.get("budgetAccountingCurrency");
     if (budgetAccountingCurrency == null) {
-      budgetAccountingCurrency = 0.0;
+      budgetAccountingCurrency = BigDecimal.ZERO;
     }
-    budgetAccountingCurrency += accountingCurrencyAmount;
+    budgetAccountingCurrency = budgetAccountingCurrency.add(accountingCurrencyAmount);
     computedValues.put("budgetAccountingCurrency", budgetAccountingCurrency);
-    computedValues.put("remainingGrantCurrency", limit.getBudgetGrantCurrency() - (Double)computedValues.get("spentGrantCurrency"));
-    computedValues.put("remainingAccountingCurrency", budgetAccountingCurrency - (Double)computedValues.get("spentAccountingCurrency"));
+    computedValues.put("remainingGrantCurrency", limit.getBudgetGrantCurrency().subtract((BigDecimal)computedValues.get("spentGrantCurrency"), Utils.MC));
+    computedValues.put("remainingAccountingCurrency", budgetAccountingCurrency.subtract((BigDecimal)computedValues.get("spentAccountingCurrency"), Utils.MC));
   }
   
   @Override
@@ -123,11 +124,11 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
       EntityManager em,
       Project project,
-      Date filterStartDate,
-      Date filterEndDate) {
-    Double total =
-        Utils.getSingleResultWithDefault(0.0,
-            em.createQuery("SELECT SUM(s.amount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", Double.class).
+      LocalDate filterStartDate,
+      LocalDate filterEndDate) {
+    BigDecimal total =
+        Utils.getSingleResultWithDefault(BigDecimal.ZERO,
+            em.createQuery("SELECT SUM(s.grantCurrencyAmount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", BigDecimal.class).
                 setParameter("project", project));
 
         

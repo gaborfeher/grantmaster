@@ -24,4 +24,9 @@ public class Currency implements Serializable {
   public String toString() {
     return code;
   }
+
+  @Override
+  public boolean equals(Object other) {
+    return other != null && (other instanceof Currency) && ((Currency)other).getCode().equals(getCode());
+  }
 }
