@@ -49,8 +49,7 @@ public class MainPageController implements Initializable {
   File openedFile;
   
   public void stop() {
-    System.out.println("STOPPING: closing database connection");
-    DatabaseConnectionSingleton.getInstance().close();
+    DatabaseConnectionSingleton.getInstance().cleanup();
   }
 
   private void closeProjectTabs() {
@@ -96,7 +95,6 @@ public class MainPageController implements Initializable {
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {    
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
-    connection.close();
     FileChooser fileChooser = getFileChooser();
     fileChooser.setTitle("Adatbázis megnyitása");
     
@@ -120,7 +118,6 @@ public class MainPageController implements Initializable {
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
-    connection.close();
     closeProjectTabs();
     openedFile = null;
     

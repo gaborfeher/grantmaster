@@ -115,15 +115,12 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   
   @Override
   public boolean save(EntityManager em) {
-    System.out.println("ProjectBudgetCategoryWrapper.save");
     if (limit == null) {
-      System.out.println("  set limit");
       setState(State.EDITING_NEW);
       limit = new ProjectBudgetLimit();
       limit.setBudgetCategory(budgetCategory);
       limit.setProject(project);
     }
-    System.out.println("   " + limit + " " + getEntity());
     return super.save(em);
   }
   

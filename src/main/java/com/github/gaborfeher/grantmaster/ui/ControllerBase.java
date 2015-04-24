@@ -23,8 +23,6 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   protected abstract void refresh(EntityManager em, List<T> items);
   
   public void refresh() {
-    System.out.println("refresh");
-    System.out.flush();
     DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
@@ -47,8 +45,6 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
         return true;
       }
     });
-    System.out.println("end refresh");
-    System.out.flush();
   }
   
   @Override

@@ -32,7 +32,6 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetC
   
   @Override
   protected BudgetCategoryWrapper createNewEntity() {
-    System.out.println("ProjectBudgetCategoriesTabController.createNewEntity");
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
     ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);

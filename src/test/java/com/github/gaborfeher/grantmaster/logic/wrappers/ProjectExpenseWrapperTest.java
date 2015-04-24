@@ -63,6 +63,7 @@ public class ProjectExpenseWrapperTest {
   
   @After
   public void tearDown() {
+    DatabaseConnectionSingleton.getInstance().cleanup();
   }
   
   @Test

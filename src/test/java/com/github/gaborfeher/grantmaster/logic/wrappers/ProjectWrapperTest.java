@@ -54,7 +54,7 @@ public class ProjectWrapperTest {
   
   @After
   public void tearDown() {
-    DatabaseConnectionSingleton.getInstance().close();
+    DatabaseConnectionSingleton.getInstance().cleanup();
   }
 
   @Test

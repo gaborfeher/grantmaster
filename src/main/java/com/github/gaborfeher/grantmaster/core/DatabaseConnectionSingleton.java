@@ -40,11 +40,14 @@ public class DatabaseConnectionSingleton {
     return instance;
   }
   
-  public void close() {
- //   if (entityManager != null) {
- //     entityManager.close();
- //     entityManager = null;
- //   }
+  public void cleanup() {
+    close();
+    if (tempFile != null) {
+      simpleRecursiveDelete(tempFile);
+    }
+  }
+    
+  private void close() {
     if (entityManagerFactory != null) {
       entityManagerFactory.close();
       entityManagerFactory = null;
@@ -68,38 +71,50 @@ public class DatabaseConnectionSingleton {
        + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
   }
   
+  private static void simpleRecursiveDelete(File main) {
+    // No simlink handling.
+    if (main.isDirectory()) {
+      for (File sub : main.listFiles()) {
+        simpleRecursiveDelete(sub);
+      }
+    }
+    if (!main.delete()) {
+      System.out.println("failed to delete " + main);
+    }
+  }
+  
   public File createNewDatabase() {
+    cleanup();
     tempFile = createTempDir();
-    if (connectTo(tempFile.getAbsolutePath())) {
+    if (connectToFile(tempFile.getAbsolutePath())) {
       return tempFile;
     }
     return null;
   }
   
-  private EntityManagerFactory connectToJdbcUrl(String jdbcUrl) {
+  private boolean connectToJdbcUrl(String jdbcUrl) {
+    if (entityManagerFactory != null) {
+      throw new RuntimeException("Cannot connect while previous connection is active.");
+    }
+    entityManagerFactory = null;
     Map<String, String> properties = new HashMap<>();
     properties.put("javax.persistence.jdbc.url", jdbcUrl);
     try {
-      return Persistence.createEntityManagerFactory(
+      entityManagerFactory = Persistence.createEntityManagerFactory(
           "LocalH2ConnectionTemplate", properties);
     } catch (PersistenceException ex) {
       Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, ex);
     }
-    return null;
+    return entityManagerFactory != null;
 
   }
   
   public boolean connectToMemoryFileForTesting() {
-    if (entityManagerFactory != null) {
-      entityManagerFactory.close();
-    }
-    entityManagerFactory = connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
-    return entityManagerFactory != null;
+    return connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
   }
   
-  private boolean connectTo(String pathString) {
-    entityManagerFactory = connectToJdbcUrl("jdbc:hsqldb:file:" + new File(pathString, "database") +";shutdown=true");
-    return entityManagerFactory != null;
+  private boolean connectToFile(String pathString) {
+    return connectToJdbcUrl("jdbc:hsqldb:file:" + new File(pathString, "database") +";shutdown=true");
   }
   
   public File saveDatabase(File path) throws IOException {
@@ -117,7 +132,7 @@ public class DatabaseConnectionSingleton {
       }
     }
     
-    connectTo(tempFile.getAbsolutePath());
+    connectToFile(tempFile.getAbsolutePath());
     return tempFile;
   }
   
@@ -127,7 +142,7 @@ public class DatabaseConnectionSingleton {
    * @return 
    */
   public File openDatabase(File path) {
-    close();
+    cleanup();
     tempFile = createTempDir();
     try (
         FileInputStream fileInputStream = new FileInputStream(path);
@@ -150,7 +165,7 @@ public class DatabaseConnectionSingleton {
     } catch (IOException e) {
       return null;
     }
-    connectTo(tempFile.getAbsolutePath());
+    connectToFile(tempFile.getAbsolutePath());
     return tempFile;
   }
   

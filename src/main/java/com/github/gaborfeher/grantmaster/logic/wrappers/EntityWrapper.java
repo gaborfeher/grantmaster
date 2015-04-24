@@ -67,7 +67,6 @@ public abstract class EntityWrapper {
   
   private final boolean setEntityPropeprty(Object entity, String name, Object value) {
     try {
-      System.out.println("   entity= " + entity + " name= " + name + " value= " + value);
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       entity.getClass().getMethod(setterName, value.getClass()).invoke(entity, value);
       return true;
@@ -112,7 +111,6 @@ public abstract class EntityWrapper {
       entity = (EntityBase) em.find(getEntity().getClass(), getEntity().getId());
     }
     for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
-      System.out.println("save: " + entry.getKey() + " <-- " + entry.getValue());
       setEntityPropeprty(entity, entry.getKey(), entry.getValue());
     }
     changedValues.clear();
