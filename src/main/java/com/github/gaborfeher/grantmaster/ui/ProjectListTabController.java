@@ -14,7 +14,6 @@ public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
   
   @Override
   public void refresh(EntityManager em, List<ProjectWrapper> items) {
-    items.clear();
     items.addAll(ProjectWrapper.getProjects(em));
   }
   

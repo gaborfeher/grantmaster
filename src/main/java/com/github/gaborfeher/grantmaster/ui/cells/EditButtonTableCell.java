@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
@@ -16,8 +17,8 @@ import javafx.scene.layout.HBox;
 import javax.persistence.EntityManager;
 
 public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
-  final Button saveButton = new Button("Ment");
-  final Button discardButton = new Button("Visszavon");
+  final Button saveButton = new Button("Létrehoz");
+  final Button discardButton = new Button("Töröl");
   final Button deleteButton = new Button("Töröl");
   
   final HBox editDeleteBox = new HBox();
@@ -75,22 +76,24 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleSaveButtonClick() {
     final EntityWrapper entityWrapper = getEntityWrapper();
-    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+    boolean success = DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
 
       @Override
       public boolean run(EntityManager em) {
         return entityWrapper.save(em);
       }
-
-      @Override
-      public void onSuccess() {
-        entityWrapper.refresh();
-      }
-
     });
-    
-    entityWrapper.setState(EntityWrapper.State.SAVED);
-    updateItem(entityWrapper.getState(), false);
+    if (success == true) {
+      entityWrapper.setState(EntityWrapper.State.SAVED);
+      updateItem(entityWrapper.getState(), false);
+      entityWrapper.refresh();
+    } else {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Hiba");
+      alert.setHeaderText("Nem sikerült a létrehozás");
+      alert.showAndWait();
+      entityWrapper.refresh();  // TODO(gaborfeher): Eliminate the need for this.
+    }
   }
   
   void handleDiscardButtonClick() {

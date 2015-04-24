@@ -1,10 +1,8 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -30,7 +28,7 @@ public class ProjectNoteWrapper extends EntityWrapper {
             "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper(n) " +
             "FROM ProjectNote n " +
             "WHERE n.project = :project " +
-            "ORDER BY n.entryTime",
+            "ORDER BY n.entryTime DESC",
             ProjectNoteWrapper.class).
         setParameter("project", project).
         getResultList();

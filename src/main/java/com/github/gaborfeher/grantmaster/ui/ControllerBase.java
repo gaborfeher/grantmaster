@@ -36,8 +36,10 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
         List<T> items = table.getItems();
         if (items != null) {
           items.clear();
+          T wrapper = createNewEntity();
+          wrapper.setState(EntityWrapper.State.EDITING_NEW);
+          items.add(wrapper);
         }
-        //System.out.println("selectedItem= " + selectedItem);
         refresh(em, items);
         if (items != null) {
           addMyselfAsParent(items);
@@ -54,16 +56,6 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     mainNode.getProperties().put("controller", this);
     if (table != null) {
       table.getSelectionModel().setCellSelectionEnabled(true);
-    }
-  }
-  
-  @FXML
-  public void addButtonAction(ActionEvent event) {
-    T wrapper = createNewEntity();
-    wrapper.setState(EntityWrapper.State.EDITING_NEW);
-    wrapper.setParent(this);
-    if (Utils.prepareForEditing()) {
-      table.getItems().add(wrapper);
     }
   }
   

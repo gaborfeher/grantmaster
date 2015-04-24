@@ -33,6 +33,11 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     setComputedValue("budgetAccountingCurrency", null);
 
   }
+
+  @Override
+  public boolean canEdit() {
+    return limit != null || budgetCategory != null;
+  }
   
   @Override
   public BudgetCategoryWrapper createFakeCopy(String fakeTitle) {

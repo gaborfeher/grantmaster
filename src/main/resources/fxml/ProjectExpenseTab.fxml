@@ -8,7 +8,6 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectExpenseTabController">
   <children>
-    <Button text="%ProjectExpenseCreateButtonLabbel" onAction="#addButtonAction" />
     <fx:include source="ExpenseTable.fxml" fx:id="table" />
   </children>
 </VBox>

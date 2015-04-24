@@ -19,7 +19,6 @@
         <Button onAction="#filterResetButtonAction" text="%ProjectBudgetLimitsFilterResetButton" /> 
       </children>
     </HBox>
-    <Button text="%ProjectBudgetLimitAddButtonLabel" onAction="#addButtonAction" />    
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS" >
       <rowFactory>
         <SummaryHighlighterRowFactory />

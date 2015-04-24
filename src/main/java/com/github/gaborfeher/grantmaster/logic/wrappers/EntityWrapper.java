@@ -67,7 +67,7 @@ public abstract class EntityWrapper {
   
   private final boolean setEntityPropeprty(Object entity, String name, Object value) {
     try {
-      System.out.println("   entity= " + entity);
+      System.out.println("   entity= " + entity + " name= " + name + " value= " + value);
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       entity.getClass().getMethod(setterName, value.getClass()).invoke(entity, value);
       return true;

@@ -220,7 +220,6 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       List<BudgetCategoryWrapper> paymentCategories,
       List<BudgetCategoryWrapper> incomeCategories,
       List<BudgetCategoryWrapper> output) {
-    output.clear();
     BudgetCategoryWrapper expenseSum =
         createBudgetSummaryList(em, paymentCategories, "Költségek mindösszesen", output);
     BudgetCategoryWrapper incomeSum = 

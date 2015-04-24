@@ -32,6 +32,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetC
   
   @Override
   protected BudgetCategoryWrapper createNewEntity() {
+    System.out.println("ProjectBudgetCategoriesTabController.createNewEntity");
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
     ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
@@ -65,7 +66,6 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetC
             project,
             startDate,
             endDate);
-    items.clear();
     BudgetCategoryWrapper.createBudgetSummaryList(em, paymentLines, "Összes projektbevétel és -költség", items);
     if (items.size() > 0) {
       ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);

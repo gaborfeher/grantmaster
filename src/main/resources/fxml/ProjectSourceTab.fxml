@@ -10,7 +10,6 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectSourceTabController">
   <children>
-    <Button text="%ProjectSourceAddButtonLabel" onAction="#addButtonAction" />
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn prefWidth="150" sortable="false" styleClass="editColumn">

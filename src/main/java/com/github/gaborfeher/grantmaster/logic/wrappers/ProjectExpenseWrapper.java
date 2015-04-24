@@ -181,7 +181,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
             "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
             "WHERE e.project = :project " + extraWhere + " " +
             "GROUP BY e " +
-            "ORDER BY e.paymentDate, e.id",
+            "ORDER BY e.paymentDate DESC, e.id DESC",
         ProjectExpenseWrapper.class).setParameter("project", project);
   }
 
