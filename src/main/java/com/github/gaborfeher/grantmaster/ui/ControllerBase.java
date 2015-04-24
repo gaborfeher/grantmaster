@@ -2,12 +2,10 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -35,8 +33,10 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
         if (items != null) {
           items.clear();
           T wrapper = createNewEntity();
-          wrapper.setState(EntityWrapper.State.EDITING_NEW);
-          items.add(wrapper);
+          if (wrapper != null) {
+            wrapper.setState(EntityWrapper.State.EDITING_NEW);
+            items.add(wrapper);
+          }
         }
         refresh(em, items);
         if (items != null) {

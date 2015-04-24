@@ -111,7 +111,7 @@ public class SearchTabController
 
   @Override
   protected ProjectExpenseWrapper createNewEntity() {
-    throw new UnsupportedOperationException("Not supported.");
+    return null;
   }
   
 }
