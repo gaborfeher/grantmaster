@@ -1,7 +1,8 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
+import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.ui.cells.BigDecimalTableCellFactory;
 import com.github.gaborfeher.grantmaster.ui.cells.EntityPropertyValueFactory;
 import java.math.BigDecimal;
@@ -12,23 +13,23 @@ import java.util.TreeSet;
 import javafx.scene.control.TableColumn;
 import javax.persistence.EntityManager;
 
-public class BudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> {
+public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCategoryWrapper> {
 
   public BudgetCategoriesTabController() {
   }
   
   @Override
-  protected void refresh(EntityManager em, List<BudgetCategoryWrapper> items) {
-    List<BudgetCategoryWrapper> paymentCategories = new ArrayList<>();
-    List<BudgetCategoryWrapper> incomeCategories = new ArrayList<>();
+  protected void refresh(EntityManager em, List items) {
+    List paymentCategories = new ArrayList();
+    List incomeCategories = new ArrayList();
     Set<String> columnNames = new TreeSet<>();
-        BudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
+        GlobalBudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
             em, paymentCategories, incomeCategories, columnNames);
     
     // Initialize table columns.
     table.getColumns().remove(4, table.getColumns().size());
     for (final String columnName : columnNames) {
-      TableColumn column = new TableColumn<BudgetCategoryWrapper, BigDecimal>(columnName);
+      TableColumn column = new TableColumn<GlobalBudgetCategoryWrapper, BigDecimal>(columnName);
       column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
       column.setCellFactory(new BigDecimalTableCellFactory());
       column.getStyleClass().add("numColumn");
@@ -38,7 +39,7 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
       table.getColumns().add(column);
     }
     
-    BudgetCategoryWrapper.createBudgetSummaryList(
+    BudgetCategoryWrapperBase.createBudgetSummaryList(
         em,
         paymentCategories,
         incomeCategories,
@@ -46,9 +47,9 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
   }
 
   @Override
-  public BudgetCategoryWrapper createNewEntity() {
+  public GlobalBudgetCategoryWrapper createNewEntity() {
     BudgetCategory budgetCategory = new BudgetCategory();
-    return new BudgetCategoryWrapper(budgetCategory);
+    return new GlobalBudgetCategoryWrapper(budgetCategory);
   }
 
 }

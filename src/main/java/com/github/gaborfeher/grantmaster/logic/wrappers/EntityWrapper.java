@@ -5,9 +5,6 @@ import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -19,6 +16,8 @@ public abstract class EntityWrapper {
       return false;
     }
     if (state == EntityWrapper.State.EDITING_NEW) {
+      // Nothing is to be done for newly created objects here. The user has to
+      // click the create button to commit them.
       return true;
     }
     return DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
@@ -41,12 +40,9 @@ public abstract class EntityWrapper {
   private boolean isSummary;
   private ControllerBase parent;
   
-  protected final Map<String, Object> computedValues;
-  
   public EntityWrapper() {
     state = State.SAVED;
     isSummary = false;
-    computedValues = new HashMap<>();
   }
   
   public State getState() {
@@ -61,7 +57,7 @@ public abstract class EntityWrapper {
     return !isSummary;
   }
   
-  private final boolean setEntityPropeprty(Object entity, String name, Object value) {
+  private boolean setEntityPropeprty(Object entity, String name, Object value) {
     try {
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       entity.getClass().getMethod(setterName, value.getClass()).invoke(entity, value);
@@ -77,9 +73,6 @@ public abstract class EntityWrapper {
   }
   
   public Object getProperty(String name) {
-    if (computedValues.containsKey(name)) {
-      return computedValues.get(name);
-    }
     try {
       String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       return getEntity().getClass().getMethod(getterName).invoke(getEntity());
@@ -104,8 +97,11 @@ public abstract class EntityWrapper {
   }
   
   public void delete() {
-    DatabaseConnectionSingleton.getInstance().remove(getEntity());
-    parent.refresh();
+    EntityBase entityBase = getEntity();
+    if (entityBase != null) {
+      DatabaseConnectionSingleton.getInstance().remove(entityBase);
+      parent.refresh();
+    }
   }
   
   public void discardEdits() {
@@ -131,17 +127,6 @@ public abstract class EntityWrapper {
     this.parent = parent;
   }
 
-  public BigDecimal getComputedValue(String key) {
-    BigDecimal result = (BigDecimal) computedValues.get(key);
-    if (result == null) {
-      result = BigDecimal.ZERO;
-    }
-    return result;
-  }
-  
-  public void setComputedValue(String key, BigDecimal value) {
-    computedValues.put(key, value);
-  }
   
   public abstract EntityBase getEntity();
   protected abstract void setEntity(EntityBase entity);

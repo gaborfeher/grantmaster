@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 @Entity
@@ -33,7 +34,7 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
   @ManyToOne
   @JoinColumn(nullable = false)
   private Project project;
-  
+    
   public ProjectBudgetLimit() {
   }
 

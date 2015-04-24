@@ -4,7 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
-import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -127,7 +127,7 @@ public class MainPageController implements Initializable {
       @Override
       public boolean run(EntityManager em) {
         CurrencyManager.createDefaultCurrencies(em);
-        BudgetCategoryWrapper.createDefaultBudgetCategories(em);
+        GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
         return true;
       }
     });

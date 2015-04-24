@@ -8,7 +8,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.StringConverter;
 
 public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
   final String property;
@@ -20,10 +19,8 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
   boolean userCancelled;
   
   public TextFieldTableCell(String property, MultiStringConverter<T> stringConverter0) {
-    //super(new DefaultStringConverter());
     this.property = property;
     this.stringConverter = stringConverter0;
-    
     editTextField = new TextField();
     editTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
         @Override
@@ -46,7 +43,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
           }
     });
   }
-   
+
   private EntityWrapper getEntityWrapper() {
     return (EntityWrapper) getTableRow().getItem();
   }

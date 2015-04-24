@@ -10,29 +10,38 @@ import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
 
-public class BudgetCategoryWrapper extends EntityWrapper {
-  protected BudgetCategory budgetCategory;
-
-  public BudgetCategoryWrapper(BudgetCategory budgetCategory) {
-    this.budgetCategory = budgetCategory;
-    this.computedValues.put("budgetCategory", budgetCategory);
+public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
+  protected final Map<String, BigDecimal> computedValues;
+  
+  public GlobalBudgetCategoryWrapper(BudgetCategory budgetCategory) {
+    super(budgetCategory, null);
+    computedValues = new HashMap<>();
   }
   
-  protected BudgetCategoryWrapper(String fakeName) {
-    this.budgetCategory = null;
-    this.computedValues.put("name", fakeName);
+  protected GlobalBudgetCategoryWrapper(String fakeName) {
+    super(null, fakeName);
+    computedValues = new HashMap<>();
   }
   
-  public BudgetCategoryWrapper createFakeCopy(String fakeName) {
-    BudgetCategoryWrapper copy = new BudgetCategoryWrapper(fakeName);
+  
+  public BigDecimal getComputedValue(String key) {
+    BigDecimal result = computedValues.get(key);
+    if (result == null) {
+      result = BigDecimal.ZERO;
+    }
+    return result;
+  }
+  
+  public void setComputedValue(String key, BigDecimal value) {
+    computedValues.put(key, value);
+  }
+  
+  public GlobalBudgetCategoryWrapper createFakeCopy(String fakeName) {
+    GlobalBudgetCategoryWrapper copy = new GlobalBudgetCategoryWrapper(fakeName);
     copy.addSummaryValues(this, BigDecimal.ONE);
     copy.setIsSummary(true);
     copy.setState(null);
     return copy;
-  }
-  
-  public Long getId() {
-    return budgetCategory.getId();
   }
   
   @Override
@@ -45,29 +54,21 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return null;
   }
 
-   public String getGroupName() {
-    if (budgetCategory == null) {
-      return null;
-    }
-    return budgetCategory.getGroupName();
-  }
-   
-  public BudgetCategory getBudgetCategory() {
-    return budgetCategory;
-  }
-
   @Override
   public boolean canEdit() {
     return budgetCategory != null;
   }
-  
-  protected void addSummaryValue(BudgetCategoryWrapper other, String key, BigDecimal multiplier) {
+      
+  protected void addSummaryValue(BudgetCategoryWrapperBase other0, String key, BigDecimal multiplier) {
+    GlobalBudgetCategoryWrapper other = (GlobalBudgetCategoryWrapper) other0;
     BigDecimal value = multiplier.multiply(other.getComputedValue(key), Utils.MC);
     setComputedValue(key, value.add(getComputedValue(key), Utils.MC));
   }
   
-  public void addSummaryValues(BudgetCategoryWrapper other, BigDecimal multiplier) {
-    for (Map.Entry<String, Object> summaryEntry : other.computedValues.entrySet()) {
+  @Override
+  public void addSummaryValues(BudgetCategoryWrapperBase other0, BigDecimal multiplier) {
+    GlobalBudgetCategoryWrapper other = (GlobalBudgetCategoryWrapper) other0;
+    for (Map.Entry<String, BigDecimal> summaryEntry : other.computedValues.entrySet()) {
       String key = summaryEntry.getKey();
       Object entryValue = summaryEntry.getValue();
       if (entryValue != null && entryValue instanceof BigDecimal) {
@@ -81,13 +82,12 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return budgetCategory;
   }
 
-  public static List<BudgetCategoryWrapper> getBudgetCategoryWrappers(EntityManager em, BudgetCategory.Direction direction) {
-    return em.createQuery(
-            "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper(c) " +
+  public static List<GlobalBudgetCategoryWrapper> getBudgetCategoryWrappers(EntityManager em, BudgetCategory.Direction direction) {
+    return em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper(c) " +
             "FROM BudgetCategory c " +
             "WHERE :direction IS NULL OR c.direction = :direction " +
             "ORDER BY c.direction, c.groupName NULLS LAST, c.name",
-        BudgetCategoryWrapper.class).
+        GlobalBudgetCategoryWrapper.class).
             setParameter("direction", direction).
             getResultList();
   }
@@ -105,11 +105,11 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   private static void getYearlyBudgetCategorySummaryMap(
       EntityManager em,
       String query,
-      Map<Long, BudgetCategoryWrapper> map,
+      Map<Long, GlobalBudgetCategoryWrapper> map,
       Set<String> columnNames) {
     List<Object[]> summaryList = em.createQuery(query, Object[].class).getResultList();
     for (Object[] line : summaryList) {
-      BudgetCategoryWrapper budgetCategoryWrapper = map.get(((BudgetCategory)line[0]).getId());
+      GlobalBudgetCategoryWrapper budgetCategoryWrapper = map.get(((BudgetCategory)line[0]).getId());
       int year = (Integer)line[2];
       String header = String.format("%d (%s)", year, (String)line[1]);
       columnNames.add(header);
@@ -125,8 +125,8 @@ public class BudgetCategoryWrapper extends EntityWrapper {
    */
   public static void getYearlyBudgetCategorySummaries(
       EntityManager em,
-      List<BudgetCategoryWrapper> paymentCategories,
-      List<BudgetCategoryWrapper> incomeCategories,
+      List<GlobalBudgetCategoryWrapper> paymentCategories,
+      List<GlobalBudgetCategoryWrapper> incomeCategories,
       Set<String> columnNames) {
     paymentCategories.clear();
     paymentCategories.addAll(getBudgetCategoryWrappers(
@@ -135,11 +135,11 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     incomeCategories.addAll(getBudgetCategoryWrappers(
         em, BudgetCategory.Direction.INCOME));
     
-    Map<Long, BudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
-    for (BudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {
+    Map<Long, GlobalBudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
+    for (GlobalBudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {
       budgetCategoryMap.put(budgetCategoryWrapper.getId(), budgetCategoryWrapper);
     }
-    for (BudgetCategoryWrapper budgetCategoryWrapper : incomeCategories) {
+    for (GlobalBudgetCategoryWrapper budgetCategoryWrapper : incomeCategories) {
       budgetCategoryMap.put(budgetCategoryWrapper.getId(), budgetCategoryWrapper);
     }
     
@@ -163,73 +163,6 @@ public class BudgetCategoryWrapper extends EntityWrapper {
         columnNames);
   }
   
-  public static BudgetCategoryWrapper createBudgetSummaryList(
-      EntityManager em,
-      List<BudgetCategoryWrapper> rawLines,
-      String summaryTitle,
-      List<BudgetCategoryWrapper> summary) {
-    BudgetCategoryWrapper totalSum = null;
-    BudgetCategoryWrapper groupSum = null;
-    String currentGroupName = null;
-    BudgetCategoryWrapper previous = null;
-    for (BudgetCategoryWrapper current : rawLines) {
-      if (previous != null) {
-        if (currentGroupName != null && !currentGroupName.equals(current.getGroupName())) {
-          summary.add(groupSum);
-          currentGroupName = null;
-          groupSum = null;
-        }
-      }
-      
-      if (current.getGroupName() != null) {
-        if (currentGroupName == null || groupSum == null) {
-          currentGroupName = current.getGroupName();
-          groupSum = current.createFakeCopy(current.getGroupName() + " mindösszesen");
-        } else {
-          groupSum.addSummaryValues(current, BigDecimal.ONE);
-        }
-      }
-      
-      summary.add(current);
-      if (totalSum != null) {
-        totalSum.addSummaryValues(current, BigDecimal.ONE);
-      } else {
-        totalSum = current.createFakeCopy(summaryTitle);
-      }
-      
-      previous = current;
-    }
-    if (groupSum != null) {
-      summary.add(groupSum);
-    }
-    if (totalSum != null) {
-      summary.add(totalSum);
-    }
-    return totalSum;
-  }
-
-  /**
-   * Processes the lists of income and expense budget categories, and inserts
-   * summary lines after groups of categories.
-   * @param paymentCategories
-   * @param incomeCategories
-   * @param output 
-   */
-  public static void createBudgetSummaryList(
-      EntityManager em,
-      List<BudgetCategoryWrapper> paymentCategories,
-      List<BudgetCategoryWrapper> incomeCategories,
-      List<BudgetCategoryWrapper> output) {
-    BudgetCategoryWrapper expenseSum =
-        createBudgetSummaryList(em, paymentCategories, "Költségek mindösszesen", output);
-    BudgetCategoryWrapper incomeSum = 
-        createBudgetSummaryList(em, incomeCategories, "Bevételek mindösszesen", output);
-    BudgetCategoryWrapper finalSum = incomeSum.createFakeCopy("Különbség");
-    if (expenseSum != null) {
-      finalSum.addSummaryValues(expenseSum, new BigDecimal(-1));
-    }
-    output.add(finalSum);
-  }
   
   public static void createDefaultBudgetCategories(EntityManager em) {
     String groupName = "Személyi jellegű ráfordítások";

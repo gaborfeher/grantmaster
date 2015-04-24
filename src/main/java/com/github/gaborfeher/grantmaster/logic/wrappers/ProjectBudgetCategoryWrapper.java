@@ -12,25 +12,30 @@ import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
 
-public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
+public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   private ProjectBudgetLimit limit;
   private Project project;
   
+  private BigDecimal spentGrantCurrency;
+  private BigDecimal spentAccountingCurrency;
+  private BigDecimal remainingAccountingCurrency;
+  private BigDecimal remainingGrantCurrency;
+  private BigDecimal budgetAccountingCurrency;
+  
   public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, BigDecimal spentAccountingCurrency, BigDecimal spentGrantCurrency) {
-    super(budgetCategory);
-    setComputedValue("spentGrantCurrency", spentGrantCurrency);
-    setComputedValue("spentAccountingCurrency", spentAccountingCurrency);
-    setComputedValue("remainingAccountingCurrency", null);
-    setComputedValue("budgetAccountingCurrency", null);
+    super(budgetCategory, null);
+    this.spentGrantCurrency = spentGrantCurrency;
+    this.spentAccountingCurrency = spentAccountingCurrency;
+    this.remainingAccountingCurrency = null;
+    this.budgetAccountingCurrency = null;
   }
   
   public ProjectBudgetCategoryWrapper(String fakeName) {
-    super(fakeName);
-    computedValues.put("budgetCategory", fakeName);
-    setComputedValue("spentGrantCurrency", BigDecimal.ZERO);
-    setComputedValue("spentAccountingCurrency", BigDecimal.ZERO);
-    setComputedValue("remainingAccountingCurrency", null);
-    setComputedValue("budgetAccountingCurrency", null);
+    super(null, fakeName);
+    this.spentGrantCurrency = BigDecimal.ZERO;
+    this.spentAccountingCurrency = BigDecimal.ZERO;
+    this.remainingAccountingCurrency = null;
+    this.budgetAccountingCurrency = null;
   }
 
   @Override
@@ -41,8 +46,12 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   }
   
   @Override
-  public BudgetCategoryWrapper createFakeCopy(String fakeTitle) {
-    BudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
+  public ProjectBudgetCategoryWrapper createFakeCopy(String fakeTitle) {
+    ProjectBudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
+    copy.setProject(project);
+    ProjectBudgetLimit l = new ProjectBudgetLimit();
+    l.setProject(project);
+    copy.setLimit(BigDecimal.ZERO, l);
     copy.addSummaryValues(this, BigDecimal.ONE);
     copy.setIsSummary(true);
     copy.setState(null);
@@ -70,12 +79,10 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       limit.setBudgetGrantCurrency(total.multiply(limit.getBudgetPercentage()).divide(new BigDecimal("100"), Utils.MC));
     }
     if (limit.getBudgetGrantCurrency() != null) {
-      BigDecimal remainingGrantCurrency = limit.getBudgetGrantCurrency();
-      BigDecimal spentGrantCurrency = getComputedValue("spentGrantCurrency");
+      remainingGrantCurrency = limit.getBudgetGrantCurrency();
       if (spentGrantCurrency != null) {
         remainingGrantCurrency = remainingGrantCurrency.subtract(spentGrantCurrency, Utils.MC);
       }
-      setComputedValue("remainingGrantCurrency", remainingGrantCurrency);
     }
   }
 
@@ -85,28 +92,34 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   }
 
   @Override
-  public void addSummaryValues(BudgetCategoryWrapper other, BigDecimal multiplier) {
-    addSummaryValue(other, "spentGrantCurrency", multiplier);
-    addSummaryValue(other, "spentAccountingCurrency", multiplier);
+  public void addSummaryValues(BudgetCategoryWrapperBase other0, BigDecimal multiplier) {
+    ProjectBudgetCategoryWrapper other = (ProjectBudgetCategoryWrapper) other0;
+    spentGrantCurrency = Utils.addMult(spentGrantCurrency, other.spentGrantCurrency, multiplier);
+    spentAccountingCurrency = Utils.addMult(spentAccountingCurrency, other.spentAccountingCurrency, multiplier);
   }
   
   public void addBudgetAmounts(BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
-    if (limit == null) {
-      limit = new ProjectBudgetLimit();
-    }
     if (limit.getBudgetGrantCurrency() == null) {
       limit.setBudgetGrantCurrency(grantCurrencyAmount);
     } else {
       limit.setBudgetGrantCurrency(limit.getBudgetGrantCurrency().add(grantCurrencyAmount, Utils.MC));
     }
-    BigDecimal budgetAccountingCurrency = (BigDecimal) computedValues.get("budgetAccountingCurrency");
     if (budgetAccountingCurrency == null) {
       budgetAccountingCurrency = BigDecimal.ZERO;
     }
     budgetAccountingCurrency = budgetAccountingCurrency.add(accountingCurrencyAmount);
-    setComputedValue("budgetAccountingCurrency", budgetAccountingCurrency);
-    setComputedValue("remainingGrantCurrency", limit.getBudgetGrantCurrency().subtract(getComputedValue("spentGrantCurrency"), Utils.MC));
-    setComputedValue("remainingAccountingCurrency", budgetAccountingCurrency.subtract(getComputedValue("spentAccountingCurrency"), Utils.MC));
+    remainingGrantCurrency = limit.getBudgetGrantCurrency().subtract(spentGrantCurrency, Utils.MC);
+    remainingAccountingCurrency = budgetAccountingCurrency.subtract(spentAccountingCurrency, Utils.MC);
+  }
+  
+  @Override
+  public Object getProperty(String name) {
+    if ("spentGrantCurrency".equals(name)) return spentGrantCurrency;
+    if ("spentAccountingCurrency".equals(name)) return spentAccountingCurrency;
+    if ("remainingAccountingCurrency".equals(name)) return remainingAccountingCurrency;
+    if ("remainingGrantCurrency".equals(name)) return remainingGrantCurrency;
+    if ("budgetAccountingCurrency".equals(name)) return budgetAccountingCurrency;
+    return super.getProperty(name);
   }
   
   @Override
@@ -164,7 +177,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
 
 
       
-      if (limit == null && limitWrapper.computedValues.get("spentGrantCurrency") == null) {
+      if (limit == null && limitWrapper.spentGrantCurrency == null) {
         iterator.remove();
       }
       if (limit == null) {

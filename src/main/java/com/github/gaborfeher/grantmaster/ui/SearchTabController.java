@@ -4,7 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.util.List;
@@ -64,7 +64,7 @@ public class SearchTabController
   public void refresh(EntityManager em, List<ProjectExpenseWrapper> items) {
     budgetCategory.getItems().clear();
     budgetCategory.getItems().add(null);
-    budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
+    budgetCategory.getItems().addAll(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
     project.getItems().clear();
     project.getItems().add(null);
     project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping(em));

@@ -1,5 +1,7 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.List;
 import javax.persistence.TypedQuery;
@@ -19,22 +21,14 @@ public class Utils {
     }
     return list.get(0);    
   }
-
-  public static boolean prepareForEditing() {
- /*   if (RefreshControlSingleton.getInstance().isEditingActive()) {
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setTitle("Szerkesztés");
-      alert.setHeaderText("Egyszerre egy dolgot lehet szerkeszteni");
-      alert.setContentText("Ha ezt folytatod, az előző megnyitott\nszerkesztés adatai el fognak veszni.");
-      Optional<ButtonType> result = alert.showAndWait();
-      if (result.get() == ButtonType.OK) {
-        RefreshControlSingleton.getInstance().broadcastRefresh();
-        // There is no point in going forward here.
-        return false;
-      }
+  
+  public static BigDecimal addMult(BigDecimal base, BigDecimal add, BigDecimal mult) {
+    if (add == null) {
+      return base;
     }
-    RefreshControlSingleton.getInstance().setEditingActive(true); */
-    return true;
+    if (base == null) {
+      base = BigDecimal.ZERO;
+    }
+    return base.add(add.multiply(mult, MC), MC);
   }
-
 }

@@ -203,6 +203,9 @@ public class DatabaseConnectionSingleton {
   */
   
   public boolean runInTransaction(TransactionRunner runner) {
+    if (entityManagerFactory == null) {
+      return false;
+    }
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = entityManager.getTransaction();
     try {
@@ -229,13 +232,15 @@ public class DatabaseConnectionSingleton {
   }
   
   public void runWithEntityManager(TransactionRunner runner) {
+    if (entityManagerFactory == null) {
+      return;
+    }
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     try  {
       runner.run(entityManager);
     } finally {
       entityManager.close();
     }
-    
   }
 
   public boolean isConnected() {
