@@ -31,13 +31,8 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetC
   Project project;
   
   @Override
-  protected BudgetCategoryWrapper createNewEntity() {
-    ProjectBudgetLimit limit = new ProjectBudgetLimit();
-    limit.setProject(project);
-    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
-    wrapper.setProject(project);
-    wrapper.setLimit(BigDecimal.ZERO, limit);
-    return wrapper;
+  protected ProjectBudgetCategoryWrapper createNewEntity() {
+    return ProjectBudgetCategoryWrapper.createNew(project);
   }
   
   public void filterUpdateAction(ActionEvent event) {

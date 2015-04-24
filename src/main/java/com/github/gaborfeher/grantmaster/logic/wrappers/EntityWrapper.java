@@ -42,12 +42,10 @@ public abstract class EntityWrapper {
   private ControllerBase parent;
   
   protected final Map<String, Object> computedValues;
-  protected final Map<String, Object> changedValues;
   
   public EntityWrapper() {
     state = State.SAVED;
     isSummary = false;
-    changedValues = new HashMap<>();
     computedValues = new HashMap<>();
   }
   
@@ -75,14 +73,10 @@ public abstract class EntityWrapper {
   }
   
   public boolean setProperty(String name, Object value) {
-    changedValues.put(name, value);
-    return true;
+    return setEntityPropeprty(getEntity(), name, value);
   }
   
   public Object getProperty(String name) {
-    if (changedValues.containsKey(name)) {
-      return changedValues.get(name);
-    }
     if (computedValues.containsKey(name)) {
       return computedValues.get(name);
     }
@@ -103,15 +97,7 @@ public abstract class EntityWrapper {
 
   public boolean save(EntityManager em) {
     EntityBase entity;
-    if (state == State.EDITING_NEW) {
-      entity = em.merge(getEntity());  // TODO(gaborfeher): build new entity from scratch here
-    } else {
-      entity = (EntityBase) em.find(getEntity().getClass(), getEntity().getId());
-    }
-    for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
-      setEntityPropeprty(entity, entry.getKey(), entry.getValue());
-    }
-    changedValues.clear();
+    entity = em.merge(getEntity());
     setState(State.SAVED);
     setEntity(entity);
     return true;

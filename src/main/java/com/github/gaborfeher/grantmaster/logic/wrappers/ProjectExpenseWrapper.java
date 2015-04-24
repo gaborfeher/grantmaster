@@ -22,6 +22,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     this.expense = expense;
     this.expense.setAccountingCurrencyAmount(accountingCurrencyAmount);
+    this.expense.setAccountingCurrencyAmountNotEdited(accountingCurrencyAmount);
     this.expense.setGrantCurrencyAmount(grantCurrencyAmount);
     this.expense.setExchangeRate(grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
   }
@@ -99,11 +100,10 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   @Override
   public boolean save(EntityManager em) {
     BigDecimal editedAccountingCurrencyAmount = null;
-    if (changedValues.containsKey("accountingCurrencyAmount")) {
-      editedAccountingCurrencyAmount = (BigDecimal) changedValues.get("accountingCurrencyAmount");
-      changedValues.remove("accountingCurrencyAmount");
+    if (expense.getAccountingCurrencyAmount().compareTo(expense.getAccountingCurrencyAmountNotEdited()) != 0) {
+      editedAccountingCurrencyAmount = expense.getAccountingCurrencyAmount();
     }
-    super.save(em);
+    super.save(em);  // expense is replaced here, transient fields are lost
     if (editedAccountingCurrencyAmount != null) {
       // Set the allocation size to be right for this entity and flush.
       // This is just an initial fake setting which will be removed while normalizing.

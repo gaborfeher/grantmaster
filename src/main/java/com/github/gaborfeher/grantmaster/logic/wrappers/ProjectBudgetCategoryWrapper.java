@@ -31,12 +31,13 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     setComputedValue("spentAccountingCurrency", BigDecimal.ZERO);
     setComputedValue("remainingAccountingCurrency", null);
     setComputedValue("budgetAccountingCurrency", null);
-
   }
 
   @Override
   public boolean canEdit() {
-    return limit != null || budgetCategory != null;
+    return !getIsSummary() &&
+        (budgetCategory == null ||
+         budgetCategory.getDirection() == BudgetCategory.Direction.PAYMENT);
   }
   
   @Override
@@ -65,7 +66,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       System.out.println("bad project for limit");
     }
     
-    if (limit.getBudgetPercentage() != null) {
+    if (limit.getBudgetPercentage() != null && total != null) {
       limit.setBudgetGrantCurrency(total.multiply(limit.getBudgetPercentage()).divide(new BigDecimal("100"), Utils.MC));
     }
     if (limit.getBudgetGrantCurrency() != null) {
@@ -113,15 +114,13 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     return limit;
   }
   
-  @Override
-  public boolean save(EntityManager em) {
-    if (limit == null) {
-      setState(State.EDITING_NEW);
-      limit = new ProjectBudgetLimit();
-      limit.setBudgetCategory(budgetCategory);
-      limit.setProject(project);
-    }
-    return super.save(em);
+  public static ProjectBudgetCategoryWrapper createNew(Project project) {
+    ProjectBudgetLimit limit = new ProjectBudgetLimit();
+    limit.setProject(project);
+    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
+    wrapper.setProject(project);
+    wrapper.setLimit(BigDecimal.ZERO, limit);
+    return wrapper;
   }
   
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
@@ -164,10 +163,16 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
                   setParameter("budgetCategory", limitWrapper.getBudgetCategory()));
 
 
-      limitWrapper.setLimit(total, limit);
-      if (limitWrapper.getEntity() == null && limitWrapper.computedValues.get("spentGrantCurrency") == null) {
+      
+      if (limit == null && limitWrapper.computedValues.get("spentGrantCurrency") == null) {
         iterator.remove();
       }
+      if (limit == null) {
+        limit = new ProjectBudgetLimit();
+        limit.setBudgetCategory(limitWrapper.getBudgetCategory());
+        limit.setProject(project);
+      }
+      limitWrapper.setLimit(total, limit);
     }
 
     return list;

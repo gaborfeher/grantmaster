@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -56,6 +55,9 @@ public class ProjectExpense implements EntityBase, Serializable {
   
   @Transient
   private BigDecimal accountingCurrencyAmount;
+  
+  @Transient
+  private BigDecimal accountingCurrencyAmountNotEdited;
   
   @Transient
   private BigDecimal grantCurrencyAmount;
@@ -230,6 +232,14 @@ public class ProjectExpense implements EntityBase, Serializable {
 
   public void setExchangeRate(BigDecimal exchangeRate) {
     this.exchangeRate = exchangeRate;
+  }
+
+  public BigDecimal getAccountingCurrencyAmountNotEdited() {
+    return accountingCurrencyAmountNotEdited;
+  }
+
+  public void setAccountingCurrencyAmountNotEdited(BigDecimal accountingCurrencyAmountNotEdited) {
+    this.accountingCurrencyAmountNotEdited = accountingCurrencyAmountNotEdited;
   }
 
 
