@@ -60,8 +60,6 @@ public abstract class EntityWrapper {
   }
   
   public boolean canEdit() {
-    //return state == State.EDITING || state == State.EDITING_NEW;
-   // return true;
     return !isSummary;
   }
   

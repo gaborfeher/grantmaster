@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 // http://svanimpe.be/blog/properties-jpa.html
 
@@ -52,6 +53,15 @@ public class ProjectExpense implements EntityBase, Serializable {
   private String comment1;
   
   private String comment2;
+  
+  @Transient
+  private BigDecimal accountingCurrencyAmount;
+  
+  @Transient
+  private BigDecimal grantCurrencyAmount;
+  
+  @Transient
+  private BigDecimal exchangeRate;
   
   public ProjectExpense() {
   }
@@ -196,6 +206,30 @@ public class ProjectExpense implements EntityBase, Serializable {
    */
   public void setComment2(String comment2) {
     this.comment2 = comment2;
+  }
+
+  public BigDecimal getAccountingCurrencyAmount() {
+    return accountingCurrencyAmount;
+  }
+
+  public void setAccountingCurrencyAmount(BigDecimal accountingCurrencyAmount) {
+    this.accountingCurrencyAmount = accountingCurrencyAmount;
+  }
+
+  public BigDecimal getGrantCurrencyAmount() {
+    return grantCurrencyAmount;
+  }
+
+  public void setGrantCurrencyAmount(BigDecimal grantCurrencyAmount) {
+    this.grantCurrencyAmount = grantCurrencyAmount;
+  }
+
+  public BigDecimal getExchangeRate() {
+    return exchangeRate;
+  }
+
+  public void setExchangeRate(BigDecimal exchangeRate) {
+    this.exchangeRate = exchangeRate;
   }
 
 

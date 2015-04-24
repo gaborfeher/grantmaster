@@ -69,7 +69,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetC
     if (items.size() > 0) {
       ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);
       for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(em, project, startDate, endDate)) {
-        lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
+        lastLine.addBudgetAmounts(source.getSource().getAccountingCurrencyAmount(), source.getSource().getGrantCurrencyAmount());
       }
     }
 

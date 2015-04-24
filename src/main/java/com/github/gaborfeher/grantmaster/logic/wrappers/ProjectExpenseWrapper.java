@@ -21,9 +21,9 @@ public class ProjectExpenseWrapper extends EntityWrapper {
 
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     this.expense = expense;
-    setComputedValue("accountingCurrencyAmount", accountingCurrencyAmount);
-    setComputedValue("grantCurrencyAmount", grantCurrencyAmount);
-    setComputedValue("exchangeRate", grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
+    this.expense.setAccountingCurrencyAmount(accountingCurrencyAmount);
+    this.expense.setGrantCurrencyAmount(grantCurrencyAmount);
+    this.expense.setExchangeRate(grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
   }
   
   public Project getProject() {
@@ -51,8 +51,8 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       if (accountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
         break;
       }
-      if (source.getRemainingAccountingCurrencyAmount().compareTo(BigDecimal.ZERO) > 0) {
-        BigDecimal take = accountingCurrencyAmount.min(source.getRemainingAccountingCurrencyAmount());
+      if (source.getSource().getRemainingAccountingCurrencyAmount().compareTo(BigDecimal.ZERO) > 0) {
+        BigDecimal take = accountingCurrencyAmount.min(source.getSource().getRemainingAccountingCurrencyAmount());
         if (i == list.size() - 1) {
           take = accountingCurrencyAmount;  // Allow of going below zero balance for the last source.
         }

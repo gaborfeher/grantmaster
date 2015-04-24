@@ -18,25 +18,13 @@ public class ProjectSourceWrapper extends EntityWrapper {
     if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
       return;
     }
-    setComputedValue("usedAccountingCurrencyAmount", usedAccountingCurrencyAmount);
-    BigDecimal accountingCurrencyAmount = source.getGrantCurrencyAmount().multiply(source.getExchangeRate(), Utils.MC);
-    setComputedValue("accountingCurrencyAmount", accountingCurrencyAmount);
-    setComputedValue("remainingAccountingCurrencyAmount", accountingCurrencyAmount.subtract(usedAccountingCurrencyAmount, Utils.MC));
+    source.setUsedAccountingCurrencyAmount(usedAccountingCurrencyAmount);
+    source.setAccountingCurrencyAmount(source.getGrantCurrencyAmount().multiply(source.getExchangeRate(), Utils.MC));
+    source.setRemainingAccountingCurrencyAmount(source.getAccountingCurrencyAmount().subtract(source.getUsedAccountingCurrencyAmount(), Utils.MC));
     if (source.getExchangeRate().compareTo(BigDecimal.ZERO) > 0) {
-      BigDecimal usedGrantCurrencyAmount = usedAccountingCurrencyAmount.divide(source.getExchangeRate(), Utils.MC);
-      setComputedValue("usedGrantCurrencyAmount", usedGrantCurrencyAmount);
-      setComputedValue("remainingGrantCurrencyAmount", source.getGrantCurrencyAmount().subtract(usedGrantCurrencyAmount, Utils.MC));
+      source.setUsedGrantCurrencyAmount(usedAccountingCurrencyAmount.divide(source.getExchangeRate(), Utils.MC));
+      source.setRemainingGrantCurrencyAmount(source.getGrantCurrencyAmount().subtract(source.getUsedGrantCurrencyAmount(), Utils.MC));
     }
-  }
-  
-  // TODO(gaborfeher): Eliminate below getters?
-  
-  public BigDecimal getRemainingAccountingCurrencyAmount() {
-    return (BigDecimal) computedValues.get("remainingAccountingCurrencyAmount");
-  }
-
-  public BigDecimal getAccountingCurrencyAmount() {
-    return (BigDecimal) computedValues.get("accountingCurrencyAmount");
   }
   
   public BigDecimal getGrantCurrencyAmount() {
@@ -51,7 +39,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
     this.source = source;
   }
   
-  public Integer getId() {
+  public Long getId() {
     return source.getId();
   }
 

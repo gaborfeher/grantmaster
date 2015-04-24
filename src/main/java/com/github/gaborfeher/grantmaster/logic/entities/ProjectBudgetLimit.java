@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
@@ -38,8 +33,7 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
   @ManyToOne
   @JoinColumn(nullable = false)
   private Project project;
-
-
+  
   public ProjectBudgetLimit() {
   }
 
