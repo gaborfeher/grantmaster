@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
@@ -62,7 +61,7 @@ public class SearchTabController
   }
 
   @Override
-  public void refresh(EntityManager em) {
+  public void refresh(EntityManager em, List<ProjectExpenseWrapper> items) {
     budgetCategory.getItems().clear();
     budgetCategory.getItems().add(null);
     budgetCategory.getItems().addAll(BudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
@@ -104,10 +103,9 @@ public class SearchTabController
       }
     });
 
+    items.clear();
     if (searchResults != null) {
-      table.getItems().setAll(searchResults);
-    } else {
-      table.getItems().clear();
+      items.addAll(searchResults);
     }
   }
 

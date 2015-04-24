@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.temporal.TemporalUnit;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 

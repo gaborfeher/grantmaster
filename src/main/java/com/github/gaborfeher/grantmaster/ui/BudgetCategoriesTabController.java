@@ -18,7 +18,7 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
   }
   
   @Override
-  protected void refresh(EntityManager em) {
+  protected void refresh(EntityManager em, List<BudgetCategoryWrapper> items) {
     List<BudgetCategoryWrapper> paymentCategories = new ArrayList<>();
     List<BudgetCategoryWrapper> incomeCategories = new ArrayList<>();
     Set<String> columnNames = new TreeSet<>();
@@ -42,7 +42,7 @@ public class BudgetCategoriesTabController extends ControllerBase<BudgetCategory
         em,
         paymentCategories,
         incomeCategories,
-        table.getItems());
+        items);
   }
 
   @Override

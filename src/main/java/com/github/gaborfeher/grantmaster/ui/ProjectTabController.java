@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import java.util.List;
 import javafx.fxml.FXML;
 import javax.persistence.EntityManager;
 
@@ -24,7 +25,7 @@ public class ProjectTabController extends ControllerBase {
   }
 
   @Override
-  public void refresh(EntityManager em) {
+  public void refresh(EntityManager em, List items) {
     this.projectExpenseTabController.refresh();
     this.projectSourceTabController.refresh();
     this.projectBudgetCategoriesTabController.refresh();

@@ -56,7 +56,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
     if (userCancelled) {
       return;  // User cancel was before this commit message, ignore this.
     }
-    if (getEntityWrapper().setPropeprty(property, val)) {
+    if (getEntityWrapper().commitEdit(property, val)) {
       super.commitEdit(val);
       updateItem(val, false);
     }

@@ -2,9 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapper;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,7 +14,7 @@ import java.time.LocalDate;
 import javafx.scene.control.DatePicker;
 import javax.persistence.EntityManager;
 
-public class ProjectBudgetCategoriesTabController extends ControllerBase {  
+public class ProjectBudgetCategoriesTabController extends ControllerBase<BudgetCategoryWrapper> {  
   @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> spentGrantCurrencyColumn;
   @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> spentAccountingCurrencyColumn;  
   @FXML TableColumn<BudgetCategoryWrapper, BigDecimal> remainingGrantCurrencyColumn;
@@ -33,7 +31,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase {
   Project project;
   
   @Override
-  protected EntityWrapper createNewEntity() {
+  protected BudgetCategoryWrapper createNewEntity() {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
     ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
@@ -57,7 +55,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase {
   }
   
   @Override
-  public void refresh(EntityManager em) {
+  public void refresh(EntityManager em, List<BudgetCategoryWrapper> items) {
     LocalDate startDate = filterStartDate.getValue();
     LocalDate endDate = filterEndDate.getValue();
     
@@ -67,10 +65,10 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase {
             project,
             startDate,
             endDate);
-    table.getItems().clear();
-    BudgetCategoryWrapper.createBudgetSummaryList(em, paymentLines, "Összes projektbevétel és -költség", table.getItems());
-    if (table.getItems().size() > 0) {
-      ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) table.getItems().get(table.getItems().size() - 1);
+    items.clear();
+    BudgetCategoryWrapper.createBudgetSummaryList(em, paymentLines, "Összes projektbevétel és -költség", items);
+    if (items.size() > 0) {
+      ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);
       for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(em, project, startDate, endDate)) {
         lastLine.addBudgetAmounts(source.getAccountingCurrencyAmount(), source.getGrantCurrencyAmount());
       }

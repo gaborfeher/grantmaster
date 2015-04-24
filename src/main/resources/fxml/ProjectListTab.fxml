@@ -12,13 +12,13 @@
   <children>
     <HBox>
       <Button text="%AddProjectButtonLabel" onAction="#addButtonAction" />
-      <Button text="%OpenProjectButtonLabel" onAction="#handleOpenButtonAction" />
     </HBox>
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
         <TableColumn prefWidth="150" styleClass="editColumn">
           <cellFactory>
-            <EditButtonTableCellFactory />
+            <EditButtonTableCellFactory extraButtonText="Megnyitás" onAction="#handleOpenButtonAction">
+            </EditButtonTableCellFactory>
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="state" /> 

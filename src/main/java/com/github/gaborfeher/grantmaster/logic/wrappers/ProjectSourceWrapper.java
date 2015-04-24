@@ -18,14 +18,14 @@ public class ProjectSourceWrapper extends EntityWrapper {
     if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
       return;
     }
-    computedValues.put("usedAccountingCurrencyAmount", usedAccountingCurrencyAmount);
+    setComputedValue("usedAccountingCurrencyAmount", usedAccountingCurrencyAmount);
     BigDecimal accountingCurrencyAmount = source.getGrantCurrencyAmount().multiply(source.getExchangeRate(), Utils.MC);
-    computedValues.put("accountingCurrencyAmount", accountingCurrencyAmount);
-    computedValues.put("remainingAccountingCurrencyAmount", accountingCurrencyAmount.subtract(usedAccountingCurrencyAmount, Utils.MC));
+    setComputedValue("accountingCurrencyAmount", accountingCurrencyAmount);
+    setComputedValue("remainingAccountingCurrencyAmount", accountingCurrencyAmount.subtract(usedAccountingCurrencyAmount, Utils.MC));
     if (source.getExchangeRate().compareTo(BigDecimal.ZERO) > 0) {
       BigDecimal usedGrantCurrencyAmount = usedAccountingCurrencyAmount.divide(source.getExchangeRate(), Utils.MC);
-      computedValues.put("usedGrantCurrencyAmount", usedGrantCurrencyAmount);
-      computedValues.put("remainingGrantCurrencyAmount", source.getGrantCurrencyAmount().subtract(usedGrantCurrencyAmount, Utils.MC));
+      setComputedValue("usedGrantCurrencyAmount", usedGrantCurrencyAmount);
+      setComputedValue("remainingGrantCurrencyAmount", source.getGrantCurrencyAmount().subtract(usedGrantCurrencyAmount, Utils.MC));
     }
   }
   
@@ -81,7 +81,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
   }
 
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return source;
   }
 

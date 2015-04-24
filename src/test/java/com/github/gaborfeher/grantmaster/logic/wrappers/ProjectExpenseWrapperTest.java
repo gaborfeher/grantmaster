@@ -69,10 +69,10 @@ public class ProjectExpenseWrapperTest {
   public void testCreateExpense() {
     final ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(PROJECT1);
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    newWrapper.setPropeprty("paymentDate", LocalDate.of(2015, 3, 4));
-    newWrapper.setPropeprty("budgetCategory", SOME_EXPENSE);
-    newWrapper.setPropeprty("originalAmount", new BigDecimal("10000.5", Utils.MC));
-    newWrapper.setPropeprty("accountingCurrencyAmount", new BigDecimal("10000.5", Utils.MC));
+    newWrapper.setProperty("paymentDate", LocalDate.of(2015, 3, 4));
+    newWrapper.setProperty("budgetCategory", SOME_EXPENSE);
+    newWrapper.setProperty("originalAmount", new BigDecimal("10000.5", Utils.MC));
+    newWrapper.setProperty("accountingCurrencyAmount", new BigDecimal("10000.5", Utils.MC));
     
     assertTrue(DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
       @Override

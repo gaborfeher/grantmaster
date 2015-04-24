@@ -41,6 +41,7 @@ public class CurrenciesTabController extends ControllerBase {
     Currency currency = new Currency();
     currency.setCode(code);
     connection.persist(currency);
+    refresh();
   }
 
   @Override
@@ -49,7 +50,7 @@ public class CurrenciesTabController extends ControllerBase {
   }
 
   @Override
-  protected void refresh(EntityManager em) {
+  protected void refresh(EntityManager em, List items) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

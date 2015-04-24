@@ -2,11 +2,12 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
-import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import java.util.List;
 import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -16,25 +17,23 @@ import javax.persistence.EntityManager;
 
 public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
   final Button saveButton = new Button("Ment");
-  final Button editButton = new Button("Szerkeszt");
   final Button discardButton = new Button("Visszavon");
   final Button deleteButton = new Button("Töröl");
   
-  final HBox editDeleteBox = new HBox(editButton, deleteButton);
+  final HBox editDeleteBox = new HBox();
   final HBox saveDiscardBox = new HBox(saveButton, discardButton);
   
-  public EditButtonTableCell() {
+  public EditButtonTableCell(List<Node> extraButtons) {
+    editDeleteBox.getChildren().add(deleteButton);
+    editDeleteBox.getChildren().addAll(extraButtons);
+    for (Node extraButton : extraButtons) {
+      extraButton.getProperties().put("tableCell", this);
+    }
 
     saveButton.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent t) {
         handleSaveButtonClick();
-      }
-    });
-    editButton.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent t) {
-        handleEditButtonClick();
       }
     });
     discardButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -51,7 +50,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
     });
   }
   
-  private EntityWrapper getEntityWrapper() {
+  public EntityWrapper getEntityWrapper() {
     return (EntityWrapper) getTableRow().getItem();
   }
   
@@ -65,7 +64,6 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
       return;
     }
     switch (state) {
-      case EDITING:
       case EDITING_NEW:
         setGraphic(saveDiscardBox);
         break;
@@ -91,17 +89,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
 
     });
     
-    
     entityWrapper.setState(EntityWrapper.State.SAVED);
-    updateItem(entityWrapper.getState(), false);
-  }
-  
-  void handleEditButtonClick() {
-    if (!Utils.prepareForEditing()) {
-      return;
-    }
-    EntityWrapper entityWrapper = getEntityWrapper();
-    entityWrapper.setState(EntityWrapper.State.EDITING);
     updateItem(entityWrapper.getState(), false);
   }
   

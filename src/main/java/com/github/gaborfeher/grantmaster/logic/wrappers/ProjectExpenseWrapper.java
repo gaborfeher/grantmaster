@@ -21,9 +21,9 @@ public class ProjectExpenseWrapper extends EntityWrapper {
 
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     this.expense = expense;
-    computedValues.put("accountingCurrencyAmount", accountingCurrencyAmount);
-    computedValues.put("grantCurrencyAmount", grantCurrencyAmount);
-    computedValues.put("exchangeRate", grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
+    setComputedValue("accountingCurrencyAmount", accountingCurrencyAmount);
+    setComputedValue("grantCurrencyAmount", grantCurrencyAmount);
+    setComputedValue("exchangeRate", grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
   }
   
   public Project getProject() {
@@ -31,7 +31,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
   
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return expense;
   }
   
@@ -155,9 +155,10 @@ public class ProjectExpenseWrapper extends EntityWrapper {
       @Override
       public boolean run(EntityManager em) {
         LocalDate startDate = expense.getPaymentDate();
-        em.remove(expense);
+        ProjectExpense mergedExpense = em.find(ProjectExpense.class, expense.getId());
+        em.remove(mergedExpense);
         em.flush();
-        updateExpenseAllocations(em, expense.getProject(), startDate);
+        updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
         return true;
       }
       @Override

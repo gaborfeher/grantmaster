@@ -61,10 +61,10 @@ public class ProjectWrapperTest {
   public void testCreateProject() {
     final ProjectWrapper newWrapper = ProjectWrapper.createNew();
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    newWrapper.setPropeprty("name", "testProject");
-    newWrapper.setPropeprty("grantCurrency", USD);
-    newWrapper.setPropeprty("accountCurrency", HUF);
-    newWrapper.setPropeprty("incomeType", SOME_GRANT);
+    newWrapper.setProperty("name", "testProject");
+    newWrapper.setProperty("grantCurrency", USD);
+    newWrapper.setProperty("accountCurrency", HUF);
+    newWrapper.setProperty("incomeType", SOME_GRANT);
     
     assertTrue(DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
       @Override

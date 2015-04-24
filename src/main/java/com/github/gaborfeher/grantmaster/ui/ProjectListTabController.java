@@ -1,26 +1,33 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
+import com.github.gaborfeher.grantmaster.ui.cells.EditButtonTableCell;
 import java.io.IOException;
+import java.util.List;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javax.persistence.EntityManager;
 
 public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
   MainPageController parent;
   
   @Override
-  public void refresh(EntityManager em) {
-    table.getItems().setAll(ProjectWrapper.getProjects(em));
+  public void refresh(EntityManager em, List<ProjectWrapper> items) {
+    items.clear();
+    items.addAll(ProjectWrapper.getProjects(em));
   }
   
   public void handleOpenButtonAction(ActionEvent event) throws IOException {
-    int selectedIndex = table.getSelectionModel().getSelectedIndex();
+    Node sourceButton = (Node) event.getSource();
+    EditButtonTableCell sourceCell = (EditButtonTableCell) sourceButton.getProperties().get("tableCell");
+    ProjectWrapper selectedProjectWrapper = (ProjectWrapper) sourceCell.getEntityWrapper();
+
+  /*  int selectedIndex = table.getSelectionModel().getSelectedIndex();
     if (selectedIndex < 0) {
       return;
     }
-    ProjectWrapper selectedProjectWrapper = table.getItems().get(selectedIndex);
+    ProjectWrapper selectedProjectWrapper = table.getItems().get(selectedIndex);*/
     if (selectedProjectWrapper.getState() != EntityWrapper.State.SAVED) {
       return;
     }

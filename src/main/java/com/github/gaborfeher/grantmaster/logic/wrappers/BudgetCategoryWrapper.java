@@ -15,6 +15,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
 
   public BudgetCategoryWrapper(BudgetCategory budgetCategory) {
     this.budgetCategory = budgetCategory;
+    this.computedValues.put("budgetCategory", budgetCategory);
   }
   
   protected BudgetCategoryWrapper(String fakeName) {
@@ -30,7 +31,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     return copy;
   }
   
-  public int getId() {
+  public Long getId() {
     return budgetCategory.getId();
   }
   
@@ -54,10 +55,15 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   public BudgetCategory getBudgetCategory() {
     return budgetCategory;
   }
+
+  @Override
+  public boolean canEdit() {
+    return budgetCategory != null;
+  }
   
   protected void addSummaryValue(BudgetCategoryWrapper other, String key, BigDecimal multiplier) {
-    BigDecimal value = multiplier.multiply((BigDecimal)other.computedValues.get(key), Utils.MC);
-    computedValues.put(key, value.add((BigDecimal) computedValues.getOrDefault(key, BigDecimal.ZERO), Utils.MC));
+    BigDecimal value = multiplier.multiply(other.getComputedValue(key), Utils.MC);
+    setComputedValue(key, value.add(getComputedValue(key), Utils.MC));
   }
   
   public void addSummaryValues(BudgetCategoryWrapper other, BigDecimal multiplier) {
@@ -71,7 +77,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   }
   
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return budgetCategory;
   }
 
@@ -99,7 +105,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
   private static void getYearlyBudgetCategorySummaryMap(
       EntityManager em,
       String query,
-      Map<Integer, BudgetCategoryWrapper> map,
+      Map<Long, BudgetCategoryWrapper> map,
       Set<String> columnNames) {
     List<Object[]> summaryList = em.createQuery(query, Object[].class).getResultList();
     for (Object[] line : summaryList) {
@@ -107,7 +113,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
       int year = (Integer)line[2];
       String header = String.format("%d (%s)", year, (String)line[1]);
       columnNames.add(header);
-      budgetCategoryWrapper.computedValues.put(header, (BigDecimal)line[3]);
+      budgetCategoryWrapper.setComputedValue(header, (BigDecimal)line[3]);
     }
   }
   
@@ -129,7 +135,7 @@ public class BudgetCategoryWrapper extends EntityWrapper {
     incomeCategories.addAll(getBudgetCategoryWrappers(
         em, BudgetCategory.Direction.INCOME));
     
-    Map<Integer, BudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
+    Map<Long, BudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
     for (BudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {
       budgetCategoryMap.put(budgetCategoryWrapper.getId(), budgetCategoryWrapper);
     }

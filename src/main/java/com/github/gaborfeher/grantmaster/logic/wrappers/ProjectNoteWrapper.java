@@ -16,7 +16,7 @@ public class ProjectNoteWrapper extends EntityWrapper {
   }
   
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return note;
   }
   

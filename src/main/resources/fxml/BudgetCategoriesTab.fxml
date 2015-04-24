@@ -42,7 +42,7 @@
         </TableColumn>
         <TableColumn text="%BudgetCategoryName" prefWidth="400" editable="true" sortable="false" styleClass="textColumn">
           <cellFactory>
-            <StringTableCellFactory property="budgetCategory" /> 
+            <StringTableCellFactory property="name" /> 
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="name" />

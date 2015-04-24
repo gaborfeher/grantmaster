@@ -6,11 +6,11 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
-import javafx.util.converter.DefaultStringConverter;
+import javax.persistence.EntityManager;
 
 /**
  *
@@ -32,7 +32,7 @@ class BudgetCategoryDirectionTableCell<S> extends ChoiceBoxTableCell<S, BudgetCa
 
   @Override  
   public void commitEdit(BudgetCategory.Direction val) {
-    if (getEntityWrapper().setPropeprty(property, val)) {
+    if (getEntityWrapper().commitEdit(property, val)) {
       updateItem(val, false);
     }
   }
@@ -43,8 +43,4 @@ class BudgetCategoryDirectionTableCell<S> extends ChoiceBoxTableCell<S, BudgetCa
       super.startEdit();
     }
   }
-  
-  
-  
-  
 }

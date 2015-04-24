@@ -1,10 +1,9 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import javafx.fxml.FXML;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
-import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.EntityManager;
 
 public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> {
@@ -21,8 +20,10 @@ public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWr
   }
   
   @Override
-  public void refresh(EntityManager em) {
-    table.getItems().setAll(ProjectExpenseWrapper.getProjectExpenseList(em, project));
+  public void refresh(EntityManager em, List<ProjectExpenseWrapper> items) {
+    items.clear();
+    items.addAll(ProjectExpenseWrapper.getProjectExpenseList(em, project));
+    tableController.refresh();
   }
 
   @Override

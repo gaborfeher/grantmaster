@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -28,5 +29,10 @@ public class Currency implements Serializable {
   @Override
   public boolean equals(Object other) {
     return other != null && (other instanceof Currency) && ((Currency)other).getCode().equals(getCode());
+  }
+
+  @Override
+  public int hashCode() {
+    return code.hashCode();
   }
 }

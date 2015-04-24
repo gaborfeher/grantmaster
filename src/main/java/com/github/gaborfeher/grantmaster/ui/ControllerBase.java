@@ -20,22 +20,41 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   @FXML private Node mainNode;
  
   protected abstract T createNewEntity();
-  protected abstract void refresh(EntityManager em);
+  protected abstract void refresh(EntityManager em, List<T> items);
   
   public void refresh() {
+    System.out.println("refresh");
+    System.out.flush();
     DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
-        ControllerBase.this.refresh(em);
-        addMyselfAsParentToTable();
+        if (table == null) {
+          refresh(em, null);
+          return true;
+        }
+        table.getSelectionModel().clearSelection();
+        List<T> items = table.getItems();
+        if (items != null) {
+          items.clear();
+        }
+        //System.out.println("selectedItem= " + selectedItem);
+        refresh(em, items);
+        if (items != null) {
+          addMyselfAsParent(items);
+        }
         return true;
       }
     });
+    System.out.println("end refresh");
+    System.out.flush();
   }
   
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     mainNode.getProperties().put("controller", this);
+    if (table != null) {
+      table.getSelectionModel().setCellSelectionEnabled(true);
+    }
   }
   
   @FXML
@@ -48,11 +67,9 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     }
   }
   
-  protected void addMyselfAsParentToTable() {
-    if (table != null) {
-      for (T entity : table.getItems()) {
-        entity.setParent(this);
-      }
+  private void addMyselfAsParent(List<T> items) {
+    for (T entity : items) {
+      entity.setParent(this);
     }
   }
 }

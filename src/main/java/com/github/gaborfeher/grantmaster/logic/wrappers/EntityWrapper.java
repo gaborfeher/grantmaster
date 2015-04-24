@@ -5,6 +5,7 @@ import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -13,8 +14,25 @@ import javax.persistence.EntityManager;
 
 public abstract class EntityWrapper {
 
+  public boolean commitEdit(String property, Object val) {
+    if (!setProperty(property, val)) {
+      return false;
+    }
+    if (state == EntityWrapper.State.EDITING_NEW) {
+      return true;
+    }
+    return DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+      @Override
+      public boolean run(EntityManager em) {
+        return save(em);
+      }
+      @Override
+      public void onSuccess() {
+        refresh();
+      }});
+  }
+
   public static enum State {
-    EDITING,
     EDITING_NEW,
     SAVED;
   }
@@ -42,11 +60,14 @@ public abstract class EntityWrapper {
   }
   
   public boolean canEdit() {
-    return state == State.EDITING || state == State.EDITING_NEW;
+    //return state == State.EDITING || state == State.EDITING_NEW;
+   // return true;
+    return !isSummary;
   }
   
-  public boolean setEntityPropeprty(Object entity, String name, Object value) {
+  private final boolean setEntityPropeprty(Object entity, String name, Object value) {
     try {
+      System.out.println("   entity= " + entity);
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       entity.getClass().getMethod(setterName, value.getClass()).invoke(entity, value);
       return true;
@@ -56,7 +77,7 @@ public abstract class EntityWrapper {
     }
   }
   
-  public boolean setPropeprty(String name, Object value) {
+  public boolean setProperty(String name, Object value) {
     changedValues.put(name, value);
     return true;
   }
@@ -85,12 +106,13 @@ public abstract class EntityWrapper {
 
   public boolean save(EntityManager em) {
     EntityBase entity;
-    if (state == State.EDITING) {
-      entity = (EntityBase) em.find(getEntity().getClass(), getEntity().getId());
-    } else {
+    if (state == State.EDITING_NEW) {
       entity = em.merge(getEntity());  // TODO(gaborfeher): build new entity from scratch here
+    } else {
+      entity = (EntityBase) em.find(getEntity().getClass(), getEntity().getId());
     }
     for (Map.Entry<String, Object> entry : changedValues.entrySet()) {
+      System.out.println("save: " + entry.getKey() + " <-- " + entry.getValue());
       setEntityPropeprty(entity, entry.getKey(), entry.getValue());
     }
     changedValues.clear();
@@ -105,10 +127,7 @@ public abstract class EntityWrapper {
   }
   
   public void discardEdits() {
-    if (state == State.EDITING) {
-      DatabaseConnectionSingleton.getInstance().refresh(getEntity());
-      setState(State.SAVED);
-    } else if (state == State.EDITING_NEW) {
+    if (state == State.EDITING_NEW) {
       // This thing will just go away at next refresh.
     }
     parent.refresh();
@@ -130,6 +149,18 @@ public abstract class EntityWrapper {
     this.parent = parent;
   }
 
-  protected abstract EntityBase getEntity();
+  public BigDecimal getComputedValue(String key) {
+    BigDecimal result = (BigDecimal) computedValues.get(key);
+    if (result == null) {
+      result = BigDecimal.ZERO;
+    }
+    return result;
+  }
+  
+  public void setComputedValue(String key, BigDecimal value) {
+    computedValues.put(key, value);
+  }
+  
+  public abstract EntityBase getEntity();
   protected abstract void setEntity(EntityBase entity);
 }

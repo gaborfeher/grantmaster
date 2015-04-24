@@ -17,7 +17,7 @@ import javax.persistence.ManyToOne;
 public class Project implements EntityBase, Serializable {
   @Id
   @GeneratedValue
-  private Integer id;
+  private Long id;
 
   @Column(nullable = false)
   private String name;
@@ -45,12 +45,9 @@ public class Project implements EntityBase, Serializable {
     this.name = name;
   }
 
-  public Integer getId() {
+  @Override
+  public Long getId() {
     return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
   }
 
   /**

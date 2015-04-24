@@ -18,19 +18,19 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
   
   public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, BigDecimal spentAccountingCurrency, BigDecimal spentGrantCurrency) {
     super(budgetCategory);
-    this.computedValues.put("spentGrantCurrency", spentGrantCurrency);
-    this.computedValues.put("spentAccountingCurrency", spentAccountingCurrency);
-    this.computedValues.put("remainingAccountingCurrency", null);
-    this.computedValues.put("budgetAccountingCurrency", null);
+    setComputedValue("spentGrantCurrency", spentGrantCurrency);
+    setComputedValue("spentAccountingCurrency", spentAccountingCurrency);
+    setComputedValue("remainingAccountingCurrency", null);
+    setComputedValue("budgetAccountingCurrency", null);
   }
   
   public ProjectBudgetCategoryWrapper(String fakeName) {
     super(fakeName);
-    this.computedValues.put("budgetCategory", fakeName);
-    this.computedValues.put("spentGrantCurrency", BigDecimal.ZERO);
-    this.computedValues.put("spentAccountingCurrency", BigDecimal.ZERO);
-    this.computedValues.put("remainingAccountingCurrency", null);
-    this.computedValues.put("budgetAccountingCurrency", null);
+    computedValues.put("budgetCategory", fakeName);
+    setComputedValue("spentGrantCurrency", BigDecimal.ZERO);
+    setComputedValue("spentAccountingCurrency", BigDecimal.ZERO);
+    setComputedValue("remainingAccountingCurrency", null);
+    setComputedValue("budgetAccountingCurrency", null);
 
   }
   
@@ -65,11 +65,11 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
     }
     if (limit.getBudgetGrantCurrency() != null) {
       BigDecimal remainingGrantCurrency = limit.getBudgetGrantCurrency();
-      BigDecimal spentGrantCurrency = (BigDecimal) computedValues.get("spentGrantCurrency");
+      BigDecimal spentGrantCurrency = getComputedValue("spentGrantCurrency");
       if (spentGrantCurrency != null) {
         remainingGrantCurrency = remainingGrantCurrency.subtract(spentGrantCurrency, Utils.MC);
       }
-      this.computedValues.put("remainingGrantCurrency", remainingGrantCurrency);
+      setComputedValue("remainingGrantCurrency", remainingGrantCurrency);
     }
   }
 
@@ -98,27 +98,28 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapper {
       budgetAccountingCurrency = BigDecimal.ZERO;
     }
     budgetAccountingCurrency = budgetAccountingCurrency.add(accountingCurrencyAmount);
-    computedValues.put("budgetAccountingCurrency", budgetAccountingCurrency);
-    computedValues.put("remainingGrantCurrency", limit.getBudgetGrantCurrency().subtract((BigDecimal)computedValues.get("spentGrantCurrency"), Utils.MC));
-    computedValues.put("remainingAccountingCurrency", budgetAccountingCurrency.subtract((BigDecimal)computedValues.get("spentAccountingCurrency"), Utils.MC));
+    setComputedValue("budgetAccountingCurrency", budgetAccountingCurrency);
+    setComputedValue("remainingGrantCurrency", limit.getBudgetGrantCurrency().subtract(getComputedValue("spentGrantCurrency"), Utils.MC));
+    setComputedValue("remainingAccountingCurrency", budgetAccountingCurrency.subtract(getComputedValue("spentAccountingCurrency"), Utils.MC));
   }
   
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return limit;
   }
   
   @Override
-  public void setState(State state) {
-    if (state == State.EDITING) {
-      if (limit == null) {
-        state = State.EDITING_NEW;
-        limit = new ProjectBudgetLimit();
-        limit.setBudgetCategory(budgetCategory);
-        limit.setProject(project);
-      }
+  public boolean save(EntityManager em) {
+    System.out.println("ProjectBudgetCategoryWrapper.save");
+    if (limit == null) {
+      System.out.println("  set limit");
+      setState(State.EDITING_NEW);
+      limit = new ProjectBudgetLimit();
+      limit.setBudgetCategory(budgetCategory);
+      limit.setProject(project);
     }
-    super.setState(state);
+    System.out.println("   " + limit + " " + getEntity());
+    return super.save(em);
   }
   
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(

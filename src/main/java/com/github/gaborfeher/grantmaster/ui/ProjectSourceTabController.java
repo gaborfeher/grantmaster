@@ -10,7 +10,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.math.BigDecimal;
 import javax.persistence.EntityManager;
 
-public class ProjectSourceTabController extends ControllerBase {
+public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrapper> {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> grantCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> usedAccountingCurrencyAmountColumn;
@@ -28,9 +28,10 @@ public class ProjectSourceTabController extends ControllerBase {
   }
 
   @Override
-  public void refresh(EntityManager em) {
+  public void refresh(EntityManager em, List<ProjectSourceWrapper> items) {
     List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null, null);
-    table.getItems().setAll(projectTransfers);
+    items.clear();
+    items.addAll(projectTransfers);
     
     String grantCurrency = project.getGrantCurrency().getCode();
     String accountingCurrency = project.getAccountCurrency().getCode();
@@ -44,7 +45,7 @@ public class ProjectSourceTabController extends ControllerBase {
   }
 
   @Override
-  protected EntityWrapper createNewEntity() {
+  protected ProjectSourceWrapper createNewEntity() {
     ProjectSource newSource = new ProjectSource();
     newSource.setProject(project);
     return new ProjectSourceWrapper(newSource, BigDecimal.ZERO);

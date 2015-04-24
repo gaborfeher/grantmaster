@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -163,11 +164,12 @@ public class DatabaseConnectionSingleton {
     });
   }
 
-  public void remove(final Object obj) {
+  public void remove(final EntityBase obj) {
     runInTransaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
-        em.remove(obj);
+        EntityBase entity = (EntityBase) em.find(obj.getClass(), obj.getId());
+        em.remove(entity);
         return true;
       }
       @Override

@@ -21,7 +21,7 @@ class CurrencyTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, C
 
   @Override  
   public void commitEdit(Currency val) {
-    if (getEntityWrapper().setPropeprty(property, val)) {
+    if (getEntityWrapper().commitEdit(property, val)) {
       updateItem(val, false);
     }
   }     

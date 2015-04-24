@@ -15,7 +15,7 @@ import javax.persistence.UniqueConstraint;
 public class BudgetCategory implements EntityBase, Serializable {
   @Id
   @GeneratedValue
-  private Integer id;
+  private Long id;
   
   @Column(nullable = false)
   private String name;
@@ -63,16 +63,24 @@ public class BudgetCategory implements EntityBase, Serializable {
     this.name = name;
   }
 
-  public Integer getId() {
+  @Override
+  public Long getId() {
     return id;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
-  
   @Override
   public String toString() {
     return name;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj != null && obj instanceof BudgetCategory && ((BudgetCategory)obj).getId().equals(id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
+  }
+  
 }

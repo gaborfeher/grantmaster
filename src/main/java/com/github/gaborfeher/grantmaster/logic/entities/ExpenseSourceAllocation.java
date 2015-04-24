@@ -18,7 +18,7 @@ import javax.persistence.UniqueConstraint;
 public class ExpenseSourceAllocation implements Serializable {
   @Id
   @GeneratedValue
-  private int id;
+  private Long id;
   
   @ManyToOne
   @JoinColumn(nullable = false)

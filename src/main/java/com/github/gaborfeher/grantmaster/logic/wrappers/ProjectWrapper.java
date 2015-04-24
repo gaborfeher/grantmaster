@@ -15,12 +15,12 @@ public class ProjectWrapper extends EntityWrapper {
     this.project = project;
   }
   
-  public int getId() {
+  public Long getId() {
     return project.getId();
   }
   
   @Override
-  protected EntityBase getEntity() {
+  public EntityBase getEntity() {
     return project;
   }
   

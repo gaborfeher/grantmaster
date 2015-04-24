@@ -24,7 +24,7 @@ class BudgetCategoryTableCell<S extends EntityWrapper> extends ChoiceBoxTableCel
 
   @Override  
   public void commitEdit(Object val) {
-    if (getEntityWrapper().setPropeprty(property, (BudgetCategory) val)) {
+    if (getEntityWrapper().commitEdit(property, val)) {
       updateItem(val, false);
     }
   }
@@ -33,7 +33,6 @@ class BudgetCategoryTableCell<S extends EntityWrapper> extends ChoiceBoxTableCel
   public void startEdit() {
     if (getEntityWrapper() != null && getEntityWrapper().canEdit()) {
       DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
-
         @Override
         public boolean run(EntityManager em) {
           getItems().setAll(BudgetCategoryWrapper.getBudgetCategories(em, direction));

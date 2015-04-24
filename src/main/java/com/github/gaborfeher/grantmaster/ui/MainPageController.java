@@ -94,7 +94,7 @@ public class MainPageController implements Initializable {
   }
   
   @FXML
-  private void handleOpenButtonAction(ActionEvent event) {
+  private void handleOpenButtonAction(ActionEvent event) {    
     DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
     connection.close();
     FileChooser fileChooser = getFileChooser();
