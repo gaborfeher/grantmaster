@@ -1,11 +1,9 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseSourceAllocation;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
@@ -44,17 +42,17 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   private void recalculateAllocations(EntityManager em) {
     BigDecimal accountingCurrencyAmount = (BigDecimal) getProperty("accountingCurrencyAmount");
     
-    List<ProjectSourceWrapper> list = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null, null);  // TODO
+    List<ProjectSourceWrapper> sources = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null, null);  // TODO
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
     
-    for (int i = 0; i < list.size(); ++i) {
-      ProjectSourceWrapper source = list.get(i);
+    for (int i = 0; i < sources.size(); ++i) {
+      ProjectSourceWrapper source = sources.get(i);
       if (accountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
         break;
       }
       if (source.getSource().getRemainingAccountingCurrencyAmount().compareTo(BigDecimal.ZERO) > 0) {
         BigDecimal take = accountingCurrencyAmount.min(source.getSource().getRemainingAccountingCurrencyAmount());
-        if (i == list.size() - 1) {
+        if (i == sources.size() - 1) {
           take = accountingCurrencyAmount;  // Allow of going below zero balance for the last source.
         }
         accountingCurrencyAmount = accountingCurrencyAmount.subtract(take, Utils.MC);
@@ -76,11 +74,11 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     // Get list of expenses to update.
     List<ProjectExpenseWrapper> expensesToUpdate;
     if (startingFrom != null) {
-      expensesToUpdate = getProjectExpenseListQuery(em, project, " AND e.paymentDate >= :date").
+      expensesToUpdate = getProjectExpenseListQuery(em, project, false, " AND e.paymentDate >= :date").
           setParameter("date", startingFrom).
           getResultList();
     } else {
-      expensesToUpdate = getProjectExpenseListQuery(em, project, "").getResultList();
+      expensesToUpdate = getProjectExpenseListQuery(em, project, false, "").getResultList();
     }
     
     // Delete allocations and flush this to database. (Accounting currency amounts
@@ -150,38 +148,27 @@ public class ProjectExpenseWrapper extends EntityWrapper {
   }
   
   @Override
-  public void delete() {
-    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        LocalDate startDate = expense.getPaymentDate();
-        ProjectExpense mergedExpense = em.find(ProjectExpense.class, expense.getId());
-        em.remove(mergedExpense);
-        em.flush();
-        updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
-        return true;
-      }
-      @Override
-      public void onFailure() {
-      }
-      @Override
-      public void onSuccess() {
-        getParent().refresh();
-      }
-    });
+  public void delete(EntityManager em) {
+    LocalDate startDate = expense.getPaymentDate();
+    ProjectExpense mergedExpense = em.find(ProjectExpense.class, expense.getId());
+    em.remove(mergedExpense);
+    em.flush();
+    updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
+    getParent().refresh();
   }
   
   public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {
-    return getProjectExpenseListQuery(em, project, "").getResultList();
+    return getProjectExpenseListQuery(em, project, true, "").getResultList();
   }
   
-  public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, String extraWhere) {
+  public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
+    String sortString = descending ? " DESC" : "";
     return em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
             "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
             "WHERE e.project = :project " + extraWhere + " " +
             "GROUP BY e " +
-            "ORDER BY e.paymentDate DESC, e.id DESC",
+            "ORDER BY e.paymentDate " + sortString + ", e.id " + sortString,
         ProjectExpenseWrapper.class).setParameter("project", project);
   }
 

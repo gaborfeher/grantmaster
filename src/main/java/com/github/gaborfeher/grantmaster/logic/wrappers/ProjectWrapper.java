@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
@@ -25,26 +25,13 @@ public class ProjectWrapper extends EntityWrapper {
   }
   
   @Override
-  public void delete() {
-    DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        project = em.find(Project.class, project.getId());
-        ProjectExpenseWrapper.removeProjectExpenses(em, project);
-        ProjectSourceWrapper.removeProjectSources(em, project);
-        ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(em, project);
-        ProjectNoteWrapper.removeProjectNotes(em, project);
-        em.remove(project);
-        return true;
-      }
-      @Override
-      public void onFailure() {
-      }
-      @Override
-      public void onSuccess() {
-        getParent().refresh();
-      }
-    });
+  public void delete(EntityManager em) {
+    project = em.find(Project.class, project.getId());
+    ProjectExpenseWrapper.removeProjectExpenses(em, project);
+    ProjectSourceWrapper.removeProjectSources(em, project);
+    ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(em, project);
+    ProjectNoteWrapper.removeProjectNotes(em, project);
+    em.remove(project);
   }
 
   public Project getProject() {

@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.List;
@@ -76,7 +76,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleSaveButtonClick() {
     final EntityWrapper entityWrapper = getEntityWrapper();
-    boolean success = DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+    boolean success = DatabaseSingleton.INSTANCE.transaction(new TransactionRunner() {
 
       @Override
       public boolean run(EntityManager em) {
@@ -111,7 +111,12 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
       return;
     }
     EntityWrapper entityWrapper = getEntityWrapper();
-    entityWrapper.delete();
+    if (DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      entityWrapper.delete(em);
+      return true;
+    })) {
+      entityWrapper.refresh();
+    }
   }
   
 }

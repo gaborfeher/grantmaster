@@ -1,13 +1,12 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,15 +23,14 @@ public class ProjectExpenseWrapperTest {
   BudgetCategory SOME_GRANT;
   BudgetCategory SOME_EXPENSE;
   Project PROJECT1;
-  ProjectSource PROJECT1_SOURCE1;
 
   public ProjectExpenseWrapperTest() {
   }
   
   @Before
   public void setUp() {
-    assertTrue(DatabaseConnectionSingleton.getInstance().connectToMemoryFileForTesting());
-    assertTrue(DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
+    assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
         HUF = new Currency(); HUF.setCode("HUF"); em.persist(HUF);
@@ -44,18 +42,13 @@ public class ProjectExpenseWrapperTest {
         SOME_EXPENSE = new BudgetCategory(
             BudgetCategory.Direction.PAYMENT, "p.stuff", "Some kind of payment");
         em.persist(SOME_EXPENSE);
-        PROJECT1 = new Project();
-        PROJECT1.setName("project1");
-        PROJECT1.setAccountCurrency(HUF);
-        PROJECT1.setGrantCurrency(USD);
-        PROJECT1.setIncomeType(SOME_GRANT);
-        em.persist(PROJECT1);
-        PROJECT1_SOURCE1 = new ProjectSource();
-        PROJECT1_SOURCE1.setProject(PROJECT1);
-        PROJECT1_SOURCE1.setAvailabilityDate(LocalDate.of(2015, 2, 1));
-        PROJECT1_SOURCE1.setExchangeRate(new BigDecimal(230, Utils.MC));
-        PROJECT1_SOURCE1.setGrantCurrencyAmount(new BigDecimal(10000, Utils.MC));
-        em.persist(PROJECT1_SOURCE1);
+        PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
+        TestUtils.createProjectSource(
+            em, PROJECT1, LocalDate.of(2015, 2, 1), "100", "1000");
+        TestUtils.createProjectSource(
+            em, PROJECT1, LocalDate.of(2015, 4, 1), "200", "1000");
+        TestUtils.createProjectSource(
+            em, PROJECT1, LocalDate.of(2015, 6, 1), "300", "1000");        
         return true;
       }
     }));
@@ -63,7 +56,7 @@ public class ProjectExpenseWrapperTest {
   
   @After
   public void tearDown() {
-    DatabaseConnectionSingleton.getInstance().cleanup();
+    DatabaseSingleton.INSTANCE.cleanup();
   }
   
   @Test
@@ -72,37 +65,81 @@ public class ProjectExpenseWrapperTest {
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
     newWrapper.setProperty("paymentDate", LocalDate.of(2015, 3, 4));
     newWrapper.setProperty("budgetCategory", SOME_EXPENSE);
-    newWrapper.setProperty("originalAmount", new BigDecimal("10000.5", Utils.MC));
-    newWrapper.setProperty("accountingCurrencyAmount", new BigDecimal("10000.5", Utils.MC));
+    newWrapper.setProperty("originalAmount", new BigDecimal("100000.5", Utils.MC));
+    newWrapper.setProperty("accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC));
     
-    assertTrue(DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        newWrapper.save(em);
-        return true;
-      }
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      newWrapper.save(em);
+      return true;
     }));
     assertEquals(EntityWrapper.State.SAVED, newWrapper.getState());
     
-    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
-        assertEquals(1, expenses.size());
-        ProjectExpenseWrapper added = expenses.get(0);
-        ProjectExpense expense = (ProjectExpense) added.getEntity();
-        
-        assertEquals(LocalDate.of(2015, 3, 4), expense.getPaymentDate());
-        assertNull(expense.getAccountNo());
-        assertNull(expense.getPartnerName());
-        assertNull(expense.getComment1());
-        assertNull(expense.getComment2());
-        assertEquals(HUF, expense.getOriginalCurrency());  // should be default
-        assertEquals(0, new BigDecimal("10000.5", Utils.MC).compareTo(expense.getOriginalAmount()));
-        assertEquals(0, new BigDecimal("10000.5", Utils.MC).compareTo((BigDecimal)added.getProperty("accountingCurrencyAmount")));
-        return true;
-      }
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
+      assertEquals(1, expenses.size());
+      ProjectExpense expense = (ProjectExpense) expenses.get(0).getEntity();
+      
+      assertEquals(LocalDate.of(2015, 3, 4), expense.getPaymentDate());
+      assertNull(expense.getAccountNo());
+      assertNull(expense.getPartnerName());
+      assertNull(expense.getComment1());
+      assertNull(expense.getComment2());
+      assertEquals(HUF, expense.getOriginalCurrency());  // should be default
+      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(expense.getOriginalAmount()));
+      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(expense.getAccountingCurrencyAmount()));
+      return true;
     });
   }
 
+  @Test
+  public void testShiftExpenseForward() {
+    final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId2 = new ObjectHolder<>();
+    
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expenseId1.set(
+          (Long) TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 2, 2),
+              "100000",
+              HUF,
+              "100000"
+          ).getEntity().getId());  
+      return true;
+    }));
+    
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expenseId2.set(
+          (Long) TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 2, 1),
+              "200000",
+              HUF,
+              "200000"
+          ).getEntity().getId());
+      return true;
+    }));
+    
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      ProjectExpense expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
+      ProjectExpense expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
+      assertEquals(0, new BigDecimal("100000", Utils.MC).compareTo(expense1.getAccountingCurrencyAmount()));
+      System.out.println(expense1.getAccountingCurrencyAmount() + " " + expense1.getExchangeRate() + " " + expense1.getGrantCurrencyAmount());
+      System.out.println(expense2.getAccountingCurrencyAmount() + " " + expense2.getExchangeRate() + " " + expense2.getGrantCurrencyAmount());
+      assertEquals(0, new BigDecimal("200", Utils.MC).compareTo(expense1.getExchangeRate()));
+      assertEquals(0, new BigDecimal("500", Utils.MC).compareTo(expense1.getGrantCurrencyAmount()));
+      
+      assertEquals(0, new BigDecimal("200000", Utils.MC).compareTo(expense2.getAccountingCurrencyAmount()));
+      BigDecimal value133_33 = new BigDecimal("200000", Utils.MC).divide(new BigDecimal("1500", Utils.MC), Utils.MC);
+      assertEquals(0, value133_33.compareTo(expense2.getExchangeRate()));
+      assertEquals(0, new BigDecimal("1500", Utils.MC).compareTo(expense2.getGrantCurrencyAmount()));
+      return true;
+    }));
+    
+    
+  }
 }

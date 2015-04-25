@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
@@ -37,7 +37,7 @@ public class SearchTabController
   List<ProjectExpenseWrapper> searchResults;
   
   public void search() {
-    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+    DatabaseSingleton.INSTANCE.query(new TransactionRunner() {
 
       @Override
       public boolean run(EntityManager em) {

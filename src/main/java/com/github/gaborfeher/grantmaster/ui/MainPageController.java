@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
@@ -49,7 +49,7 @@ public class MainPageController implements Initializable {
   File openedFile;
   
   public void stop() {
-    DatabaseConnectionSingleton.getInstance().cleanup();
+    DatabaseSingleton.INSTANCE.cleanup();
   }
 
   private void closeProjectTabs() {
@@ -94,7 +94,7 @@ public class MainPageController implements Initializable {
   
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {    
-    DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
+    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     FileChooser fileChooser = getFileChooser();
     fileChooser.setTitle("Adatbázis megnyitása");
     
@@ -117,13 +117,13 @@ public class MainPageController implements Initializable {
   
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
-    DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
+    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     closeProjectTabs();
     openedFile = null;
     
     File tempDir = connection.createNewDatabase();
     
-    boolean result = connection.runInTransaction(new TransactionRunner() {
+    boolean result = connection.transaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
         CurrencyManager.createDefaultCurrencies(em);
@@ -140,7 +140,7 @@ public class MainPageController implements Initializable {
   
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
-    DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
+    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
 
     if (openedFile == null && connection.isConnected()) {
       FileChooser fileChooser = getFileChooser();

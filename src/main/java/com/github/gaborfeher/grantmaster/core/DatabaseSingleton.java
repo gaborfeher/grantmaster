@@ -19,8 +19,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
-public class DatabaseConnectionSingleton {
-  private static DatabaseConnectionSingleton instance;
+public enum DatabaseSingleton {
+  INSTANCE;
   
   private EntityManagerFactory entityManagerFactory;
  // private EntityManager entityManager;
@@ -30,14 +30,7 @@ public class DatabaseConnectionSingleton {
    */
   private File tempFile;
   
-  private DatabaseConnectionSingleton() {
-  }
-  
-  public static synchronized DatabaseConnectionSingleton getInstance() {
-    if (instance == null) {
-      instance = new DatabaseConnectionSingleton();
-    }
-    return instance;
+  private DatabaseSingleton() {
   }
   
   public void cleanup() {
@@ -103,7 +96,7 @@ public class DatabaseConnectionSingleton {
       entityManagerFactory = Persistence.createEntityManagerFactory(
           "LocalH2ConnectionTemplate", properties);
     } catch (PersistenceException ex) {
-      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, ex);
     }
     return entityManagerFactory != null;
 
@@ -170,7 +163,7 @@ public class DatabaseConnectionSingleton {
   }
   
   public void persist(final Object obj) {
-    runInTransaction(new TransactionRunner() {
+    transaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
         em.persist(obj);
@@ -178,31 +171,8 @@ public class DatabaseConnectionSingleton {
       }
     });
   }
-
-  public void remove(final EntityBase obj) {
-    runInTransaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        EntityBase entity = (EntityBase) em.find(obj.getClass(), obj.getId());
-        em.remove(entity);
-        return true;
-      }
-      @Override
-      public void onFailure() {
-        //hardReset();
-      }
-    });
-  }
-  /*
-  public void hardReset() {
-    // TODO: try to figure out when this is exactly needed
-    entityManager.close();
-    entityManager = entityManagerFactory.createEntityManager();
-    //RefreshControlSingleton.getInstance().broadcastRefresh();
-  }
-  */
   
-  public boolean runInTransaction(TransactionRunner runner) {
+  public boolean transaction(TransactionRunner runner) {
     if (entityManagerFactory == null) {
       return false;
     }
@@ -214,33 +184,35 @@ public class DatabaseConnectionSingleton {
         transaction.commit();
       } else {
         transaction.rollback();
-        runner.onFailure();
+        //runner.onFailure();
         return false;
       }
     } catch (Throwable t) {
-      Logger.getLogger(DatabaseConnectionSingleton.class.getName()).log(Level.SEVERE, null, t);
+      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, t);
       if (transaction.isActive()) {
         transaction.rollback();
       }
-      runner.onFailure();
+      //runner.onFailure();
       return false;
     } finally {
       entityManager.close();
     }
-    runner.onSuccess();
+    //runner.onSuccess();
     return true;
   }
   
-  public void runWithEntityManager(TransactionRunner runner) {
+  public boolean query(TransactionRunner runner) {
     if (entityManagerFactory == null) {
-      return;
+      return false;
     }
     EntityManager entityManager = entityManagerFactory.createEntityManager();
+    boolean result = false;
     try  {
-      runner.run(entityManager);
+      result = runner.run(entityManager);
     } finally {
       entityManager.close();
     }
+    return result;
   }
 
   public boolean isConnected() {

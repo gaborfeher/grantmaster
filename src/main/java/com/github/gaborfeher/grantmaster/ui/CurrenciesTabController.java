@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
@@ -18,7 +18,7 @@ public class CurrenciesTabController extends ControllerBase {
 
   @Override
   public void refresh() {
-    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+    DatabaseSingleton.INSTANCE.query(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
         List<Currency> list = em.createQuery(
@@ -30,7 +30,7 @@ public class CurrenciesTabController extends ControllerBase {
   }
 
   public void addCurrencyButtonAction(ActionEvent e) {
-    DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
+    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     if (!connection.isConnected()) {
       return;
     }

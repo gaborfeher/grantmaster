@@ -22,7 +22,7 @@ import javax.persistence.Transient;
 public class ProjectExpense implements EntityBase, Serializable {
   @Id
   @GeneratedValue
-  private int id;
+  private long id;
   
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
@@ -68,51 +68,31 @@ public class ProjectExpense implements EntityBase, Serializable {
   public ProjectExpense() {
   }
 
-  /**
-   * @return the id
-   */
-  public Integer getId() {
+  @Override
+  public Long getId() {
     return id;
   }
 
-  /**
-   * @param id the id to set
-   */
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  /**
-   * @return the paymentDate
-   */
   public LocalDate getPaymentDate() {
     return paymentDate;
   }
 
-  /**
-   * @param paymentDate the paymentDate to set
-   */
   public void setPaymentDate(LocalDate paymentDate) {
     this.paymentDate = paymentDate;
   }
 
-  /**
-   * @return the accountNo
-   */
   public String getAccountNo() {
     return accountNo;
   }
 
-  /**
-   * @param accountNo the accountNo to set
-   */
   public void setAccountNo(String accountNo) {
     this.accountNo = accountNo;
   }
 
-  /**
-   * @return the partnerName
-   */
   public String getPartnerName() {
     return partnerName;
   }
@@ -133,79 +113,46 @@ public class ProjectExpense implements EntityBase, Serializable {
     return project;
   }
 
-  /**
-   * @param projectId the projectId to set
-   */
   public void setProject(Project project) {
     this.project = project;
   }
 
-  /**
-   * @return the originalAmount
-   */
   public BigDecimal getOriginalAmount() {
     return originalAmount;
   }
 
-  /**
-   * @param originalAmount the originalAmount to set
-   */
   public void setOriginalAmount(BigDecimal originalAmount) {
     this.originalAmount = originalAmount;
   }
 
-  /**
-   * @return the originalCurrency
-   */
   public Currency getOriginalCurrency() {
     return originalCurrency;
   }
 
-  /**
-   * @param originalCurrency the originalCurrency to set
-   */
   public void setOriginalCurrency(Currency originalCurrency) {
     this.originalCurrency = originalCurrency;
   }
 
-  /**
-   * @return the sources
-   */
   public List<ExpenseSourceAllocation> getSourceAllocations() {
     return sourceAllocations;
   }
 
-  /**
-   * @param sources the sources to set
-   */
   public void setSourceAllocations(List<ExpenseSourceAllocation> sources) {
     this.sourceAllocations = sources;
   }
 
-  /**
-   * @return the comment1
-   */
   public String getComment1() {
     return comment1;
   }
 
-  /**
-   * @param comment1 the comment1 to set
-   */
   public void setComment1(String comment1) {
     this.comment1 = comment1;
   }
 
-  /**
-   * @return the comment2
-   */
   public String getComment2() {
     return comment2;
   }
 
-  /**
-   * @param comment2 the comment2 to set
-   */
   public void setComment2(String comment2) {
     this.comment2 = comment2;
   }
@@ -241,6 +188,4 @@ public class ProjectExpense implements EntityBase, Serializable {
   public void setAccountingCurrencyAmountNotEdited(BigDecimal accountingCurrencyAmountNotEdited) {
     this.accountingCurrencyAmountNotEdited = accountingCurrencyAmountNotEdited;
   }
-
-
 }

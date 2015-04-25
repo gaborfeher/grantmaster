@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
@@ -21,7 +21,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   protected abstract void refresh(EntityManager em, List<T> items);
   
   public void refresh() {
-    DatabaseConnectionSingleton.getInstance().runWithEntityManager(new TransactionRunner() {
+    DatabaseSingleton.INSTANCE.query(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
         if (table == null) {

@@ -1,7 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseConnectionSingleton;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
@@ -20,15 +19,13 @@ public abstract class EntityWrapper {
       // click the create button to commit them.
       return true;
     }
-    return DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        return save(em);
-      }
-      @Override
-      public void onSuccess() {
-        refresh();
-      }});
+    if (DatabaseSingleton.INSTANCE.transaction(
+        (EntityManager em) -> save(em))) {
+      refresh();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public static enum State {
@@ -96,11 +93,11 @@ public abstract class EntityWrapper {
     return true;
   }
   
-  public void delete() {
+  public void delete(EntityManager em) {
     EntityBase entityBase = getEntity();
     if (entityBase != null) {
-      DatabaseConnectionSingleton.getInstance().remove(entityBase);
-      parent.refresh();
+      EntityBase entity = (EntityBase) em.find(entityBase.getClass(), entityBase.getId());
+      em.remove(entity);
     }
   }
   
