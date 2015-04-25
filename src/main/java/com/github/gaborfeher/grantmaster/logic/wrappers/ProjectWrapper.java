@@ -29,9 +29,11 @@ public class ProjectWrapper extends EntityWrapper {
     DatabaseConnectionSingleton.getInstance().runInTransaction(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
+        project = em.find(Project.class, project.getId());
         ProjectExpenseWrapper.removeProjectExpenses(em, project);
         ProjectSourceWrapper.removeProjectSources(em, project);
         ProjectBudgetCategoryWrapper.removeProjectBudgetLimits(em, project);
+        ProjectNoteWrapper.removeProjectNotes(em, project);
         em.remove(project);
         return true;
       }

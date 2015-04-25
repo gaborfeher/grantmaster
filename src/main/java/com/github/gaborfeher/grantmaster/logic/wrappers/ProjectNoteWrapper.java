@@ -34,4 +34,9 @@ public class ProjectNoteWrapper extends EntityWrapper {
         getResultList();
   }
   
+  static void removeProjectNotes(EntityManager em, Project project) {
+    em.createQuery("DELETE FROM ProjectNote n WHERE n.project = :project").
+        setParameter("project", project).
+        executeUpdate();
+  }
 }
