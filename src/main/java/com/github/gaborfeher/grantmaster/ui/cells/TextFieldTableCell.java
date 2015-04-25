@@ -13,14 +13,19 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
   final String property;
   final TextField editTextField;
   final MultiStringConverter<T> stringConverter;
+  final Class<T> valueType;
   
   // true if the last editing session was cancelled by user (currently esc key)
   // This disables later spurious commit messages.
   boolean userCancelled;
   
-  public TextFieldTableCell(String property, MultiStringConverter<T> stringConverter0) {
+  public TextFieldTableCell(
+      String property,
+      MultiStringConverter<T> stringConverter0,
+      Class<T> valueType) {
     this.property = property;
     this.stringConverter = stringConverter0;
+    this.valueType = valueType;
     editTextField = new TextField();
     editTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
         @Override
@@ -53,7 +58,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
     if (userCancelled) {
       return;  // User cancel was before this commit message, ignore this.
     }
-    if (getEntityWrapper().commitEdit(property, val)) {
+    if (getEntityWrapper().commitEdit(property, val, valueType)) {
       super.commitEdit(val);
       updateItem(val, false);
     }

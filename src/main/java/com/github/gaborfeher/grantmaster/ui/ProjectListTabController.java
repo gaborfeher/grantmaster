@@ -13,7 +13,7 @@ public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
   MainPageController parent;
   
   @Override
-  public void refresh(EntityManager em, List<ProjectWrapper> items) {
+  public void getItemListForRefresh(EntityManager em, List<ProjectWrapper> items) {
     items.addAll(ProjectWrapper.getProjects(em));
   }
   

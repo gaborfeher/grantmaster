@@ -28,7 +28,7 @@ public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrap
   }
 
   @Override
-  public void refresh(EntityManager em, List<ProjectSourceWrapper> items) {
+  public void getItemListForRefresh(EntityManager em, List<ProjectSourceWrapper> items) {
     List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null, null);
     items.addAll(projectTransfers);
     

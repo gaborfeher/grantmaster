@@ -17,10 +17,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- *
- * @author gabor
- */
 public class ProjectWrapperTest {
   Currency HUF;
   Currency USD;
@@ -64,10 +60,10 @@ public class ProjectWrapperTest {
   public void testCreateProject() {
     final ProjectWrapper newWrapper = ProjectWrapper.createNew();
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    newWrapper.setProperty("name", "testProject");
-    newWrapper.setProperty("grantCurrency", USD);
-    newWrapper.setProperty("accountCurrency", HUF);
-    newWrapper.setProperty("incomeType", SOME_GRANT);
+    newWrapper.setProperty("name", "testProject", String.class);
+    newWrapper.setProperty("grantCurrency", USD, Currency.class);
+    newWrapper.setProperty("accountCurrency", HUF, Currency.class);
+    newWrapper.setProperty("incomeType", SOME_GRANT, BudgetCategory.class);
     
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) ->
         newWrapper.save(em)));

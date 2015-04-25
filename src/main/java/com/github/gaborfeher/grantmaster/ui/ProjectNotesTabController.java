@@ -17,7 +17,7 @@ public class ProjectNotesTabController extends ControllerBase<ProjectNoteWrapper
   }
 
   @Override
-  public void refresh(EntityManager em, List<ProjectNoteWrapper> items) {
+  public void getItemListForRefresh(EntityManager em, List<ProjectNoteWrapper> items) {
     items.addAll(ProjectNoteWrapper.getNotes(em, project));
   }
 

@@ -10,8 +10,8 @@ import javax.persistence.EntityManager;
 
 public abstract class EntityWrapper {
 
-  public boolean commitEdit(String property, Object val) {
-    if (!setProperty(property, val)) {
+  public boolean commitEdit(String property, Object val, Class<?> valueType) {
+    if (!setProperty(property, val, valueType)) {
       return false;
     }
     if (state == EntityWrapper.State.EDITING_NEW) {
@@ -53,20 +53,17 @@ public abstract class EntityWrapper {
   public boolean canEdit() {
     return !isSummary;
   }
-  
-  private boolean setEntityPropeprty(Object entity, String name, Object value) {
+
+  public boolean setProperty(String name, Object value, Class<?> paramType) {
+    Object entity = getEntity();
     try {
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-      entity.getClass().getMethod(setterName, value.getClass()).invoke(entity, value);
+      entity.getClass().getMethod(setterName, paramType).invoke(entity, value);
       return true;
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
       Logger.getLogger(EntityWrapper.class.getName()).log(Level.SEVERE, null, ex);
       return false;
     }
-  }
-  
-  public boolean setProperty(String name, Object value) {
-    return setEntityPropeprty(getEntity(), name, value);
   }
   
   public Object getProperty(String name) {
@@ -82,7 +79,7 @@ public abstract class EntityWrapper {
   }
   
   public void refresh() {
-    parent.refresh();
+    parent.onRefresh();
   }
 
   public boolean save(EntityManager em) {
@@ -105,7 +102,7 @@ public abstract class EntityWrapper {
     if (state == State.EDITING_NEW) {
       // This thing will just go away at next refresh.
     }
-    parent.refresh();
+    parent.onRefresh();
   }
   
   public boolean getIsSummary() {

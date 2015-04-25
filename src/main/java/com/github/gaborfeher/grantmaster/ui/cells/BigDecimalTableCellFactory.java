@@ -12,7 +12,10 @@ public class BigDecimalTableCellFactory<S extends EntityWrapper>
   
   @Override  
   public TableCell<S, BigDecimal> call(TableColumn<S, BigDecimal> param) {  
-    return new TextFieldTableCell(property, new BigDecimalStringConverter());  
+    return new TextFieldTableCell(
+        property,
+        new BigDecimalStringConverter(),
+        BigDecimal.class);  
   }        
 
 }

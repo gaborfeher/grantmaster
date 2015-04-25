@@ -154,7 +154,7 @@ public class ProjectExpenseWrapper extends EntityWrapper {
     em.remove(mergedExpense);
     em.flush();
     updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
-    getParent().refresh();
+    getParent().onRefresh();
   }
   
   public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {

@@ -37,13 +37,13 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
   }
   
   public void filterUpdateAction(ActionEvent event) {
-    refresh();
+    onRefresh();
   }
   
   public void filterResetButtonAction(ActionEvent event) {
     filterStartDate.setValue(null);
     filterEndDate.setValue(null);
-    refresh();
+    onRefresh();
   }
   
   void init(Project project) {
@@ -51,7 +51,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
   }
   
   @Override
-  public void refresh(EntityManager em, List items) {
+  public void getItemListForRefresh(EntityManager em, List items) {
     LocalDate startDate = filterStartDate.getValue();
     LocalDate endDate = filterEndDate.getValue();
     

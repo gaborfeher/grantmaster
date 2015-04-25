@@ -25,11 +25,11 @@ public class ProjectTabController extends ControllerBase {
   }
 
   @Override
-  public void refresh(EntityManager em, List items) {
-    this.projectExpenseTabController.refresh();
-    this.projectSourceTabController.refresh();
-    this.projectBudgetCategoriesTabController.refresh();
-    this.projectNotesTabController.refresh();
+  public void getItemListForRefresh(EntityManager em, List items) {
+    this.projectExpenseTabController.onRefresh();
+    this.projectSourceTabController.onRefresh();
+    this.projectBudgetCategoriesTabController.onRefresh();
+    this.projectNotesTabController.onRefresh();
   }
 
 }

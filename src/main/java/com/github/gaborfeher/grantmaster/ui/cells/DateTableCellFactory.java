@@ -11,7 +11,10 @@ public class DateTableCellFactory<S extends EntityWrapper> implements Callback<T
   
   @Override  
   public TableCell<S, LocalDate> call(TableColumn<S, LocalDate> param) {  
-    return new TextFieldTableCell(property, new DateStringConverter());  
+    return new TextFieldTableCell(
+        property,
+        new DateStringConverter(),
+        LocalDate.class);  
   }        
 
   /**

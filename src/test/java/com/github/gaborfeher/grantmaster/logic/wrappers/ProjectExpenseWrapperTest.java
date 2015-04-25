@@ -61,12 +61,17 @@ public class ProjectExpenseWrapperTest {
   
   @Test
   public void testCreateExpense() {
-    final ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(PROJECT1);
+    final ProjectExpenseWrapper newWrapper =
+        ProjectExpenseWrapper.createNew(PROJECT1);
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    newWrapper.setProperty("paymentDate", LocalDate.of(2015, 3, 4));
-    newWrapper.setProperty("budgetCategory", SOME_EXPENSE);
-    newWrapper.setProperty("originalAmount", new BigDecimal("100000.5", Utils.MC));
-    newWrapper.setProperty("accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC));
+    newWrapper.setProperty(
+        "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
+    newWrapper.setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    newWrapper.setProperty(
+        "originalAmount", new BigDecimal("100000.5", Utils.MC),BigDecimal.class);
+    newWrapper.setProperty(
+        "accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC), BigDecimal.class);
     
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
       newWrapper.save(em);

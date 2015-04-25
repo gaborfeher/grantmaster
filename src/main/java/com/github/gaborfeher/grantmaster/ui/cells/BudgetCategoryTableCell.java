@@ -24,7 +24,7 @@ class BudgetCategoryTableCell<S extends EntityWrapper> extends ChoiceBoxTableCel
 
   @Override  
   public void commitEdit(Object val) {
-    if (getEntityWrapper().commitEdit(property, val)) {
+    if (getEntityWrapper().commitEdit(property, val, BudgetCategory.class)) {
       updateItem(val, false);
     }
   }

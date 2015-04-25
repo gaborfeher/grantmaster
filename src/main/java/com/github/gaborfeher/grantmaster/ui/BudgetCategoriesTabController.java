@@ -19,7 +19,7 @@ public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCa
   }
   
   @Override
-  protected void refresh(EntityManager em, List items) {
+  protected void getItemListForRefresh(EntityManager em, List items) {
     List paymentCategories = new ArrayList();
     List incomeCategories = new ArrayList();
     Set<String> columnNames = new TreeSet<>();

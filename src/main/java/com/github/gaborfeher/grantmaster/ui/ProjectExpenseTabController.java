@@ -20,7 +20,7 @@ public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWr
   }
   
   @Override
-  public void refresh(EntityManager em, List<ProjectExpenseWrapper> items) {
+  public void getItemListForRefresh(EntityManager em, List<ProjectExpenseWrapper> items) {
     items.addAll(ProjectExpenseWrapper.getProjectExpenseList(em, project));
     tableController.refresh();
   }

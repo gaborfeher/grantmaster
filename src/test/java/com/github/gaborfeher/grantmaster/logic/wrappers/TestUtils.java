@@ -56,10 +56,16 @@ public class TestUtils {
       String accountingCurrencyAmount) {
     ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(project);
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
-    newWrapper.setProperty("paymentDate", date);
-    newWrapper.setProperty("budgetCategory", budgetCategory);
-    newWrapper.setProperty("originalAmount", new BigDecimal(originalAmount, Utils.MC));
-    newWrapper.setProperty("accountingCurrencyAmount", new BigDecimal(accountingCurrencyAmount, Utils.MC));
+    newWrapper.setProperty("paymentDate", date, LocalDate.class);
+    newWrapper.setProperty(
+        "budgetCategory",
+        budgetCategory, BudgetCategory.class);
+    newWrapper.setProperty(
+        "originalAmount",
+        new BigDecimal(originalAmount, Utils.MC), BigDecimal.class);
+    newWrapper.setProperty(
+        "accountingCurrencyAmount",
+        new BigDecimal(accountingCurrencyAmount, Utils.MC), BigDecimal.class);
     newWrapper.save(em);
     return newWrapper;
   }

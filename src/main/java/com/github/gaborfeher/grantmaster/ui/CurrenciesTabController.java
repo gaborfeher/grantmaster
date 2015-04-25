@@ -17,7 +17,7 @@ public class CurrenciesTabController extends ControllerBase {
   @FXML TableView<Currency> currencyTable;
 
   @Override
-  public void refresh() {
+  public void refreshContent() {
     DatabaseSingleton.INSTANCE.query(new TransactionRunner() {
       @Override
       public boolean run(EntityManager em) {
@@ -41,7 +41,7 @@ public class CurrenciesTabController extends ControllerBase {
     Currency currency = new Currency();
     currency.setCode(code);
     connection.persist(currency);
-    refresh();
+    onRefresh();
   }
 
   @Override
@@ -50,7 +50,7 @@ public class CurrenciesTabController extends ControllerBase {
   }
 
   @Override
-  protected void refresh(EntityManager em, List items) {
+  protected void getItemListForRefresh(EntityManager em, List items) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }

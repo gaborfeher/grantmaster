@@ -7,7 +7,7 @@ import javafx.scene.control.Tab;
 public class TabSelectionChangeListener implements ChangeListener<Tab> {
   static void refreshTab(Tab tab) {
     Object controller = tab.getContent().getProperties().get("controller");
-    ((ControllerBase) controller).refresh(); 
+    ((ControllerBase) controller).onRefresh(); 
   }
   
   @Override

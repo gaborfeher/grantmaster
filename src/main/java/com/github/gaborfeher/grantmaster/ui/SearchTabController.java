@@ -61,7 +61,7 @@ public class SearchTabController
   }
 
   @Override
-  public void refresh(EntityManager em, List<ProjectExpenseWrapper> items) {
+  public void getItemListForRefresh(EntityManager em, List<ProjectExpenseWrapper> items) {
     budgetCategory.getItems().clear();
     budgetCategory.getItems().add(null);
     budgetCategory.getItems().addAll(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
