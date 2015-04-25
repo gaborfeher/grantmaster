@@ -1,6 +1,5 @@
 package com.github.gaborfeher.grantmaster.core;
 
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -163,12 +162,9 @@ public enum DatabaseSingleton {
   }
   
   public void persist(final Object obj) {
-    transaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        em.persist(obj);
-        return true;
-      }
+    transaction((EntityManager em) -> {
+      em.persist(obj);
+      return true;
     });
   }
   

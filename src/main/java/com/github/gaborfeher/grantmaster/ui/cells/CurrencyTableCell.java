@@ -37,6 +37,7 @@ class CurrencyTableCell<S extends EntityWrapper> extends ChoiceBoxTableCell<S, C
         }
       });
       super.startEdit();
+      
     }
   }
   

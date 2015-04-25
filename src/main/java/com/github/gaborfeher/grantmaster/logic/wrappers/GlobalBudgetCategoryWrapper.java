@@ -48,7 +48,7 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   public Object getProperty(String name) {
     if (computedValues.containsKey(name)) {
       return computedValues.get(name);
-    } else if (getEntity() != null) {
+    } else if (getEntity() != null || "name".equals(name)) {
       return super.getProperty(name);
     }
     return null;

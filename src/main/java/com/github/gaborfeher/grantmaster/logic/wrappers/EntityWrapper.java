@@ -121,6 +121,13 @@ public abstract class EntityWrapper {
     this.parent = parent;
   }
 
+  public Object getId() {
+    if (getEntity() == null) {
+      return null;
+    } else {
+      return getEntity().getId();
+    }
+  }
   
   public abstract EntityBase getEntity();
   protected abstract void setEntity(EntityBase entity);

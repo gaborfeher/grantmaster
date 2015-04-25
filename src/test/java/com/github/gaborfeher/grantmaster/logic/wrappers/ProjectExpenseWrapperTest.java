@@ -111,7 +111,7 @@ public class ProjectExpenseWrapperTest {
               "100000",
               HUF,
               "100000"
-          ).getEntity().getId());  
+          ).getId());  
       return true;
     }));
     
@@ -125,7 +125,7 @@ public class ProjectExpenseWrapperTest {
               "200000",
               HUF,
               "200000"
-          ).getEntity().getId());
+          ).getId());
       return true;
     }));
     

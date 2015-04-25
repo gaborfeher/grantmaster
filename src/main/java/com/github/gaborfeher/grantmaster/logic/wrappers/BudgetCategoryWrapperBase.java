@@ -94,7 +94,8 @@ public abstract class BudgetCategoryWrapperBase extends EntityWrapper {
 
   @Override
   public Object getProperty(String name) {
-    if ("fakeName".equals(name)) {
+    if (fakeName != null &&
+            ("name".equals(name) || "budgetCategory".equals(name))) {
       return fakeName;
     }
     return super.getProperty(name);

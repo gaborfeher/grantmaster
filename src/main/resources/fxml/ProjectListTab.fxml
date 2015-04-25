@@ -12,24 +12,23 @@
   <children>
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
-        <TableColumn prefWidth="150" styleClass="editColumn">
+        <TableColumn prefWidth="150" styleClass="editColumn" sortable="false" >
           <cellFactory>
-            <EditButtonTableCellFactory extraButtonText="Megnyitás" onAction="#handleOpenButtonAction">
-            </EditButtonTableCellFactory>
+            <EditButtonTableCellFactory extraButtonText="Megnyitás" onAction="#handleOpenButtonAction" />
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectName" prefWidth="150" styleClass="textColumn">
-          <cellFactory>
+        <TableColumn text="%ProjectName" prefWidth="150" styleClass="textColumn" sortable="false">
+            <cellFactory>
             <StringTableCellFactory property="name" /> 
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="name" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectAccountCurrency" prefWidth="150" styleClass="textColumn">
+        <TableColumn text="%ProjectAccountCurrency" prefWidth="150" styleClass="textColumn" sortable="false">
           <cellFactory>
             <CurrencyTableCellFactory property="accountCurrency" />
           </cellFactory>
@@ -37,7 +36,7 @@
             <EntityPropertyValueFactory property="accountCurrency" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectGrantCurrency" prefWidth="150" styleClass="textColumn">
+        <TableColumn text="%ProjectGrantCurrency" prefWidth="150" styleClass="textColumn" sortable="false">
           <cellFactory>
             <CurrencyTableCellFactory property="grantCurrency" /> 
           </cellFactory>
@@ -45,7 +44,7 @@
             <EntityPropertyValueFactory property="grantCurrency" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectIncomeType" prefWidth="300" styleClass="textColumn">
+        <TableColumn text="%ProjectIncomeType" prefWidth="300" styleClass="textColumn" sortable="false">
           <cellFactory>
             <BudgetCategoryTableCellFactory property="incomeType" direction="INCOME" />
           </cellFactory>

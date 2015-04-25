@@ -111,7 +111,7 @@ public class TestUtils {
   static ProjectExpense findExpenseById(
       EntityManager em, Project project, Long id) {
     for (ProjectExpenseWrapper expense : ProjectExpenseWrapper.getProjectExpenseList(em, project)) {
-      if (Objects.equals(expense.getEntity().getId(), id)) {
+      if (Objects.equals(expense.getId(), id)) {
         return (ProjectExpense) expense.getEntity();
       }
     }
