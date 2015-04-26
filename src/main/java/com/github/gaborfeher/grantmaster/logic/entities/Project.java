@@ -6,12 +6,14 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Project extends EntityBase implements  Serializable {
@@ -34,6 +36,9 @@ public class Project extends EntityBase implements  Serializable {
   @JoinColumn(nullable = false)
   private BudgetCategory incomeType;
 
+  @OneToMany(mappedBy="project")
+  private List<ProjectReport> reports;
+  
   public Project() {
   }
 
@@ -49,51 +54,41 @@ public class Project extends EntityBase implements  Serializable {
   public Long getId() {
     return id;
   }
-
-  /**
-   * @return the grantCurrency
-   */
-  public Currency getGrantCurrency() {
-    return grantCurrency;
-  }
-
-  /**
-   * @param grantCurrency the grantCurrency to set
-   */
-  public void setGrantCurrency(Currency grantCurrency) {
-    this.grantCurrency = grantCurrency;
-  }
-
-  /**
-   * @return the accountCurrency
-   */
-  public Currency getAccountCurrency() {
-    return accountCurrency;
-  }
-
-  /**
-   * @param accountCurrency the accountCurrency to set
-   */
-  public void setAccountCurrency(Currency accountCurrency) {
-    this.accountCurrency = accountCurrency;
-  }
-
-  /**
-   * @return the incomeType
-   */
-  public BudgetCategory getIncomeType() {
-    return incomeType;
-  }
-
-  /**
-   * @param incomeType the incomeType to set
-   */
-  public void setIncomeType(BudgetCategory incomeType) {
-    this.incomeType = incomeType;
-  }
   
   @Override
   public String toString() {
     return getName();
+  }
+
+  public Currency getGrantCurrency() {
+    return grantCurrency;
+  }
+
+  public void setGrantCurrency(Currency grantCurrency) {
+    this.grantCurrency = grantCurrency;
+  }
+
+  public Currency getAccountCurrency() {
+    return accountCurrency;
+  }
+
+  public void setAccountCurrency(Currency accountCurrency) {
+    this.accountCurrency = accountCurrency;
+  }
+
+  public BudgetCategory getIncomeType() {
+    return incomeType;
+  }
+
+  public void setIncomeType(BudgetCategory incomeType) {
+    this.incomeType = incomeType;
+  }
+
+  public List<ProjectReport> getReports() {
+    return reports;
+  }
+
+  public void setReports(List<ProjectReport> reports) {
+    this.reports = reports;
   }
 }

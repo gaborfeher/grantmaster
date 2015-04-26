@@ -8,7 +8,7 @@ import javax.persistence.EntityManager;
 
 public class CurrenciesTabController extends ControllerBase {
   @Override
-  protected EntityWrapper createNewEntity() {
+  protected EntityWrapper createNewEntity(EntityManager em) {
     return new CurrencyWrapper(new Currency());
   }
 

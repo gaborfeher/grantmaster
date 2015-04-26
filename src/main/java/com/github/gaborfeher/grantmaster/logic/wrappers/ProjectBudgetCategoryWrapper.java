@@ -4,8 +4,8 @@ import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -88,7 +88,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Proj
     return entity.getBudgetCategory();
   }
 
-
   @Override
   public void addSummaryValues(BudgetCategoryWrapperBase other0, BigDecimal multiplier) {
     ProjectBudgetCategoryWrapper other = (ProjectBudgetCategoryWrapper) other0;
@@ -131,26 +130,22 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Proj
   public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
       EntityManager em,
       Project project,
-      LocalDate filterStartDate,
-      LocalDate filterEndDate) {
+      ProjectReport filterReport) {
     BigDecimal total =
         Utils.getSingleResultWithDefault(BigDecimal.ZERO,
             em.createQuery("SELECT SUM(s.grantCurrencyAmount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", BigDecimal.class).
                 setParameter("project", project));
-
         
     List<ProjectBudgetCategoryWrapper> list = em.createQuery("SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
         "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
             "WHERE c.direction = :direction " +
-            " AND (:filterStartDate IS NULL OR e.paymentDate >= :filterStartDate) " +
-            " AND (:filterEndDate IS NULL OR e.paymentDate <= :filterEndDate) " +
+            " AND (:filterReportId IS NULL OR e.report.id = :filterReportId) " +
             "GROUP BY c " +
             "ORDER BY c.groupName NULLS LAST, c.name",
         ProjectBudgetCategoryWrapper.class).
             setParameter("project", project).
             setParameter("direction", BudgetCategory.Direction.PAYMENT).
-            setParameter("filterStartDate", filterStartDate).
-            setParameter("filterEndDate", filterEndDate).
+            setParameter("filterReportId", filterReport == null ? null : filterReport.getId()).
             getResultList();
     
     Iterator<ProjectBudgetCategoryWrapper> iterator = list.iterator();

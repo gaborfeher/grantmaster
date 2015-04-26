@@ -29,7 +29,7 @@ public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrap
 
   @Override
   public void getItemListForRefresh(EntityManager em, List<ProjectSourceWrapper> items) {
-    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null, null);
+    List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null);
     items.addAll(projectTransfers);
     
     String grantCurrency = project.getGrantCurrency().getCode();
@@ -44,9 +44,7 @@ public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrap
   }
 
   @Override
-  protected ProjectSourceWrapper createNewEntity() {
-    ProjectSource newSource = new ProjectSource();
-    newSource.setProject(project);
-    return new ProjectSourceWrapper(newSource, BigDecimal.ZERO);
+  protected ProjectSourceWrapper createNewEntity(EntityManager em) {
+    return ProjectSourceWrapper.createNew(em, project);
   }
 }

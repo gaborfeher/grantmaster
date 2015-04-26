@@ -86,7 +86,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
       alert.setTitle("Hiba");
       alert.setHeaderText("Nem sikerült a létrehozás");
       alert.showAndWait();
-      entityWrapper.refresh();  // TODO(gaborfeher): Eliminate the need for this.
+      entityWrapper.refresh();
     }
   }
   
@@ -110,6 +110,11 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
       return true;
     })) {
       entityWrapper.refresh();
+    } else {
+      alert = new Alert(AlertType.ERROR);
+      alert.setTitle("Hiba");
+      alert.setHeaderText("Nem sikerült a törlés.");
+      alert.showAndWait();
     }
   }
   

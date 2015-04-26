@@ -11,7 +11,9 @@
     <class>com.github.gaborfeher.grantmaster.logic.entities.Project</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.ProjectNote</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory</class>
-    <shared-cache-mode>NONE</shared-cache-mode> <!-- to make sure rounding in database shows up in UI after refresh -->
+    <class>com.github.gaborfeher.grantmaster.logic.entities.ProjectReport</class>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <!-- to make sure rounding in database shows up in UI after refresh -->
     <properties>
       <property name="javax.persistence.jdbc.user" value="sa"/>
       <property name="javax.persistence.jdbc.password" value=""/>

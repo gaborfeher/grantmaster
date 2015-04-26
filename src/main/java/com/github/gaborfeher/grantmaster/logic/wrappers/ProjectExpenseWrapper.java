@@ -5,7 +5,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +25,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   private void recalculateAllocations(EntityManager em) {
     BigDecimal accountingCurrencyAmount = (BigDecimal) getProperty("accountingCurrencyAmount");
     ProjectExpense expense = (ProjectExpense) entity;
-    List<ProjectSourceWrapper> sources = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null, null);  // TODO
+    List<ProjectSourceWrapper> sources = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null);
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
     
     for (int i = 0; i < sources.size(); ++i) {
@@ -44,7 +43,6 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         allocation.setExpense(expense);
         allocation.setSource(source);
         allocation.setAccountingCurrencyAmount(take);
-  //      grantCurrencyAmount += allocation.getAccountingCurrencyAmount() / source.getExchangeRate();
         expense.getSourceAllocations().add(allocation);
       }
     }
@@ -58,7 +56,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     // Get list of expenses to update.
     List<ProjectExpenseWrapper> expensesToUpdate;
     if (startingFrom != null) {
-      expensesToUpdate = getProjectExpenseListQuery(em, project, false, " AND e.paymentDate >= :date").
+      expensesToUpdate = getProjectExpenseListQuery(em, project, false, " AND e.report.reportDate >= :date").
           setParameter("date", startingFrom).
           getResultList();
     } else {
@@ -123,10 +121,11 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     return true;
   }
   
-  public static ProjectExpenseWrapper createNew(Project project) {
+  public static ProjectExpenseWrapper createNew(EntityManager em, Project project) {
     ProjectExpense expense = new ProjectExpense();
     expense.setProject(project);
     expense.setOriginalCurrency(project.getAccountCurrency());
+    expense.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
     ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense, BigDecimal.ZERO, BigDecimal.ZERO);
     return wrapper;
   }
@@ -147,13 +146,14 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   
   public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
     String sortString = descending ? " DESC" : "";
-    return em.createQuery(
+    String queryString =
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
-            "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
-            "WHERE e.project = :project " + extraWhere + " " +
-            "GROUP BY e " +
-            "ORDER BY e.paymentDate " + sortString + ", e.id " + sortString,
-        ProjectExpenseWrapper.class).setParameter("project", project);
+        "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectReport r ON e.report = r " +
+        "WHERE e.project = :project " + extraWhere + " " +
+        "GROUP BY e, r " +
+        "ORDER BY r.reportDate " + sortString + ", e.paymentDate " + sortString + ", e.id " + sortString;
+    return em.createQuery(queryString, ProjectExpenseWrapper.class).
+        setParameter("project", project);
   }
 
   public static List<ProjectExpenseWrapper> getExpenseList(

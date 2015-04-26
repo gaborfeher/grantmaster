@@ -26,8 +26,8 @@ public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWr
   }
 
   @Override
-  public ProjectExpenseWrapper createNewEntity() {
-    return ProjectExpenseWrapper.createNew(project);
+  public ProjectExpenseWrapper createNewEntity(EntityManager em) {
+    return ProjectExpenseWrapper.createNew(em, project);
   }
 
 }

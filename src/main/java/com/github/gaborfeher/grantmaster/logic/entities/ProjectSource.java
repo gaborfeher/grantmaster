@@ -26,6 +26,13 @@ public class ProjectSource extends EntityBase implements  Serializable {
   @CascadeOnDelete
   private Project project;
 
+  /**
+   * The report in which this income source will be included.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn(nullable = false)
+  private ProjectReport report;  
+  
   @Column(nullable = false, scale = 10, precision = 25)
   private BigDecimal grantCurrencyAmount;
       
@@ -132,6 +139,14 @@ public class ProjectSource extends EntityBase implements  Serializable {
 
   public void setRemainingGrantCurrencyAmount(BigDecimal remainingGrantCurrencyAmount) {
     this.remainingGrantCurrencyAmount = remainingGrantCurrencyAmount;
+  }
+
+  public ProjectReport getReport() {
+    return report;
+  }
+
+  public void setReport(ProjectReport report) {
+    this.report = report;
   }
   
 }

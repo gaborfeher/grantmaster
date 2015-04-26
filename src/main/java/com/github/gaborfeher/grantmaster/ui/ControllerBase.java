@@ -16,11 +16,11 @@ import javafx.scene.control.TableView;
 import javax.persistence.EntityManager;
 
 public abstract class ControllerBase<T extends EntityWrapper> implements Initializable {
-  @FXML protected TableView<T> table;
+  @FXML private TableView<T> table;
   
   @FXML private Node mainNode;
  
-  protected abstract T createNewEntity();
+  protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
   
   static class TableSelectionSaver<T extends EntityWrapper> {
@@ -83,7 +83,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
           items.get(0).getState() != EntityWrapper.State.EDITING_NEW) {
         items.clear();
         // Add the editable empty new element at first position.
-        T wrapper = createNewEntity();
+        T wrapper = createNewEntity(em);
         if (wrapper != null) {
           wrapper.setState(EntityWrapper.State.EDITING_NEW);
           items.add(wrapper);
@@ -97,6 +97,10 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
       addMyselfAsParent(items);
       return true;
     });
+  }
+  
+  protected ObservableList<TableColumn<T, ?>> getTableColumns() {
+    return table.getColumns();
   }
   
   @Override

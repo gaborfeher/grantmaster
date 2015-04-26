@@ -22,43 +22,37 @@ import javax.persistence.EntityManager;
 
 public class SearchTabController
     extends ControllerBase<ProjectExpenseWrapper> {
-
-  @FXML ExpenseTableController tableController;
+  @FXML private ExpenseTableController tableController;
   
-  @FXML ChoiceBox<Project> project;
-  @FXML DatePicker startDate;
-  @FXML DatePicker endDate;
-  @FXML ChoiceBox<BudgetCategory> budgetCategory;
-  @FXML TextField budgetCategoryGroup;
-  @FXML TextField accountNo;
-  @FXML TextField partnerName;
-  @FXML TextField comment1;
-  @FXML TextField comment2;
+  @FXML private ChoiceBox<Project> project;
+  @FXML private DatePicker startDate;
+  @FXML private DatePicker endDate;
+  @FXML private ChoiceBox<BudgetCategory> budgetCategory;
+  @FXML private TextField budgetCategoryGroup;
+  @FXML private TextField accountNo;
+  @FXML private TextField partnerName;
+  @FXML private TextField comment1;
+  @FXML private TextField comment2;
   
-  List<ProjectExpenseWrapper> searchResults;
+  private List<ProjectExpenseWrapper> searchResults;
   
-  public void search() {
-    DatabaseSingleton.INSTANCE.query(new TransactionRunner() {
-
-      @Override
-      public boolean run(EntityManager em) {
-        searchResults = ProjectExpenseWrapper.getExpenseList(
-            em,
-            project.getValue(),
-            startDate.getValue(),
-            endDate.getValue(),
-            budgetCategory.getValue(),
-            budgetCategoryGroup.getText(),
-            accountNo.getText(),
-            partnerName.getText(),
-            comment1.getText(),
-            comment2.getText());
-        table.getItems().setAll(searchResults);
-        return true;
-      }
-      
+  @FXML
+  private void search() {
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      searchResults = ProjectExpenseWrapper.getExpenseList(
+          em,
+          project.getValue(),
+          startDate.getValue(),
+          endDate.getValue(),
+          budgetCategory.getValue(),
+          budgetCategoryGroup.getText(),
+          accountNo.getText(),
+          partnerName.getText(),
+          comment1.getText(),
+          comment2.getText());
+      return true;
     });
-    
+    onRefresh();
   }
 
   @Override
@@ -119,7 +113,7 @@ public class SearchTabController
   }
 
   @Override
-  protected ProjectExpenseWrapper createNewEntity() {
+  protected ProjectExpenseWrapper createNewEntity(EntityManager em) {
     return null;
   }
   

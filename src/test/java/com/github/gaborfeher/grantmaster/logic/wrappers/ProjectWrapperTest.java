@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -84,11 +85,11 @@ public class ProjectWrapperTest {
     // Create projects for testing.
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
       Project project1 = TestUtils.createProject(em, "P1", USD, HUF, SOME_GRANT);
-      TestUtils.createProjectSource(em, project1, LocalDate.of(2014, 1, 1), "100", "1000");
-      TestUtils.createProjectExpense(em, project1, SOME_EXPENSE, LocalDate.of(2014, 6, 4), "1000", HUF, "1000");
+      ProjectReport report1 = TestUtils.createProjectReport(em, project1, LocalDate.of(2015, 5, 18));
+      TestUtils.createProjectSource(em, project1, LocalDate.of(2014, 1, 1), report1, "100", "1000");
+      TestUtils.createProjectExpense(em, project1, SOME_EXPENSE, LocalDate.of(2014, 6, 4), report1, "1000", HUF, "1000");
       TestUtils.createProjectNote(em, project1, new Timestamp(1234), "hello, world");
       TestUtils.createProjectBudgetLimit(em, project1, SOME_EXPENSE, null, "1000");
-      // TODO: add limit
       TestUtils.createProject(em, "P2", USD, HUF, SOME_GRANT);
       return true;
     }));

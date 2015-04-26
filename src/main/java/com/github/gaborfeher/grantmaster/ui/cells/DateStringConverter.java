@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 /**
  *
@@ -21,7 +22,11 @@ class DateStringConverter extends MultiStringConverter<LocalDate> {
 
   @Override
   public LocalDate fromString(String string) {
-    return LocalDate.parse(string);
+    try {
+      return LocalDate.parse(string);
+    } catch (DateTimeParseException ex) {
+      return null;
+    }
   }
   
 }

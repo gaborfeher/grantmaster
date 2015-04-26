@@ -2,14 +2,15 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
+
   public ProjectSourceWrapper(ProjectSource source, BigDecimal usedAccountingCurrencyAmount) {
     super(source);
     if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
@@ -29,18 +30,16 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
   }
 
   public static List<ProjectSourceWrapper> getProjectSources(
-      EntityManager em, Project project, LocalDate filterStartDate, LocalDate filterEndDate) {
+      EntityManager em, Project project, ProjectReport filterReport) {
     TypedQuery<ProjectSourceWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +
             "WHERE s.project = :project " +
-            "  AND (:filterStartDate IS NULL OR s.availabilityDate >= :filterStartDate) " +
-            "  AND (:filterEndDate IS NULL OR s.availabilityDate <= :filterEndDate) " +
+            "  AND (:filterReportId IS NULL OR s.report.id = :filterReportId) " +
             "GROUP BY s " +
             "ORDER BY s.availabilityDate, s.id", ProjectSourceWrapper.class);
     query.setParameter("project", project);
-    query.setParameter("filterStartDate", filterStartDate);
-    query.setParameter("filterEndDate", filterEndDate);
+    query.setParameter("filterReportId", filterReport == null ? null : filterReport.getId());
     return query.getResultList();
   }
   
@@ -59,4 +58,13 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getAvailabilityDate());
     return true;
   }
+  
+  public static ProjectSourceWrapper createNew(EntityManager em, Project project) {
+    ProjectSource source = new ProjectSource();
+    source.setProject(project);
+    source.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
+    return new ProjectSourceWrapper(source, BigDecimal.ZERO);
+  }
+
+  
 }

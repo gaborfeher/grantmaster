@@ -7,6 +7,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -34,10 +35,12 @@ public class TestUtils {
       EntityManager em,
       Project project,
       LocalDate date,
+      ProjectReport report,
       String exchangeRate,
       String accountingCurrencyAmount) {
     ProjectSource projectSource = new ProjectSource();
     projectSource.setProject(project);
+    projectSource.setReport(report);
     projectSource.setAvailabilityDate(LocalDate.of(2015, 2, 1));
     projectSource.setExchangeRate(new BigDecimal(exchangeRate, Utils.MC));
     projectSource.setGrantCurrencyAmount(
@@ -51,10 +54,11 @@ public class TestUtils {
       Project project,
       BudgetCategory budgetCategory,
       LocalDate date,
+      ProjectReport report,
       String originalAmount,
       Currency originalCurrency,
       String accountingCurrencyAmount) {
-    ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(project);
+    ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(em, project);
     newWrapper.setState(EntityWrapper.State.EDITING_NEW);
     newWrapper.setProperty("paymentDate", date, LocalDate.class);
     newWrapper.setProperty(
@@ -66,6 +70,7 @@ public class TestUtils {
     newWrapper.setProperty(
         "accountingCurrencyAmount",
         new BigDecimal(accountingCurrencyAmount, Utils.MC), BigDecimal.class);
+    newWrapper.setProperty("report", report, ProjectReport.class);
     newWrapper.save(em);
     return newWrapper;
   }
@@ -79,6 +84,17 @@ public class TestUtils {
     projectNote.setEntryTime(entryTime);
     projectNote.setNote(note);
     em.persist(projectNote);
+  }
+  
+  static ProjectReport createProjectReport(
+      EntityManager em,
+      Project project,
+      LocalDate reportDate) {
+    ProjectReport report = new ProjectReport();
+    report.setProject(project);
+    report.setReportDate(reportDate);
+    em.persist(report);
+    return report;
   }
 
   static void createProjectBudgetLimit(
@@ -124,4 +140,5 @@ public class TestUtils {
     }
     return null;
   }
+
 }

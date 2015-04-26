@@ -30,6 +30,13 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   @Temporal(TemporalType.DATE)
   private LocalDate paymentDate;
   
+  /**
+   * The report in which this expense will be included.
+   */
+  @ManyToOne(optional = false)
+  @JoinColumn(nullable = false)
+  private ProjectReport report;
+  
   private String accountNo;
   private String partnerName;
   
@@ -44,6 +51,10 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   @JoinColumn(nullable = false)
   private Currency originalCurrency;
   
+  /**
+   * This list describes the money used for paying this expense: income
+   * sources and income amounts.
+   */
   @OneToMany(mappedBy="expense", cascade=CascadeType.ALL, orphanRemoval = true)
   private List<ExpenseSourceAllocation> sourceAllocations;
 
@@ -185,5 +196,13 @@ public class ProjectExpense extends EntityBase implements  Serializable {
 
   public void setAccountingCurrencyAmountNotEdited(BigDecimal accountingCurrencyAmountNotEdited) {
     this.accountingCurrencyAmountNotEdited = accountingCurrencyAmountNotEdited;
+  }
+
+  public ProjectReport getReport() {
+    return report;
+  }
+
+  public void setReport(ProjectReport report) {
+    this.report = report;
   }
 }

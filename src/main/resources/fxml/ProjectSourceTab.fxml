@@ -28,6 +28,14 @@
             <EntityPropertyValueFactory property="availabilityDate" /> 
           </cellValueFactory>
         </TableColumn>
+        <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
+          <cellFactory>
+            <ProjectReportTableCellFactory property="report" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="report" />
+          </cellValueFactory>
+        </TableColumn>
         <TableColumn text="%ProjectSourceExchangeRate" styleClass="numColumn" prefWidth="100" sortable="false">
           <cellFactory>
             <BigDecimalTableCellFactory property="exchangeRate" /> 

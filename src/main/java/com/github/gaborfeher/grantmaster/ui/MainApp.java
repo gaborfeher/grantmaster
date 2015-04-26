@@ -26,7 +26,7 @@ public class MainApp extends Application {
 
     Scene scene = new Scene(root);
     scene.getStylesheets().add("/styles/Styles.css");
-    stage.setTitle("GrantMaster - Költségvetés Tervező - v0.3");
+    stage.setTitle("GrantMaster - Költségvetés Tervező - v0.4");
     stage.setMaximized(true);
     stage.setScene(scene);
     stage.show();

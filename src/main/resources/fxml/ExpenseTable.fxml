@@ -18,7 +18,7 @@
         <PropertyValueFactory property="state" /> 
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%ProjectName" editable="false" sortable="false" styleClass="textColumn">
+    <TableColumn text="%Project" editable="false" sortable="false" styleClass="textColumn">
       <cellValueFactory>
         <EntityPropertyValueFactory property="project" />
       </cellValueFactory>
@@ -29,6 +29,14 @@
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="paymentDate" />
+      </cellValueFactory>
+    </TableColumn>
+    <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
+      <cellFactory>
+        <ProjectReportTableCellFactory property="report" />
+      </cellFactory>
+      <cellValueFactory>
+        <EntityPropertyValueFactory property="report" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseAccountNo" prefWidth="120" sortable="false" styleClass="textColumn" >

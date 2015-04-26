@@ -27,7 +27,7 @@ public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCa
             em, paymentCategories, incomeCategories, columnNames);
     
     // Initialize table columns.
-    table.getColumns().remove(4, table.getColumns().size());
+    getTableColumns().remove(4, getTableColumns().size());
     for (final String columnName : columnNames) {
       TableColumn column = new TableColumn<GlobalBudgetCategoryWrapper, BigDecimal>(columnName);
       column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
@@ -36,7 +36,7 @@ public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCa
       column.setSortable(false);
       column.setEditable(false);
       column.setPrefWidth(130.0);
-      table.getColumns().add(column);
+      getTableColumns().add(column);
     }
     
     BudgetCategoryWrapperBase.createBudgetSummaryList(
@@ -47,7 +47,7 @@ public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCa
   }
 
   @Override
-  public GlobalBudgetCategoryWrapper createNewEntity() {
+  public GlobalBudgetCategoryWrapper createNewEntity(EntityManager em) {
     BudgetCategory budgetCategory = new BudgetCategory();
     return new GlobalBudgetCategoryWrapper(budgetCategory);
   }

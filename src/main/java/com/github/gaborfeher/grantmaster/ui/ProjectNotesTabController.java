@@ -22,7 +22,7 @@ public class ProjectNotesTabController extends ControllerBase<ProjectNoteWrapper
   }
 
   @Override
-  protected ProjectNoteWrapper createNewEntity() {
+  protected ProjectNoteWrapper createNewEntity(EntityManager em) {
     ProjectNote projectNote = new ProjectNote();
     projectNote.setEntryTime(new Timestamp(new Date().getTime()));
     projectNote.setProject(project);

@@ -11,20 +11,23 @@ public class ProjectTabController extends ControllerBase {
   @FXML ProjectSourceTabController projectSourceTabController;
   @FXML ProjectBudgetCategoriesTabController projectBudgetCategoriesTabController;
   @FXML ProjectNotesTabController projectNotesTabController;
+  @FXML ProjectReportsTabController projectReportsTabController;
 
   void init(Project project) {   
-    this.projectExpenseTabController.init(project);
-    this.projectSourceTabController.init(project);
-    this.projectBudgetCategoriesTabController.init(project);
-    this.projectNotesTabController.init(project);
+    projectExpenseTabController.init(project);
+    projectSourceTabController.init(project);
+    projectBudgetCategoriesTabController.init(project);
+    projectNotesTabController.init(project);
+    projectReportsTabController.init(project);
   }
 
   @Override
   public void refreshContent() {
-    this.projectExpenseTabController.onRefresh();
-    this.projectSourceTabController.onRefresh();
-    this.projectBudgetCategoriesTabController.onRefresh();
-    this.projectNotesTabController.onRefresh();
+    projectExpenseTabController.onRefresh();
+    projectSourceTabController.onRefresh();
+    projectBudgetCategoriesTabController.onRefresh();
+    projectNotesTabController.onRefresh();
+    projectReportsTabController.onRefresh();
   }
 
   @Override
@@ -33,7 +36,7 @@ public class ProjectTabController extends ControllerBase {
   }
 
   @Override
-  protected EntityWrapper createNewEntity() {
+  protected EntityWrapper createNewEntity(EntityManager em) {
     throw new UnsupportedOperationException("Not supported.");
   }
 }
