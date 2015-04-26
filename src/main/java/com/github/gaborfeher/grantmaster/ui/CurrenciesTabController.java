@@ -40,7 +40,10 @@ public class CurrenciesTabController extends ControllerBase {
     }
     Currency currency = new Currency();
     currency.setCode(code);
-    connection.persist(currency);
+    connection.transaction((EntityManager em) -> {
+      em.persist(currency);
+      return true;
+    });
     onRefresh();
   }
 

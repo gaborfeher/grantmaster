@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -27,40 +31,25 @@ public enum DatabaseSingleton {
   /**
    * Directory where the database files are stored while the database is open.
    */
-  private File tempFile;
+  private File tempDir;
+  private boolean unsavedChanges;
   
   private DatabaseSingleton() {
   }
   
   public void cleanup() {
     close();
-    if (tempFile != null) {
-      simpleRecursiveDelete(tempFile);
+    if (tempDir != null) {
+      simpleRecursiveDelete(tempDir);
     }
   }
     
   private void close() {
+    unsavedChanges = false;
     if (entityManagerFactory != null) {
       entityManagerFactory.close();
       entityManagerFactory = null;
     }
-  }
-  
-  // This is copied from Guava. TODO: include Guava in the project
-  private static final int TEMP_DIR_ATTEMPTS = 10000;
-  private File createTempDir() {
-    File baseDir = new File(System.getProperty("java.io.tmpdir"));
-    String baseName = System.currentTimeMillis() + "-";
-
-    for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
-      File tempDir = new File(baseDir, baseName + counter);
-      if (tempDir.mkdir()) {
-        return tempDir;
-      }
-    }
-    throw new IllegalStateException("Failed to create directory within "
-        + TEMP_DIR_ATTEMPTS + " attempts (tried "
-       + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
   }
   
   private static void simpleRecursiveDelete(File main) {
@@ -75,11 +64,20 @@ public enum DatabaseSingleton {
     }
   }
   
+  private static File createTempDir() {
+    try {
+      return Files.createTempDirectory("gmtmp").toFile();
+    } catch (IOException ex) {
+      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, ex);
+      return null;
+    }
+  }
+  
   public File createNewDatabase() {
     cleanup();
-    tempFile = createTempDir();
-    if (connectToFile(tempFile.getAbsolutePath())) {
-      return tempFile;
+    tempDir = createTempDir();
+    if (tempDir != null && connectToFile(tempDir.getAbsolutePath())) {
+      return tempDir;
     }
     return null;
   }
@@ -111,21 +109,21 @@ public enum DatabaseSingleton {
   
   public File saveDatabase(File path) throws IOException {
     close();
-    // TODO(gaborfeher): Is this enough to shut down?
-    
+    Path tempFile = Files.createTempFile("gmsave", ".hdb");
     try (
-        FileOutputStream fileOutputStream = new FileOutputStream(path);
+        FileOutputStream fileOutputStream = new FileOutputStream(tempFile.toFile());
         ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
-      for (File item : tempFile.listFiles()) {
+      for (File item : tempDir.listFiles()) {
         ZipEntry entry = new ZipEntry(item.getName());
         zipOutputStream.putNextEntry(entry);
         zipOutputStream.write(Files.readAllBytes(item.toPath()));
         zipOutputStream.closeEntry();
       }
     }
-    
-    connectToFile(tempFile.getAbsolutePath());
-    return tempFile;
+    Files.move(tempFile, path.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    unsavedChanges = false;
+    connectToFile(tempDir.getAbsolutePath());
+    return tempDir;
   }
   
   /**
@@ -135,13 +133,16 @@ public enum DatabaseSingleton {
    */
   public File openDatabase(File path) {
     cleanup();
-    tempFile = createTempDir();
+    tempDir = createTempDir();
+    if (tempDir == null) {
+      return null;
+    }
     try (
         FileInputStream fileInputStream = new FileInputStream(path);
         ZipInputStream zipInputStrem = new ZipInputStream(fileInputStream)) {
       ZipEntry zipEntry;
       while ((zipEntry = zipInputStrem.getNextEntry()) != null) {
-        File fileToWrite = new File(tempFile, zipEntry.getName());
+        File fileToWrite = new File(tempDir, zipEntry.getName());
         try (FileOutputStream fileOutputStream = new FileOutputStream(fileToWrite)) {
           while (zipInputStrem.available() > 0) {
             byte[] buffer = new byte[1024 * 32];
@@ -157,15 +158,8 @@ public enum DatabaseSingleton {
     } catch (IOException e) {
       return null;
     }
-    connectToFile(tempFile.getAbsolutePath());
-    return tempFile;
-  }
-  
-  public void persist(final Object obj) {
-    transaction((EntityManager em) -> {
-      em.persist(obj);
-      return true;
-    });
+    connectToFile(tempDir.getAbsolutePath());
+    return tempDir;
   }
   
   public boolean transaction(TransactionRunner runner) {
@@ -180,7 +174,6 @@ public enum DatabaseSingleton {
         transaction.commit();
       } else {
         transaction.rollback();
-        //runner.onFailure();
         return false;
       }
     } catch (Throwable t) {
@@ -188,12 +181,11 @@ public enum DatabaseSingleton {
       if (transaction.isActive()) {
         transaction.rollback();
       }
-      //runner.onFailure();
       return false;
     } finally {
       entityManager.close();
     }
-    //runner.onSuccess();
+    unsavedChanges = true;
     return true;
   }
   
@@ -213,6 +205,10 @@ public enum DatabaseSingleton {
 
   public boolean isConnected() {
     return entityManagerFactory != null;
+  }
+  
+  public boolean getUnsavedChange() {
+    return unsavedChanges;
   }
 
   public void refresh(Object entity) {

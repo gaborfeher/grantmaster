@@ -22,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -48,10 +49,41 @@ public class MainPageController implements Initializable {
    */
   File openedFile;
   
-  public void stop() {
-    DatabaseSingleton.INSTANCE.cleanup();
+  private boolean allowCloseDatabase() {
+    if (DatabaseSingleton.INSTANCE.getUnsavedChange()) {
+      Alert alert = new Alert(AlertType.NONE);
+      alert.setTitle("Mentés");
+      alert.setHeaderText("Mentsük az adatokat bezárás előtt?");
+      ButtonType saveButtonType = new ButtonType("Mentés");
+      ButtonType discardButtonType = new ButtonType("Bezárás");
+      ButtonType cancelButtonType = new ButtonType("Mégse");
+      alert.getButtonTypes().add(saveButtonType);
+      alert.getButtonTypes().add(discardButtonType);
+      alert.getButtonTypes().add(cancelButtonType);
+      ((Button) alert.getDialogPane().lookupButton(cancelButtonType)).setDefaultButton(true);
+      ButtonType userChoice = alert.showAndWait().get();
+      if (userChoice == cancelButtonType) {
+        return false;
+      } else if (userChoice == discardButtonType) {
+        return true;
+      } else if (userChoice == saveButtonType) {
+        handleSaveButtonAction(null);
+        return true;
+      } else {
+        return false;  // TODO(gaborfeher): log this
+      }
+    }
+    return true;
   }
-
+  
+  public boolean shutdown() {
+    if (!allowCloseDatabase()) {
+      return false;
+    }
+    DatabaseSingleton.INSTANCE.cleanup();
+    return true;
+  }
+  
   private void closeProjectTabs() {
     mainTabs.getSelectionModel().selectFirst();
     mainTabs.getTabs().remove(4, mainTabs.getTabs().size());
@@ -93,7 +125,11 @@ public class MainPageController implements Initializable {
   }
   
   @FXML
-  private void handleOpenButtonAction(ActionEvent event) {    
+  private void handleOpenButtonAction(ActionEvent event) {
+    if (!allowCloseDatabase()) {
+      return;
+    }
+    
     DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     FileChooser fileChooser = getFileChooser();
     fileChooser.setTitle("Adatbázis megnyitása");
@@ -117,19 +153,20 @@ public class MainPageController implements Initializable {
   
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
+    if (!allowCloseDatabase()) {
+      return;
+    }
+    
     DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     closeProjectTabs();
     openedFile = null;
     
     File tempDir = connection.createNewDatabase();
     
-    boolean result = connection.transaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        CurrencyManager.createDefaultCurrencies(em);
-        GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
-        return true;
-      }
+    boolean result = connection.transaction((EntityManager em) -> {
+      CurrencyManager.createDefaultCurrencies(em);
+      GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
+      return true;
     });
     if (!result) {
       return;
