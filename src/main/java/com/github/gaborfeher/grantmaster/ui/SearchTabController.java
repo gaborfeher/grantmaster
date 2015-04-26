@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
@@ -73,8 +74,12 @@ public class SearchTabController
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+        ProjectExpense expense = p.getValue().getEntity();
         String result =
-            String.format("%2.2f %s", p.getValue().getProperty("accountingCurrencyAmount"), p.getValue().getProject().getAccountCurrency().getCode());
+            String.format(
+                "%2.2f %s",
+                expense.getAccountingCurrencyAmount(),
+                expense.getProject().getAccountCurrency().getCode());
         return new ReadOnlyObjectWrapper<Object>(result);
       }
     });
@@ -90,8 +95,12 @@ public class SearchTabController
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+        ProjectExpense expense = p.getValue().getEntity();
         String result =
-            String.format("%2.2f %s", p.getValue().getProperty("grantCurrencyAmount"), p.getValue().getProject().getGrantCurrency().getCode());
+            String.format(
+                "%2.2f %s",
+                expense.getGrantCurrencyAmount(),
+                expense.getProject().getGrantCurrency());
         return new ReadOnlyObjectWrapper<Object>(result);
       }
     });

@@ -20,16 +20,20 @@ public class ProjectTabController extends ControllerBase {
   }
 
   @Override
-  protected EntityWrapper createNewEntity() {
-    throw new UnsupportedOperationException("Not supported.");
-  }
-
-  @Override
-  public void getItemListForRefresh(EntityManager em, List items) {
+  public void refreshContent() {
     this.projectExpenseTabController.onRefresh();
     this.projectSourceTabController.onRefresh();
     this.projectBudgetCategoriesTabController.onRefresh();
     this.projectNotesTabController.onRefresh();
   }
 
+  @Override
+  protected void getItemListForRefresh(EntityManager em, List items) {
+    throw new UnsupportedOperationException("Not supported.");
+  }
+
+  @Override
+  protected EntityWrapper createNewEntity() {
+    throw new UnsupportedOperationException("Not supported.");
+  }
 }

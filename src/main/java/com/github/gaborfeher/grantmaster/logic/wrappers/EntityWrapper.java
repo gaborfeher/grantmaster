@@ -8,7 +8,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 
-public abstract class EntityWrapper {
+public abstract class EntityWrapper<T extends EntityBase> {
+  protected T entity;
+  
+  public static enum State {
+    EDITING_NEW,
+    SAVED;
+  }
+  
+  private State state;
+  private boolean isSummary;
+  private ControllerBase parent;
+  
+  public EntityWrapper(T entity) {
+    this.entity = entity;
+    state = State.SAVED;
+    isSummary = false;
+  }
 
   public boolean commitEdit(String property, Object val, Class<?> valueType) {
     if (!setProperty(property, val, valueType)) {
@@ -26,20 +42,6 @@ public abstract class EntityWrapper {
     } else {
       return false;
     }
-  }
-
-  public static enum State {
-    EDITING_NEW,
-    SAVED;
-  }
-  
-  private State state;
-  private boolean isSummary;
-  private ControllerBase parent;
-  
-  public EntityWrapper() {
-    state = State.SAVED;
-    isSummary = false;
   }
   
   public State getState() {
@@ -69,7 +71,6 @@ public abstract class EntityWrapper {
   public Object getProperty(String name) {
     try {
       String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-      System.out.println("getProperty: " + name + " " + getterName + " " + getEntity());
       return getEntity().getClass().getMethod(getterName).invoke(getEntity());
     } catch (NoSuchMethodException ex) {
       return null;
@@ -84,7 +85,6 @@ public abstract class EntityWrapper {
   }
 
   public boolean save(EntityManager em) {
-    EntityBase entity;
     entity = em.merge(getEntity());
     setState(State.SAVED);
     setEntity(entity);
@@ -122,7 +122,7 @@ public abstract class EntityWrapper {
     this.parent = parent;
   }
 
-  public Object getId() {
+  public Long getId() {
     if (getEntity() == null) {
       return null;
     } else {
@@ -130,6 +130,11 @@ public abstract class EntityWrapper {
     }
   }
   
-  public abstract EntityBase getEntity();
-  protected abstract void setEntity(EntityBase entity);
+  public T getEntity() {
+    return entity;
+  }
+
+  public void setEntity(T entity) {
+    this.entity = entity;
+  }
 }

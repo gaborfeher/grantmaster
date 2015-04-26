@@ -1,26 +1,13 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import java.util.List;
 import javax.persistence.EntityManager;
 
 public class ProjectNoteWrapper extends EntityWrapper {
-  private ProjectNote note;
-  
   public ProjectNoteWrapper(ProjectNote note) {
-    this.note = note;
-  }
-  
-  @Override
-  public EntityBase getEntity() {
-    return note;
-  }
-  
-  @Override
-  protected void setEntity(EntityBase entity) {
-    this.note = (ProjectNote) entity;
+    super(note);
   }
   
   public static List<ProjectNoteWrapper> getNotes(EntityManager em, Project project) {

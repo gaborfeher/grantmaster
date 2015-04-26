@@ -20,17 +20,11 @@ public class ProjectListTabController extends ControllerBase<ProjectWrapper> {
   public void handleOpenButtonAction(ActionEvent event) throws IOException {
     Node sourceButton = (Node) event.getSource();
     EditButtonTableCell sourceCell = (EditButtonTableCell) sourceButton.getProperties().get("tableCell");
-    ProjectWrapper selectedProjectWrapper = (ProjectWrapper) sourceCell.getEntityWrapper();
-
-  /*  int selectedIndex = table.getSelectionModel().getSelectedIndex();
-    if (selectedIndex < 0) {
+    ProjectWrapper sourceProjectWrapper = (ProjectWrapper) sourceCell.getEntityWrapper();
+    if (sourceProjectWrapper.getState() != EntityWrapper.State.SAVED) {
       return;
     }
-    ProjectWrapper selectedProjectWrapper = table.getItems().get(selectedIndex);*/
-    if (selectedProjectWrapper.getState() != EntityWrapper.State.SAVED) {
-      return;
-    }
-    parent.addProjectTab(selectedProjectWrapper.getProject());
+    parent.addProjectTab(sourceProjectWrapper.getEntity());
   }
   
   void init(MainPageController parent) {

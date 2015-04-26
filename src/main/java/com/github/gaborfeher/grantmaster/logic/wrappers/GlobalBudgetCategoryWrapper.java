@@ -2,7 +2,6 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
 
-public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
+public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase<BudgetCategory> {
   protected final Map<String, BigDecimal> computedValues;
   
   public GlobalBudgetCategoryWrapper(BudgetCategory budgetCategory) {
@@ -22,8 +21,7 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
     super(null, fakeName);
     computedValues = new HashMap<>();
   }
-  
-  
+
   public BigDecimal getComputedValue(String key) {
     BigDecimal result = computedValues.get(key);
     if (result == null) {
@@ -56,7 +54,7 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
 
   @Override
   public boolean canEdit() {
-    return budgetCategory != null;
+    return getBudgetCategory() != null;
   }
       
   protected void addSummaryValue(BudgetCategoryWrapperBase other0, String key, BigDecimal multiplier) {
@@ -76,10 +74,10 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
       }
     }
   }
-  
+
   @Override
-  public EntityBase getEntity() {
-    return budgetCategory;
+  public BudgetCategory getBudgetCategory() {
+    return entity;
   }
 
   public static List<GlobalBudgetCategoryWrapper> getBudgetCategoryWrappers(EntityManager em, BudgetCategory.Direction direction) {
@@ -230,12 +228,4 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
   }
-
-  @Override
-  protected void setEntity(EntityBase entity) {
-    this.budgetCategory = (BudgetCategory) entity;
-  }
-
-
-  
 }

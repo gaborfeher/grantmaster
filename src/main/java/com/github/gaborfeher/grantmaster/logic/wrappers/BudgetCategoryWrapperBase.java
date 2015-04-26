@@ -1,16 +1,16 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
+import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManager;
 
-public abstract class BudgetCategoryWrapperBase extends EntityWrapper {
-  protected BudgetCategory budgetCategory;
+public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends EntityWrapper<T> {
   private final String fakeName;
   
-  public BudgetCategoryWrapperBase(BudgetCategory budgetCategory, String fakeName) {
-    this.budgetCategory = budgetCategory;
+  public BudgetCategoryWrapperBase(T entity, String fakeName) {
+    super(entity);
     this.fakeName = fakeName;
   }
 
@@ -77,20 +77,14 @@ public abstract class BudgetCategoryWrapperBase extends EntityWrapper {
     output.add(finalSum);
   }
 
-  public Long getId() {
-    return budgetCategory.getId();
-  }
-  
   public String getGroupName() {
-    if (budgetCategory == null) {
+    if (getBudgetCategory() == null) {
       return null;
     }
-    return budgetCategory.getGroupName();
+    return getBudgetCategory().getGroupName();
   }
    
-  public BudgetCategory getBudgetCategory() {
-    return budgetCategory;
-  }
+  public abstract BudgetCategory getBudgetCategory();
 
   @Override
   public Object getProperty(String name) {

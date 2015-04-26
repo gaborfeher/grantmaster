@@ -1,7 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
@@ -10,11 +9,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-public class ProjectSourceWrapper extends EntityWrapper {
-  private ProjectSource source;
-  
+public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
   public ProjectSourceWrapper(ProjectSource source, BigDecimal usedAccountingCurrencyAmount) {
-    this.source = source;
+    super(source);
     if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
       return;
     }
@@ -28,19 +25,7 @@ public class ProjectSourceWrapper extends EntityWrapper {
   }
   
   public BigDecimal getGrantCurrencyAmount() {
-    return source.getGrantCurrencyAmount();
-  }
-  
-  public ProjectSource getSource() {
-    return source;
-  }
-
-  public void setSource(ProjectSource source) {
-    this.source = source;
-  }
-  
-  public Long getId() {
-    return source.getId();
+    return entity.getGrantCurrencyAmount();
   }
 
   public static List<ProjectSourceWrapper> getProjectSources(
@@ -69,20 +54,9 @@ public class ProjectSourceWrapper extends EntityWrapper {
   }
 
   @Override
-  public EntityBase getEntity() {
-    return source;
-  }
-
-  @Override
   public boolean save(EntityManager em) {
     super.save(em);
-    ProjectExpenseWrapper.updateExpenseAllocations(em, source.getProject(), source.getAvailabilityDate());
+    ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getAvailabilityDate());
     return true;
   }
-
-  @Override
-  protected void setEntity(EntityBase entity) {
-    this.source = (ProjectSource) entity;
-  }
-
 }

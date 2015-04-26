@@ -108,7 +108,7 @@ public class TestUtils {
   static ProjectWrapper findProjectByName(
       EntityManager em, String name) {
     for (ProjectWrapper project : ProjectWrapper.getProjects(em)) {
-      if (name.equals(project.getProject().getName())) {
+      if (name.equals(project.getEntity().getName())) {
         return project;
       }
     }

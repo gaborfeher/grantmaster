@@ -109,7 +109,7 @@ public class ProjectWrapperTest {
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectWrapper> list = ProjectWrapper.getProjects(em);
       assertEquals(1, list.size());
-      assertEquals("P2", list.get(0).getProject().getName());
+      assertEquals("P2", list.get(0).getEntity().getName());
       return true;
     }));
     

@@ -2,28 +2,29 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.EntityManager;
 
-public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
-  private ProjectBudgetLimit limit;
-  private Project project;
-  
+public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<ProjectBudgetLimit> {
   private BigDecimal spentGrantCurrency;
   private BigDecimal spentAccountingCurrency;
   private BigDecimal remainingAccountingCurrency;
   private BigDecimal remainingGrantCurrency;
   private BigDecimal budgetAccountingCurrency;
   
+  private static ProjectBudgetLimit createEmptyLimit(BudgetCategory budgetCategory) {
+    ProjectBudgetLimit limit = new ProjectBudgetLimit();
+    limit.setBudgetCategory(budgetCategory);
+    return limit;
+  }
+  
   public ProjectBudgetCategoryWrapper(BudgetCategory budgetCategory, BigDecimal spentAccountingCurrency, BigDecimal spentGrantCurrency) {
-    super(budgetCategory, null);
+    super(createEmptyLimit(budgetCategory), null);
     this.spentGrantCurrency = spentGrantCurrency;
     this.spentAccountingCurrency = spentAccountingCurrency;
     this.remainingAccountingCurrency = null;
@@ -40,6 +41,7 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
 
   @Override
   public boolean canEdit() {
+    BudgetCategory budgetCategory = entity.getBudgetCategory();
     return !getIsSummary() &&
         (budgetCategory == null ||
          budgetCategory.getDirection() == BudgetCategory.Direction.PAYMENT);
@@ -48,9 +50,8 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   @Override
   public ProjectBudgetCategoryWrapper createFakeCopy(String fakeTitle) {
     ProjectBudgetCategoryWrapper copy = new ProjectBudgetCategoryWrapper(fakeTitle);
-    copy.setProject(project);
     ProjectBudgetLimit l = new ProjectBudgetLimit();
-    l.setProject(project);
+    l.setProject(entity.getProject());
     copy.setLimit(BigDecimal.ZERO, l);
     copy.addSummaryValues(this, BigDecimal.ONE);
     copy.setIsSummary(true);
@@ -59,22 +60,15 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   }
   
   public void setProject(Project project) {
-    this.project = project;
+    entity.setProject(project);
   }
   
   public void setLimit(BigDecimal total, ProjectBudgetLimit limit) {
-    this.limit = limit;
+    this.entity = limit;
     if (limit == null) {
       return;
     }
-    
-    if (budgetCategory != null && !Objects.equals(budgetCategory.getId(), limit.getBudgetCategory().getId())) {
-      System.out.println("bad expense type");
-    }
-    if (!Objects.equals(project.getId(), limit.getProject().getId())) {
-      System.out.println("bad project for limit");
-    }
-    
+
     if (limit.getBudgetPercentage() != null && total != null) {
       limit.setBudgetGrantCurrency(total.multiply(limit.getBudgetPercentage()).divide(new BigDecimal("100"), Utils.MC));
     }
@@ -87,9 +81,13 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   }
 
   public void setBudgetCategory(BudgetCategory budgetCategory) {
-    limit.setBudgetCategory(budgetCategory);
-    this.budgetCategory = budgetCategory;
+    entity.setBudgetCategory(budgetCategory);
   }
+  
+  public BudgetCategory getBudgetCategory() {
+    return entity.getBudgetCategory();
+  }
+
 
   @Override
   public void addSummaryValues(BudgetCategoryWrapperBase other0, BigDecimal multiplier) {
@@ -99,16 +97,16 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
   }
   
   public void addBudgetAmounts(BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
-    if (limit.getBudgetGrantCurrency() == null) {
-      limit.setBudgetGrantCurrency(grantCurrencyAmount);
+    if (entity.getBudgetGrantCurrency() == null) {
+      entity.setBudgetGrantCurrency(grantCurrencyAmount);
     } else {
-      limit.setBudgetGrantCurrency(limit.getBudgetGrantCurrency().add(grantCurrencyAmount, Utils.MC));
+      entity.setBudgetGrantCurrency(entity.getBudgetGrantCurrency().add(grantCurrencyAmount, Utils.MC));
     }
     if (budgetAccountingCurrency == null) {
       budgetAccountingCurrency = BigDecimal.ZERO;
     }
     budgetAccountingCurrency = budgetAccountingCurrency.add(accountingCurrencyAmount);
-    remainingGrantCurrency = limit.getBudgetGrantCurrency().subtract(spentGrantCurrency, Utils.MC);
+    remainingGrantCurrency = entity.getBudgetGrantCurrency().subtract(spentGrantCurrency, Utils.MC);
     remainingAccountingCurrency = budgetAccountingCurrency.subtract(spentAccountingCurrency, Utils.MC);
   }
   
@@ -122,16 +120,10 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
     return super.getProperty(name);
   }
   
-  @Override
-  public EntityBase getEntity() {
-    return limit;
-  }
-  
   public static ProjectBudgetCategoryWrapper createNew(Project project) {
     ProjectBudgetLimit limit = new ProjectBudgetLimit();
     limit.setProject(project);
-    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(limit.getBudgetCategory(), BigDecimal.ZERO, BigDecimal.ZERO);
-    wrapper.setProject(project);
+    ProjectBudgetCategoryWrapper wrapper = new ProjectBudgetCategoryWrapper(null, BigDecimal.ZERO, BigDecimal.ZERO);
     wrapper.setLimit(BigDecimal.ZERO, limit);
     return wrapper;
   }
@@ -164,8 +156,6 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
     Iterator<ProjectBudgetCategoryWrapper> iterator = list.iterator();
     while (iterator.hasNext()) {
       ProjectBudgetCategoryWrapper limitWrapper = iterator.next();
-      
-      limitWrapper.setProject(project);
       ProjectBudgetLimit limit = 
           Utils.getSingleResultWithDefault(
               null,
@@ -174,18 +164,15 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
                   ProjectBudgetLimit.class).
                   setParameter("project", project).
                   setParameter("budgetCategory", limitWrapper.getBudgetCategory()));
-
-
       
       if (limit == null && limitWrapper.spentGrantCurrency == null) {
         iterator.remove();
       }
-      if (limit == null) {
-        limit = new ProjectBudgetLimit();
-        limit.setBudgetCategory(limitWrapper.getBudgetCategory());
-        limit.setProject(project);
+      if (limit != null) {
+        limitWrapper.setLimit(total, limit);
+      } else {
+        limitWrapper.setProject(project);
       }
-      limitWrapper.setLimit(total, limit);
     }
 
     return list;
@@ -196,11 +183,4 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase {
         setParameter("project", project).
         executeUpdate();
   }
-
-  @Override
-  protected void setEntity(EntityBase entity) {
-    this.limit = (ProjectBudgetLimit) entity;
-  }
-
-
 }
