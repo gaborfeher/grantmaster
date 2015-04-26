@@ -69,6 +69,7 @@ public abstract class EntityWrapper {
   public Object getProperty(String name) {
     try {
       String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+      System.out.println("getProperty: " + name + " " + getterName + " " + getEntity());
       return getEntity().getClass().getMethod(getterName).invoke(getEntity());
     } catch (NoSuchMethodException ex) {
       return null;

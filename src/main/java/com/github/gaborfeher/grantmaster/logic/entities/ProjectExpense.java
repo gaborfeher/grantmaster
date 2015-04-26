@@ -16,10 +16,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-// http://svanimpe.be/blog/properties-jpa.html
-
 @Entity
-public class ProjectExpense implements EntityBase, Serializable {
+public class ProjectExpense extends EntityBase implements  Serializable {
   @Id
   @GeneratedValue
   private long id;

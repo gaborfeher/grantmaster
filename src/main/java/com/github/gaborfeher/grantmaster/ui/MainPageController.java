@@ -3,7 +3,7 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.core.TransactionRunner;
-import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyManager;
+import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import java.io.File;
 import java.io.IOException;
@@ -164,7 +164,7 @@ public class MainPageController implements Initializable {
     File tempDir = connection.createNewDatabase();
     
     boolean result = connection.transaction((EntityManager em) -> {
-      CurrencyManager.createDefaultCurrencies(em);
+      CurrencyWrapper.createDefaultCurrencies(em);
       GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
       return true;
     });

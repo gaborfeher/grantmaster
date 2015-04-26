@@ -30,27 +30,24 @@ public class ProjectExpenseWrapperTest {
   @Before
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
-    assertTrue(DatabaseSingleton.INSTANCE.transaction(new TransactionRunner() {
-      @Override
-      public boolean run(EntityManager em) {
-        HUF = new Currency(); HUF.setCode("HUF"); em.persist(HUF);
-        USD = new Currency(); USD.setCode("USD"); em.persist(USD);
-        EUR = new Currency(); EUR.setCode("EUR"); em.persist(EUR);
-        SOME_GRANT = new BudgetCategory(
-            BudgetCategory.Direction.INCOME, "i.stuff", "Some kind of project grant");
-        em.persist(SOME_GRANT);
-        SOME_EXPENSE = new BudgetCategory(
-            BudgetCategory.Direction.PAYMENT, "p.stuff", "Some kind of payment");
-        em.persist(SOME_EXPENSE);
-        PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
-        TestUtils.createProjectSource(
-            em, PROJECT1, LocalDate.of(2015, 2, 1), "100", "1000");
-        TestUtils.createProjectSource(
-            em, PROJECT1, LocalDate.of(2015, 4, 1), "200", "1000");
-        TestUtils.createProjectSource(
-            em, PROJECT1, LocalDate.of(2015, 6, 1), "300", "1000");        
-        return true;
-      }
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      HUF = TestUtils.createCurrency(em, "HUF");
+      USD = TestUtils.createCurrency(em, "USD");
+      EUR = TestUtils.createCurrency(em, "EUR");
+      SOME_GRANT = new BudgetCategory(
+          BudgetCategory.Direction.INCOME, "i.stuff", "Some kind of project grant");
+      em.persist(SOME_GRANT);
+      SOME_EXPENSE = new BudgetCategory(
+          BudgetCategory.Direction.PAYMENT, "p.stuff", "Some kind of payment");
+      em.persist(SOME_EXPENSE);
+      PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
+      TestUtils.createProjectSource(
+          em, PROJECT1, LocalDate.of(2015, 2, 1), "100", "1000");
+      TestUtils.createProjectSource(
+          em, PROJECT1, LocalDate.of(2015, 4, 1), "200", "1000");
+      TestUtils.createProjectSource(
+          em, PROJECT1, LocalDate.of(2015, 6, 1), "300", "1000");
+      return true;
     }));
   }
   

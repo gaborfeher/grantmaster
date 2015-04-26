@@ -98,6 +98,13 @@ public class TestUtils {
     }
   }
   
+  static Currency createCurrency(EntityManager em, String code) {
+    Currency currency = new Currency();
+    currency.setCode(code);
+    em.persist(currency);
+    return currency;
+  }
+  
   static ProjectWrapper findProjectByName(
       EntityManager em, String name) {
     for (ProjectWrapper project : ProjectWrapper.getProjects(em)) {

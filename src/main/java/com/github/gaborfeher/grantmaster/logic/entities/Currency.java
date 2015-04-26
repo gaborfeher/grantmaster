@@ -1,13 +1,18 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
 import java.io.Serializable;
-import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class Currency implements Serializable {
+public class Currency extends EntityBase implements Serializable {
   @Id
+  @GeneratedValue
+  private Long id;
+  
+  @Column(nullable = false, unique = true)
   private String code;
   
   public Currency() {
@@ -27,12 +32,11 @@ public class Currency implements Serializable {
   }
 
   @Override
-  public boolean equals(Object other) {
-    return other != null && (other instanceof Currency) && ((Currency)other).getCode().equals(getCode());
+  public Long getId() {
+    return id;
   }
 
-  @Override
-  public int hashCode() {
-    return code.hashCode();
+  public void setId(Long id) {
+    this.id = id;
   }
 }

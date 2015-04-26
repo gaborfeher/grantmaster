@@ -4,7 +4,6 @@ import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -24,51 +23,61 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   protected abstract T createNewEntity();
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
   
+  static class TableSelectionSaver<T extends EntityWrapper> {
+    TableView<T> table = null;
+    TableColumn selectedColumn = null;
+    Object selectedEntityId = null;  // null means first line (new item)
+    int selectedRow = 0;
+
+    TableSelectionSaver(TableView<T> table) {
+      this.table = table;
+      if (table.getSelectionModel().getSelectedCells().size() > 0) {
+        TablePosition selectedCell =
+            table.getSelectionModel().getSelectedCells().get(0);
+        selectedColumn = selectedCell.getTableColumn();
+        selectedEntityId = table.getItems().get(selectedCell.getRow()).getId();
+        selectedRow = selectedCell.getRow();
+      }
+    }
+    
+    void restore() {
+      if (selectedColumn != null) {
+        if (selectedEntityId != null) {
+          int row = 0;
+          while (row < table.getItems().size() && 
+                 !selectedEntityId.equals(table.getItems().get(row).getId())) {
+            row++;
+          }
+          if (row < table.getItems().size()) {
+            selectedRow = row;
+          }
+        }
+        if (selectedRow < table.getItems().size()) {
+          table.getSelectionModel().clearAndSelect(
+              selectedRow, selectedColumn);
+        }
+      } else {
+        table.getSelectionModel().clearSelection();
+      }
+    }
+  }
+  
   public void onRefresh() {
     Platform.runLater(() -> {
-      TableColumn selectedColumn = null;
-      Object selectedEntityId = null;  // null means first line (new item)
-      int selectedRow = 0;
+      TableSelectionSaver selectedCell = null;
       if (table != null) {
-        if (table.getSelectionModel().getSelectedCells().size() > 0) {
-          TablePosition selectedCell =
-              table.getSelectionModel().getSelectedCells().get(0);
-          selectedColumn = selectedCell.getTableColumn();
-          selectedEntityId = table.getItems().get(selectedCell.getRow()).getId();
-          selectedRow = selectedCell.getRow();
-        }
+        selectedCell = new TableSelectionSaver(table);
         table.getSelectionModel().clearSelection();
       }
       ControllerBase.this.refreshContent();
-      if (table != null) {
-        if (selectedColumn != null) {
-          if (selectedEntityId != null) {
-            int row = 0;
-            while (row < table.getItems().size() && 
-                   !selectedEntityId.equals(table.getItems().get(row).getId())) {
-              row++;
-            }
-            if (row < table.getItems().size()) {
-              selectedRow = row;
-            }
-          }
-          if (selectedRow < table.getItems().size()) {
-            table.getSelectionModel().clearAndSelect(
-                selectedRow, selectedColumn);
-          }
-        } else {
-          table.getSelectionModel().clearSelection();
-        }
+      if (selectedCell != null) {
+        selectedCell.restore();
       }
     });
   }
   
   protected void refreshContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
-      if (table == null) {
-        getItemListForRefresh(em, null);  // TODO(gaborfeher): Eliminate this.
-        return true;
-      }
       ObservableList<T> items = table.getItems();
       if (items.isEmpty() ||
           items.get(0).getState() != EntityWrapper.State.EDITING_NEW) {

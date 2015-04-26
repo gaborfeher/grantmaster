@@ -12,7 +12,7 @@ import javax.persistence.UniqueConstraint;
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"name"}))
-public class BudgetCategory implements EntityBase, Serializable {
+public class BudgetCategory extends EntityBase implements   Serializable {
   @Id
   @GeneratedValue
   private Long id;
@@ -72,15 +72,4 @@ public class BudgetCategory implements EntityBase, Serializable {
   public String toString() {
     return name;
   }
-
-  @Override
-  public boolean equals(Object obj) {
-    return obj != null && obj instanceof BudgetCategory && ((BudgetCategory)obj).getId().equals(id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id.hashCode();
-  }
-  
 }

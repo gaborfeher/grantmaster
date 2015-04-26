@@ -10,17 +10,22 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.CurrenciesTabController">
   <children>
-    <GridPane>
-      <Label text="%CurrencyNameEntry" GridPane.rowIndex="0" GridPane.columnIndex="0"  /> 
-      <TextField fx:id="codeEntry" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-
-      <Button text="%CurrencyAddButton" onAction="#addCurrencyButtonAction" GridPane.rowIndex="1" GridPane.columnIndex="0"  />
-    </GridPane>
-    <TableView fx:id="currencyTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" editable="true" >
       <columns>
-        <TableColumn text="%CurrencyNameColumn" prefWidth="150">
+        <TableColumn prefWidth="150" styleClass="editColumn" sortable="false" >
+          <cellFactory>
+            <EditButtonTableCellFactory />
+          </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="code" /> 
+            <PropertyValueFactory property="state" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%CurrencyNameColumn" prefWidth="150" styleClass="textColumn" sortable="false" >
+          <cellFactory>
+            <StringTableCellFactory property="code" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="code" /> 
           </cellValueFactory>
         </TableColumn>
       </columns>

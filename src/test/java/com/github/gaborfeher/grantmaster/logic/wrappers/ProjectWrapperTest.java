@@ -39,9 +39,9 @@ public class ProjectWrapperTest {
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
-      HUF = new Currency(); HUF.setCode("HUF"); em.persist(HUF);
-      USD = new Currency(); USD.setCode("USD"); em.persist(USD);
-      EUR = new Currency(); EUR.setCode("EUR"); em.persist(EUR);
+      HUF = TestUtils.createCurrency(em, "HUF");
+      USD = TestUtils.createCurrency(em, "USD");
+      EUR = TestUtils.createCurrency(em, "EUR");
       SOME_GRANT = new BudgetCategory(
           BudgetCategory.Direction.INCOME, "i.stuff", "Some kind of project grant");
       em.persist(SOME_GRANT);

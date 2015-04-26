@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class ProjectNote implements EntityBase {
+public class ProjectNote extends EntityBase {
   @Id
   @GeneratedValue
   private Long id;
@@ -42,16 +42,10 @@ public class ProjectNote implements EntityBase {
     this.note = note;
   }
 
-  /**
-   * @return the project
-   */
   public Project getProject() {
     return project;
   }
 
-  /**
-   * @param project the project to set
-   */
   public void setProject(Project project) {
     this.project = project;
   }

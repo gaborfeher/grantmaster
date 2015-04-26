@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 @Entity
-public class ProjectSource implements EntityBase, Serializable {
+public class ProjectSource extends EntityBase implements  Serializable {
   @Id
   @GeneratedValue
   private Long id;

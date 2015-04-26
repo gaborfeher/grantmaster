@@ -76,13 +76,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleSaveButtonClick() {
     final EntityWrapper entityWrapper = getEntityWrapper();
-    boolean success = DatabaseSingleton.INSTANCE.transaction(new TransactionRunner() {
-
-      @Override
-      public boolean run(EntityManager em) {
-        return entityWrapper.save(em);
-      }
-    });
+    boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> entityWrapper.save(em));
     if (success == true) {
       entityWrapper.setState(EntityWrapper.State.SAVED);
       updateItem(entityWrapper.getState(), false);

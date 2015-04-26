@@ -9,17 +9,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"budgetCategory_id", "project_id"}))
-public class ProjectBudgetLimit implements EntityBase, Serializable {
+public class ProjectBudgetLimit extends EntityBase implements  Serializable {
   @Id
   @GeneratedValue
-  private int id;
+  private Long id;
   
   @Column(nullable = true, scale = 10, precision = 25)
   private BigDecimal budgetGrantCurrency;
@@ -62,21 +61,15 @@ public class ProjectBudgetLimit implements EntityBase, Serializable {
     this.project = project;
   }
 
-  /**
-   * @return the budgetPercentage
-   */
   public BigDecimal getBudgetPercentage() {
     return budgetPercentage;
   }
 
-  /**
-   * @param budgetPercentage the budgetPercentage to set
-   */
   public void setBudgetPercentage(BigDecimal budgetPercentage) {
     this.budgetPercentage = budgetPercentage;
   }
 
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
 }
