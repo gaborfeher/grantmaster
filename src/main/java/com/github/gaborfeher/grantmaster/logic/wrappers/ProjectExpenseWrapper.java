@@ -98,8 +98,6 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
       editedAccountingCurrencyAmount = getAccountingCurrencyAmount();
     }
-    System.out.println("ProjectExpense.save: 2");
-
     if (editedAccountingCurrencyAmount != null) {
       // Set the allocation size to be right for this entity and flush.
       // This is just an initial fake setting which will be removed while normalizing.

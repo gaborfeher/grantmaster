@@ -33,11 +33,11 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
       EntityManager em, Project project, ProjectReport filterReport) {
     TypedQuery<ProjectSourceWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
-            "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s " +
+            "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s LEFT OUTER JOIN ProjectReport r ON s.report = r " +
             "WHERE s.project = :project " +
             "  AND (:filterReportId IS NULL OR s.report.id = :filterReportId) " +
-            "GROUP BY s " +
-            "ORDER BY s.availabilityDate, s.id", ProjectSourceWrapper.class);
+            "GROUP BY s, r " +
+            "ORDER BY r.reportDate, s.availabilityDate, s.id", ProjectSourceWrapper.class);
     query.setParameter("project", project);
     query.setParameter("filterReportId", filterReport == null ? null : filterReport.getId());
     return query.getResultList();
