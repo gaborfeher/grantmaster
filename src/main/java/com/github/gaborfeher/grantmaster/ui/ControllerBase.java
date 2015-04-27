@@ -62,6 +62,11 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     }
   }
   
+  public void discardNew() {
+    table.getItems().clear();
+    onRefresh();
+  }
+  
   public void onRefresh() {
     Platform.runLater(() -> {
       TableSelectionSaver selectedCell = null;

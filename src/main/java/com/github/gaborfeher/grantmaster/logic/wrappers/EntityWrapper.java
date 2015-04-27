@@ -101,9 +101,10 @@ public abstract class EntityWrapper<T extends EntityBase> {
   
   public void discardEdits() {
     if (state == State.EDITING_NEW) {
-      // This thing will just go away at next refresh.
+      parent.discardNew();
+    } else {
+      parent.onRefresh();
     }
-    parent.onRefresh();
   }
   
   public boolean getIsSummary() {
