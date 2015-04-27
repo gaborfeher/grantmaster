@@ -11,6 +11,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * Connects a ProjectExpense and a ProjectSource entity.
+ * It means that a given amount of money from the source was
+ * used to fulfill the expense. One expense has at least one
+ * source, but it can have more. One source may have any number
+ * of expenses.
+ */
 @Entity
 @Table(
     uniqueConstraints=
@@ -34,48 +41,27 @@ public class ExpenseSourceAllocation implements Serializable {
   public ExpenseSourceAllocation() {
   }
 
-  /**
-   * @return the expense
-   */
   public ProjectExpense getExpense() {
     return expense;
   }
 
-  /**
-   * @param expense the expense to set
-   */
   public void setExpense(ProjectExpense expense) {
     this.expense = expense;
   }
 
-  /**
-   * @return the amount
-   */
   public BigDecimal getAccountingCurrencyAmount() {
     return accountingCurrencyAmount;
   }
 
-  /**
-   * @param amount the amount to set
-   */
   public void setAccountingCurrencyAmount(BigDecimal amount) {
     this.accountingCurrencyAmount = amount;
   }
 
-  /**
-   * @return the source
-   */
   public ProjectSource getSource() {
     return source;
   }
 
-  /**
-   * @param source the source to set
-   */
   public void setSource(ProjectSource source) {
     this.source = source;
-  }
-
-  
-  
+  }  
 }

@@ -5,20 +5,26 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolation;
 
 public abstract class ControllerBase<T extends EntityWrapper> implements Initializable {
   @FXML private TableView<T> table;
   
   @FXML private Node mainNode;
+
+  private ResourceBundle resourceBundle;
  
   protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
@@ -109,16 +115,47 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   }
   
   @Override
-  public void initialize(URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle resourceBundle) {
     mainNode.getProperties().put("controller", this);
     if (table != null) {
       table.getSelectionModel().setCellSelectionEnabled(true);
     }
+    this.resourceBundle = resourceBundle;
   }
   
   private void addMyselfAsParent(List<T> items) {
     for (T entity : items) {
       entity.setParent(this);
     }
+  }
+
+  public void showBackendFailureDialog(String message) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Hiba");
+    alert.setContentText("Nem sikerült a létrehozás\n(" + message + ")");
+    alert.showAndWait();
+  }
+  
+  public void showValidationFailureDialog(
+      Set<ConstraintViolation<T>> constraintViolations) {
+    String message = "Problémák:\n";
+    for (ConstraintViolation<T> violation : constraintViolations) {
+      String violationMessage = violation.getMessage();
+      if (violationMessage.length() > 0 && violationMessage.charAt(0) == '%') {
+        violationMessage =
+            resourceBundle.getString(violationMessage.substring(1));
+      }
+      message += "*" + violationMessage+ "\n";
+    }
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Bevitel hiba");
+    //alert.setHeaderText("Problémák:");
+    //alert.setContentText(message);
+    alert.setResizable(true);
+    TextArea text = new TextArea(message);
+    text.setWrapText(true);
+    text.setEditable(false);
+    alert.setGraphic(text);
+    alert.showAndWait();
   }
 }

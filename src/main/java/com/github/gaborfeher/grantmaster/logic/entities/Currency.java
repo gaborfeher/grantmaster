@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Currency extends EntityBase implements Serializable {
@@ -12,6 +13,7 @@ public class Currency extends EntityBase implements Serializable {
   @GeneratedValue
   private Long id;
   
+  @NotNull(message="%ValidationErrorCurrencyCodeEmpty")
   @Column(nullable = false, unique = true)
   private String code;
   

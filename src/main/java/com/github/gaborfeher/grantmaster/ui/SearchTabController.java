@@ -68,11 +68,12 @@ public class SearchTabController
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+        ProjectExpenseWrapper expenseWrapper = p.getValue();
         ProjectExpense expense = p.getValue().getEntity();
         String result =
             String.format(
                 "%2.2f %s",
-                expense.getAccountingCurrencyAmount(),
+                expenseWrapper.getAccountingCurrencyAmount(),
                 expense.getProject().getAccountCurrency().getCode());
         return new ReadOnlyObjectWrapper<Object>(result);
       }
@@ -89,11 +90,12 @@ public class SearchTabController
         new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
       @Override
       public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+        ProjectExpenseWrapper expenseWrapper = p.getValue();
         ProjectExpense expense = p.getValue().getEntity();
         String result =
             String.format(
                 "%2.2f %s",
-                expense.getGrantCurrencyAmount(),
+                expenseWrapper.getGrantCurrencyAmount(),
                 expense.getProject().getGrantCurrency());
         return new ReadOnlyObjectWrapper<Object>(result);
       }

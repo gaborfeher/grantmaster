@@ -12,33 +12,47 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 
 public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
+  @NotNull(message="%ValidationErrorExpenseAmount")
+  @DecimalMin(value="0.01", message="%ValidationErrorExpenseAmount")
+  private BigDecimal accountingCurrencyAmount;
+  
+  private BigDecimal accountingCurrencyAmountNotEdited;
+  
+  private BigDecimal grantCurrencyAmount;
+  
+  private BigDecimal exchangeRate;
+  
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     super(expense);
-    expense.setAccountingCurrencyAmount(accountingCurrencyAmount);
-    expense.setAccountingCurrencyAmountNotEdited(accountingCurrencyAmount);
-    expense.setGrantCurrencyAmount(grantCurrencyAmount);
-    expense.setExchangeRate(grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC));
+    this.accountingCurrencyAmount = accountingCurrencyAmount;
+    this.accountingCurrencyAmountNotEdited = accountingCurrencyAmount;
+    this.grantCurrencyAmount = grantCurrencyAmount;
+    this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
   }
   
   private void recalculateAllocations(EntityManager em) {
-    BigDecimal accountingCurrencyAmount = (BigDecimal) getProperty("accountingCurrencyAmount");
+    BigDecimal remainingAccountingCurrencyAmount = getAccountingCurrencyAmount();
+    grantCurrencyAmount = BigDecimal.ZERO;
     ProjectExpense expense = (ProjectExpense) entity;
     List<ProjectSourceWrapper> sources = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null);
     expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
     
     for (int i = 0; i < sources.size(); ++i) {
       ProjectSource source = sources.get(i).getEntity();
-      if (accountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
+      if (remainingAccountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
         break;
       }
       if (source.getRemainingAccountingCurrencyAmount().compareTo(BigDecimal.ZERO) > 0) {
-        BigDecimal take = accountingCurrencyAmount.min(source.getRemainingAccountingCurrencyAmount());
+        BigDecimal take = remainingAccountingCurrencyAmount.min(source.getRemainingAccountingCurrencyAmount());
         if (i == sources.size() - 1) {
-          take = accountingCurrencyAmount;  // Allow of going below zero balance for the last source.
+          take = remainingAccountingCurrencyAmount;  // Allow of going below zero balance for the last source.
         }
-        accountingCurrencyAmount = accountingCurrencyAmount.subtract(take, Utils.MC);
+        remainingAccountingCurrencyAmount = remainingAccountingCurrencyAmount.subtract(take, Utils.MC);
+        grantCurrencyAmount = grantCurrencyAmount.add(take.divide(source.getExchangeRate(), Utils.MC), Utils.MC);
         ExpenseSourceAllocation allocation = new ExpenseSourceAllocation();
         allocation.setExpense(expense);
         allocation.setSource(source);
@@ -46,7 +60,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         expense.getSourceAllocations().add(allocation);
       }
     }
-    
+    exchangeRate = accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
     for (ExpenseSourceAllocation allocation : expense.getSourceAllocations()) {
       em.persist(allocation);
     }
@@ -79,11 +93,13 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   
   @Override
   public boolean save(EntityManager em) {
+    super.save(em);
     BigDecimal editedAccountingCurrencyAmount = null;
-    if (entity.getAccountingCurrencyAmount().compareTo(entity.getAccountingCurrencyAmountNotEdited()) != 0) {
-      editedAccountingCurrencyAmount = entity.getAccountingCurrencyAmount();
+    if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
+      editedAccountingCurrencyAmount = getAccountingCurrencyAmount();
     }
-    super.save(em);  // expense is replaced here, transient fields are lost
+    System.out.println("ProjectExpense.save: 2");
+
     if (editedAccountingCurrencyAmount != null) {
       // Set the allocation size to be right for this entity and flush.
       // This is just an initial fake setting which will be removed while normalizing.
@@ -119,6 +135,28 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public Object getProperty(String name) {
+    if ("accountingCurrencyAmount".equals(name)) {
+      return getAccountingCurrencyAmount();
+    } else if ("grantCurrencyAmount".equals(name)) {
+      return getGrantCurrencyAmount();
+    } else if ("exchangeRate".equals(name)) {
+      return getExchangeRate();
+    }
+    return super.getProperty(name);
+  }
+
+  @Override
+  public boolean setProperty(String name, Object value, Class<?> paramType) {
+    if ("accountingCurrencyAmount".equals(name)) {
+      accountingCurrencyAmount = (BigDecimal) value;
+      return true;
+    } else {
+      return super.setProperty(name, value, paramType);
+    }
   }
   
   public static ProjectExpenseWrapper createNew(EntityManager em, Project project) {
@@ -218,5 +256,17 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     em.createQuery("DELETE FROM ProjectExpense p WHERE p.project = :project").
         setParameter("project", project).
         executeUpdate();
+  }
+
+  public BigDecimal getAccountingCurrencyAmount() {
+    return accountingCurrencyAmount;
+  }
+
+  public BigDecimal getGrantCurrencyAmount() {
+    return grantCurrencyAmount;
+  }
+
+  public BigDecimal getExchangeRate() {
+    return exchangeRate;
   }
 }

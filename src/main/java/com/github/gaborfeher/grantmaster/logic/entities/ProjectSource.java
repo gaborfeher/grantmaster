@@ -1,6 +1,5 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
-import com.github.gaborfeher.grantmaster.core.Utils;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 @Entity
@@ -29,16 +30,22 @@ public class ProjectSource extends EntityBase implements  Serializable {
   /**
    * The report in which this income source will be included.
    */
+  @NotNull(message="%ValidationErrorReportEmpty")
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private ProjectReport report;  
   
+  @NotNull(message="%ValidationErrorSourceGrantCurrencyAmount")
+  @DecimalMin(value="0.01", message="%ValidationErrorSourceGrantCurrencyAmount")
   @Column(nullable = false, scale = 10, precision = 25)
   private BigDecimal grantCurrencyAmount;
-      
+
+  @NotNull(message="%ValidationErrorSourceExchangeRate")
+  @DecimalMin(value="0.01", message="%ValidationErrorSourceExchangeRate")
   @Column(nullable = false, scale = 10, precision = 25)
   private BigDecimal exchangeRate;
 
+  @NotNull(message="%ValidationErrorAvailabilityDateEmpty")
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private LocalDate availabilityDate;

@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Project extends EntityBase implements  Serializable {
@@ -21,17 +23,21 @@ public class Project extends EntityBase implements  Serializable {
   @GeneratedValue
   private Long id;
 
+  @Size(min = 1, message = "%ValidationErrorNameEmpty")
   @Column(nullable = false, unique = true)
   private String name;
 
+  @NotNull(message = "%ValidationErrorGrantCurrencyEmpty")
   @ManyToOne
   @JoinColumn(nullable = false)
   private Currency grantCurrency;
 
+  @NotNull(message = "%ValidationErrorAccountingCurrencyEmpty")
   @ManyToOne
   @JoinColumn(nullable = false)
   private Currency accountCurrency;
   
+  @NotNull(message = "%ValidationErrorIncomeCategoryEmpty")
   @ManyToOne
   @JoinColumn(nullable = false)
   private BudgetCategory incomeType;

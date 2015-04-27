@@ -10,6 +10,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(
@@ -26,6 +29,7 @@ public class ProjectBudgetLimit extends EntityBase implements  Serializable {
   @Column(nullable = true, scale = 10, precision = 25)
   private BigDecimal budgetPercentage;
   
+  @NotNull(message = "%ValidationErrorBudgetCategoryEmpty")
   @ManyToOne
   @JoinColumn(nullable = false)
   private BudgetCategory budgetCategory;
@@ -35,6 +39,22 @@ public class ProjectBudgetLimit extends EntityBase implements  Serializable {
   private Project project;
     
   public ProjectBudgetLimit() {
+  }
+  
+  @AssertTrue(message="%ValidationErrorBudgetLimits")
+  private boolean isValid() {
+    if (budgetGrantCurrency == null && budgetPercentage == null) {
+      return false;
+    }
+    if (budgetGrantCurrency != null &&
+        budgetGrantCurrency.compareTo(BigDecimal.ZERO) <= 0) {
+      return false;
+    }
+    if (budgetPercentage != null &&
+        budgetPercentage.compareTo(BigDecimal.ZERO) <= 0) {
+      return false;
+    }
+    return true;
   }
 
   public BigDecimal getBudgetGrantCurrency() {
@@ -69,6 +89,7 @@ public class ProjectBudgetLimit extends EntityBase implements  Serializable {
     this.budgetPercentage = budgetPercentage;
   }
 
+  @Override
   public Long getId() {
     return id;
   }

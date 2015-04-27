@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(
@@ -22,6 +23,7 @@ public class ProjectReport extends EntityBase implements Serializable {
   @GeneratedValue
   private long id;
 
+  @NotNull(message="%ValidationErrorReportDateNotEmpty")
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private LocalDate reportDate;

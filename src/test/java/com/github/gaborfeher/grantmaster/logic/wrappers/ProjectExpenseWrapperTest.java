@@ -90,15 +90,18 @@ public class ProjectExpenseWrapperTest {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
       assertEquals(1, expenses.size());
-      ProjectExpense expense = expenses.get(0).getEntity();
+      ProjectExpenseWrapper expenseWrapper = expenses.get(0);
+      ProjectExpense expense = expenseWrapper.getEntity();
       assertEquals(LocalDate.of(2015, 3, 4), expense.getPaymentDate());
       assertNull(expense.getAccountNo());
       assertNull(expense.getPartnerName());
       assertNull(expense.getComment1());
       assertNull(expense.getComment2());
       assertEquals(HUF, expense.getOriginalCurrency());  // should be default
-      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(expense.getOriginalAmount()));
-      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(expense.getAccountingCurrencyAmount()));
+      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(
+          expense.getOriginalAmount()));
+      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(
+          expenseWrapper.getAccountingCurrencyAmount()));
       return true;
     });
   }
@@ -139,8 +142,8 @@ public class ProjectExpenseWrapperTest {
     }));
     
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
-      ProjectExpense expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
-      ProjectExpense expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
+      ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
+      ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
       assertEquals(0, new BigDecimal("100000", Utils.MC).compareTo(expense1.getAccountingCurrencyAmount()));
       System.out.println(expense1.getAccountingCurrencyAmount() + " " + expense1.getExchangeRate() + " " + expense1.getGrantCurrencyAmount());
       System.out.println(expense2.getAccountingCurrencyAmount() + " " + expense2.getExchangeRate() + " " + expense2.getGrantCurrencyAmount());

@@ -12,9 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class ProjectExpense extends EntityBase implements  Serializable {
@@ -26,6 +29,7 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   @JoinColumn(nullable = false)
   private Project project;
   
+  @NotNull(message="%ValidationErrorPaymentDateEmpty")
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private LocalDate paymentDate;
@@ -33,6 +37,7 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   /**
    * The report in which this expense will be included.
    */
+  @NotNull(message="%ValidationErrorReportEmpty")
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private ProjectReport report;
@@ -40,10 +45,13 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   private String accountNo;
   private String partnerName;
   
+  @NotNull(message="%ValidationErrorBudgetCategoryEmpty")
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private BudgetCategory budgetCategory;
   
+  @NotNull(message="%ValidationErrorExpenseOriginalAmount")
+  @DecimalMin(value="0.00", message="%ValidationErrorExpenseOriginalAmount")
   @Column(nullable = false, scale = 10, precision = 25)
   private BigDecimal originalAmount;
   
@@ -62,21 +70,9 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   
   private String comment2;
   
-  @Transient
-  private BigDecimal accountingCurrencyAmount;
-  
-  @Transient
-  private BigDecimal accountingCurrencyAmountNotEdited;
-  
-  @Transient
-  private BigDecimal grantCurrencyAmount;
-  
-  @Transient
-  private BigDecimal exchangeRate;
-  
   public ProjectExpense() {
   }
-
+  
   @Override
   public Long getId() {
     return id;
@@ -164,38 +160,6 @@ public class ProjectExpense extends EntityBase implements  Serializable {
 
   public void setComment2(String comment2) {
     this.comment2 = comment2;
-  }
-
-  public BigDecimal getAccountingCurrencyAmount() {
-    return accountingCurrencyAmount;
-  }
-
-  public void setAccountingCurrencyAmount(BigDecimal accountingCurrencyAmount) {
-    this.accountingCurrencyAmount = accountingCurrencyAmount;
-  }
-
-  public BigDecimal getGrantCurrencyAmount() {
-    return grantCurrencyAmount;
-  }
-
-  public void setGrantCurrencyAmount(BigDecimal grantCurrencyAmount) {
-    this.grantCurrencyAmount = grantCurrencyAmount;
-  }
-
-  public BigDecimal getExchangeRate() {
-    return exchangeRate;
-  }
-
-  public void setExchangeRate(BigDecimal exchangeRate) {
-    this.exchangeRate = exchangeRate;
-  }
-
-  public BigDecimal getAccountingCurrencyAmountNotEdited() {
-    return accountingCurrencyAmountNotEdited;
-  }
-
-  public void setAccountingCurrencyAmountNotEdited(BigDecimal accountingCurrencyAmountNotEdited) {
-    this.accountingCurrencyAmountNotEdited = accountingCurrencyAmountNotEdited;
   }
 
   public ProjectReport getReport() {

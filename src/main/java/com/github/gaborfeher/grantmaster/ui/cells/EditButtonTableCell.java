@@ -1,7 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.List;
 import java.util.Optional;
@@ -76,17 +75,8 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleSaveButtonClick() {
     final EntityWrapper entityWrapper = getEntityWrapper();
-    boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> entityWrapper.save(em));
-    if (success == true) {
-      entityWrapper.setState(EntityWrapper.State.SAVED);
+    if (entityWrapper.saveNew()) {
       updateItem(entityWrapper.getState(), false);
-      entityWrapper.refresh();
-    } else {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle("Hiba");
-      alert.setHeaderText("Nem sikerült a létrehozás");
-      alert.showAndWait();
-      entityWrapper.refresh();
     }
   }
   

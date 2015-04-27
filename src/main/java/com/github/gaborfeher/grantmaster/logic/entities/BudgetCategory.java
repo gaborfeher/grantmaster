@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(
@@ -17,6 +19,7 @@ public class BudgetCategory extends EntityBase implements   Serializable {
   @GeneratedValue
   private Long id;
   
+  @Size(min = 1, message = "%ValidationErrorNameEmpty")
   @Column(nullable = false)
   private String name;
   
@@ -24,6 +27,7 @@ public class BudgetCategory extends EntityBase implements   Serializable {
     PAYMENT,
     INCOME;
   }
+  @NotNull(message = "%ValidationErrorDirectionEmpty")
   @Column(nullable = false)
   private Direction direction;
   

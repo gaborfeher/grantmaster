@@ -1,12 +1,17 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.core.MyValidatorFactory;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 public abstract class EntityWrapper<T extends EntityBase> {
   protected T entity;
@@ -40,6 +45,21 @@ public abstract class EntityWrapper<T extends EntityBase> {
       refresh();
       return true;
     } else {
+      parent.showBackendFailureDialog("EntityWrapper.commitEdit(): merge");
+      return false;
+    }
+  }
+  
+  public boolean saveNew() {
+    if (!validate()) {
+      return false;
+    }
+    boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> save(em));
+    refresh();
+    if (success == true) {
+      return true;
+    } else {
+      parent.showBackendFailureDialog("EntityWrapper.saveNew(): merge");
       return false;
     }
   }
@@ -57,7 +77,6 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
 
   public boolean setProperty(String name, Object value, Class<?> paramType) {
-    Object entity = getEntity();
     try {
       String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
       entity.getClass().getMethod(setterName, paramType).invoke(entity, value);
@@ -71,7 +90,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
   public Object getProperty(String name) {
     try {
       String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-      return getEntity().getClass().getMethod(getterName).invoke(getEntity());
+      return entity.getClass().getMethod(getterName).invoke(entity);
     } catch (NoSuchMethodException ex) {
       return null;
     } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -84,17 +103,28 @@ public abstract class EntityWrapper<T extends EntityBase> {
     parent.onRefresh();
   }
 
-  public boolean save(EntityManager em) {
-    entity = em.merge(getEntity());
+  protected boolean save(EntityManager em) {
+    entity = em.merge(entity);
     setState(State.SAVED);
-    setEntity(entity);
     return true;
   }
   
+  protected boolean validate() {
+    Validator validator = MyValidatorFactory.SINGLE_INSTANCE.getValidator();
+    Set<ConstraintViolation> constraintViolations = new HashSet<>();
+    constraintViolations.addAll(validator.validate(entity));
+    constraintViolations.addAll(validator.validate(this));
+    if (constraintViolations.isEmpty()) {
+      return true;
+    } else {
+      parent.showValidationFailureDialog(constraintViolations);
+      return false;
+    }
+  }
+  
   public void delete(EntityManager em) {
-    EntityBase entityBase = getEntity();
-    if (entityBase != null) {
-      EntityBase entity = (EntityBase) em.find(entityBase.getClass(), entityBase.getId());
+    if (entity != null) {
+      entity = (T) em.find(entity.getClass(), entity.getId());
       em.remove(entity);
     }
   }
@@ -124,10 +154,10 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
 
   public Long getId() {
-    if (getEntity() == null) {
+    if (entity == null) {
       return null;
     } else {
-      return getEntity().getId();
+      return entity.getId();
     }
   }
   
