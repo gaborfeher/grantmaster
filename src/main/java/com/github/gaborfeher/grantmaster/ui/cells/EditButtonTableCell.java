@@ -75,7 +75,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleSaveButtonClick() {
     final EntityWrapper entityWrapper = getEntityWrapper();
-    if (entityWrapper.saveNew()) {
+    if (entityWrapper.saveNewInstance()) {
       updateItem(entityWrapper.getState(), false);
     }
   }

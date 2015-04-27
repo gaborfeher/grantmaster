@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import java.util.Set;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -9,6 +10,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javax.validation.ConstraintViolation;
 
 public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
   final String property;
@@ -32,7 +34,6 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
         @Override
         public void handle(KeyEvent event) {
           if (event.getCode().equals(KeyCode.ENTER)) {
-            System.out.println("enter-handle " + editTextField.getText() + " " + Thread.currentThread());
             parseAndCommit(editTextField.getText());
           } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             userCancelled = true;
@@ -45,7 +46,6 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
           @Override
           public void changed(ObservableValue<? extends Boolean> ov, Boolean t1, Boolean t2) {
             if (!t2 && t1) {
-              System.out.println("focusChanged " + editTextField.getText() + " " + Thread.currentThread());
               parseAndCommit(editTextField.getText());
             }
           }
@@ -69,10 +69,10 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
       commitEdit(parsed);
     } else {
       userCancelled = true;
+      cancelEdit();
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setHeaderText(stringConverter.getParseError());
       alert.showAndWait();
-      cancelEdit();
     }
   }
   
@@ -84,6 +84,11 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
     if (getEntityWrapper().commitEdit(property, val, valueType)) {
       super.commitEdit(val);
       updateItem(val, false);
+    } else {
+      userCancelled = true;
+      cancelEdit();
+      getEntityWrapper().validate(true);  // Show validation error dialog.
+      getEntityWrapper().refresh();
     }
   }
 

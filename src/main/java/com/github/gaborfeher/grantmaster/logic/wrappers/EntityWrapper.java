@@ -40,6 +40,12 @@ public abstract class EntityWrapper<T extends EntityBase> {
       // click the create button to commit them.
       return true;
     }
+    if (!validate(false)) {
+      // Validate but don't show error dialog. This is a hack to avoid showing
+      // the dialog twich with TextFieldTableCell. The table cell needs to clean
+      // up it's state before the dialog is shown.
+      return false;
+    }
     if (DatabaseSingleton.INSTANCE.transaction(
         (EntityManager em) -> save(em))) {
       refresh();
@@ -50,8 +56,13 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
   }
   
-  public boolean saveNew() {
-    if (!validate()) {
+  public boolean saveNewInstance() {
+    if (state != State.EDITING_NEW) {
+      // TODO(gaborfeher): Log.
+      return false;
+    }
+    if (!validate(true)) {
+      refresh();
       return false;
     }
     boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> save(em));
@@ -109,15 +120,22 @@ public abstract class EntityWrapper<T extends EntityBase> {
     return true;
   }
   
-  protected boolean validate() {
+  private Set<ConstraintViolation> checkValidationConstraints() {
     Validator validator = MyValidatorFactory.SINGLE_INSTANCE.getValidator();
     Set<ConstraintViolation> constraintViolations = new HashSet<>();
     constraintViolations.addAll(validator.validate(entity));
     constraintViolations.addAll(validator.validate(this));
+    return constraintViolations;
+  }
+  
+  public boolean validate(boolean showDialog) {
+    Set<ConstraintViolation> constraintViolations = checkValidationConstraints();
     if (constraintViolations.isEmpty()) {
       return true;
     } else {
-      parent.showValidationFailureDialog(constraintViolations);
+      if (showDialog) {
+        parent.showValidationFailureDialog(constraintViolations);
+      }
       return false;
     }
   }
