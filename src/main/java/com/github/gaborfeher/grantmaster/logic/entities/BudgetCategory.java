@@ -19,7 +19,8 @@ public class BudgetCategory extends EntityBase implements   Serializable {
   @GeneratedValue
   private Long id;
   
-  @Size(min = 1, message = "%ValidationErrorNameEmpty")
+  @NotNull(message="%ValidationErrorNameEmpty")
+  @Size(min=1, message="%ValidationErrorNameEmpty")
   @Column(nullable = false)
   private String name;
   
@@ -27,7 +28,7 @@ public class BudgetCategory extends EntityBase implements   Serializable {
     PAYMENT,
     INCOME;
   }
-  @NotNull(message = "%ValidationErrorDirectionEmpty")
+  @NotNull(message="%ValidationErrorDirectionEmpty")
   @Column(nullable = false)
   private Direction direction;
   

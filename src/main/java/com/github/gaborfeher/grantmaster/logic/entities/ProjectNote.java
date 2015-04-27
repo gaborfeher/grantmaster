@@ -25,6 +25,7 @@ public class ProjectNote extends EntityBase implements Serializable {
   @Column(nullable = false)
   private Timestamp entryTime;
   
+  @NotNull(message="%ValidationErrorNoteEmpty")
   @Size(min=1, message="%ValidationErrorNoteEmpty")
   @Column(nullable = false)
   private String note;

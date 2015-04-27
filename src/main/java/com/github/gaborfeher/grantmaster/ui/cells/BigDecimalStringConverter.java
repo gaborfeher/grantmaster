@@ -2,12 +2,17 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParsePosition;
+import javafx.scene.control.Alert;
 
 class BigDecimalStringConverter extends MultiStringConverter<BigDecimal> {
-  final DecimalFormat formatter;
+  final DecimalFormat displayFormatter;
+  final DecimalFormat editFormatter;
   
   public BigDecimalStringConverter() {
-    formatter = new DecimalFormat("#,##0.00");
+    displayFormatter = new DecimalFormat("#,##0.00");
+    editFormatter = new DecimalFormat("#0.00");
+    editFormatter.setParseBigDecimal(true);
   }
 
   @Override
@@ -15,7 +20,7 @@ class BigDecimalStringConverter extends MultiStringConverter<BigDecimal> {
     if (t == null) {
       return "";
     }
-    return formatter.format(t);
+    return displayFormatter.format(t);
   }
 
   @Override
@@ -23,7 +28,13 @@ class BigDecimalStringConverter extends MultiStringConverter<BigDecimal> {
     if (string == null) {
       return null;
     }
-    return new BigDecimal(string);
+    ParsePosition pos = new ParsePosition(0);
+    BigDecimal value = (BigDecimal) editFormatter.parse(string, pos);
+    if (pos.getIndex() == string.length()) {
+      return value;
+    } else {
+      return null;
+    }
   }
   
   @Override
@@ -31,7 +42,11 @@ class BigDecimalStringConverter extends MultiStringConverter<BigDecimal> {
     if (t == null) {
       return null;
     }
-    return String.format("%2.2f", t);
+    return editFormatter.format(t);
   }
-  
+
+  @Override
+  public String getParseError() {
+    return "Ismeretlen számformátum.";
+  }
 }

@@ -8,14 +8,17 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyEvent;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 
@@ -84,6 +87,9 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
       if (selectedCell != null) {
         selectedCell.restore();
       }
+      if (table != null) {
+        table.requestFocus();
+      }
     });
   }
   
@@ -116,11 +122,29 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    this.resourceBundle = resourceBundle;
+    // Store a pointer to this controller in the main node of the JFX GUI node
+    // strucutre.
     mainNode.getProperties().put("controller", this);
+    
     if (table != null) {
       table.getSelectionModel().setCellSelectionEnabled(true);
+      // Start editing the selected cell if a key is pressed.
+      table.setOnKeyPressed(new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent event) {
+          if (!event.getCode().isDigitKey() && !event.getCode().isLetterKey()) {
+            return;
+          }
+          ObservableList<TablePosition> selectedCells = table.getSelectionModel().getSelectedCells();
+          if (selectedCells.size() != 1) {
+            return;
+          }
+          TablePosition selectedCell = selectedCells.get(0);
+          table.edit(selectedCell.getRow(), selectedCell.getTableColumn());
+        }
+      });
     }
-    this.resourceBundle = resourceBundle;
   }
   
   private void addMyselfAsParent(List<T> items) {

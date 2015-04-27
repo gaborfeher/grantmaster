@@ -12,7 +12,7 @@
   <children>
     <TabPane VBox.vgrow="ALWAYS">
       <tabs>
-        <Tab text="%BudgetCategoriesTabName" closable="false" >
+        <Tab text="%ProjectBudgetCategoriesTabName" closable="false" >
           <fx:include source="ProjectBudgetCategoriesTab.fxml" fx:id="projectBudgetCategoriesTab" />
         </Tab>
         <Tab text="%SourcesTabName" closable="false" >

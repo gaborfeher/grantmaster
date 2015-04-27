@@ -4,7 +4,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,10 +22,9 @@ public class MainApp extends Application {
     controller = loader.getController();
     controller.setStage(stage);
 
-
     Scene scene = new Scene(root);
     scene.getStylesheets().add("/styles/Styles.css");
-    stage.setTitle("GrantMaster - Költségvetés Tervező - v0.4");
+    stage.setTitle("GrantMaster - Költségvetés Tervező - v0.5");
     stage.setMaximized(true);
     stage.setScene(scene);
     stage.show();

@@ -12,4 +12,8 @@ public abstract class MultiStringConverter<T extends Object>
   public String toEditableString(T t) {
     return toString(t);
   }
+  
+  public String getParseError() {
+    return null;
+  }
 }

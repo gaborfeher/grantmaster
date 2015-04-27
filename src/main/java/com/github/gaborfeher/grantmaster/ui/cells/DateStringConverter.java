@@ -28,5 +28,9 @@ class DateStringConverter extends MultiStringConverter<LocalDate> {
       return null;
     }
   }
-  
+
+  @Override
+  public String getParseError() {
+    return "Ismeretlen dátumformátum.";
+  }
 }

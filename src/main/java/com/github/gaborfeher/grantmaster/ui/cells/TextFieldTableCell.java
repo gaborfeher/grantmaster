@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -31,7 +32,8 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
         @Override
         public void handle(KeyEvent event) {
           if (event.getCode().equals(KeyCode.ENTER)) {
-            commitEdit(stringConverter.fromString(editTextField.getText()));
+            System.out.println("enter-handle " + editTextField.getText() + " " + Thread.currentThread());
+            parseAndCommit(editTextField.getText());
           } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             userCancelled = true;
             cancelEdit();
@@ -43,16 +45,37 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
           @Override
           public void changed(ObservableValue<? extends Boolean> ov, Boolean t1, Boolean t2) {
             if (!t2 && t1) {
-              commitEdit(stringConverter.fromString(editTextField.getText()));
+              System.out.println("focusChanged " + editTextField.getText() + " " + Thread.currentThread());
+              parseAndCommit(editTextField.getText());
             }
           }
-    });
+        }
+    );
   }
 
   private EntityWrapper getEntityWrapper() {
     return (EntityWrapper) getTableRow().getItem();
   }
 
+  private void parseAndCommit(String val) {
+    if (userCancelled) {
+      return;  // User cancel was before this commit message, ignore this.
+    }
+    if (val == null) {
+      return;
+    }
+    T parsed = stringConverter.fromString(val);
+    if (parsed != null) {
+      commitEdit(parsed);
+    } else {
+      userCancelled = true;
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setHeaderText(stringConverter.getParseError());
+      alert.showAndWait();
+      cancelEdit();
+    }
+  }
+  
   @Override  
   public void commitEdit(T val) {
     if (userCancelled) {
