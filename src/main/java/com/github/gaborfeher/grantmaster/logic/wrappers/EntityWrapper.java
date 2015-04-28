@@ -6,6 +6,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,10 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
 
   public boolean commitEdit(String property, Object val, Class<?> valueType) {
+    if (Objects.equals(val, getProperty(property))) {
+      return true;
+    }
+    
     if (!setProperty(property, val, valueType)) {
       return false;
     }

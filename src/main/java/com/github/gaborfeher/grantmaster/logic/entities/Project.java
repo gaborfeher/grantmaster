@@ -23,7 +23,8 @@ public class Project extends EntityBase implements  Serializable {
   @GeneratedValue
   private Long id;
 
-  @Size(min = 1, message = "%ValidationErrorNameEmpty")
+  @NotNull(message = "%ValidationErrorNameEmpty")
+  @Size(min = 1, message="%ValidationErrorNameEmpty")
   @Column(nullable = false, unique = true)
   private String name;
 
@@ -42,7 +43,7 @@ public class Project extends EntityBase implements  Serializable {
   @JoinColumn(nullable = false)
   private BudgetCategory incomeType;
 
-  @OneToMany(mappedBy="project")
+  @OneToMany(mappedBy = "project")
   private List<ProjectReport> reports;
   
   public Project() {
