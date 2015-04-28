@@ -10,7 +10,7 @@
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectTabController">
   <children>
-    <TabPane VBox.vgrow="ALWAYS">
+    <TabPane VBox.vgrow="ALWAYS" fx:id="projectTabs">
       <tabs>
         <Tab text="%ProjectBudgetCategoriesTabName" closable="false" >
           <fx:include source="ProjectBudgetCategoriesTab.fxml" fx:id="projectBudgetCategoriesTab" />

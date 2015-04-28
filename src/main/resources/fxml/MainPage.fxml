@@ -10,9 +10,10 @@
   <children>
     <HBox>
       <children>
-        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" />  
-        <Button text="%SaveDatabase" onAction="#handleSaveButtonAction" />  
-        <Button text="%NewDatabase" onAction="#handleNewButtonAction" />  
+        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" />
+        <Button text="%SaveDatabase" onAction="#handleSaveButtonAction" />
+        <Button text="%NewDatabase" onAction="#handleNewButtonAction" />
+        <Button text="%ExportSheet" onAction="#handleExportSheetButtonAction" />
       </children>
     </HBox>
     <TextField fx:id="pathLabel" editable="false" />
@@ -22,7 +23,7 @@
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>
         <Tab text="%BudgetCategoriesTabName" closable="false">
-          <fx:include source="BudgetCategoriesTab.fxml" />
+          <fx:include source="BudgetCategoriesTab.fxml" fx:id="budgetCategoriesTab" />
         </Tab>
         <Tab text="%CurrenciesTabName" closable="false">
           <fx:include source="CurrenciesTab.fxml" />

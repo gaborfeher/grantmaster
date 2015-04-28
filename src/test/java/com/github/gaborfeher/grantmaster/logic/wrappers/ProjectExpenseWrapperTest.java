@@ -145,8 +145,6 @@ public class ProjectExpenseWrapperTest {
       ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
       ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
       assertEquals(0, new BigDecimal("100000", Utils.MC).compareTo(expense1.getAccountingCurrencyAmount()));
-      System.out.println(expense1.getAccountingCurrencyAmount() + " " + expense1.getExchangeRate() + " " + expense1.getGrantCurrencyAmount());
-      System.out.println(expense2.getAccountingCurrencyAmount() + " " + expense2.getExchangeRate() + " " + expense2.getGrantCurrencyAmount());
       assertEquals(0, new BigDecimal("200", Utils.MC).compareTo(expense1.getExchangeRate()));
       assertEquals(0, new BigDecimal("500", Utils.MC).compareTo(expense1.getGrantCurrencyAmount()));
       

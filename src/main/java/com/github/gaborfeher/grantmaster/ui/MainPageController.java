@@ -42,6 +42,9 @@ public class MainPageController implements Initializable {
   
   @FXML ProjectListTabController projectListTabController;
   
+  // tmp
+  @FXML BudgetCategoriesTabController budgetCategoriesTabController;
+  
   /**
    * The database file which is open. null for newly created databases.
    * This is the file what the user sees at save/open, not the temporary
@@ -92,7 +95,7 @@ public class MainPageController implements Initializable {
   private void resetAndRefreshTabs() {
     closeProjectTabs();
     mainTabs.getSelectionModel().selectFirst();
-    TabSelectionChangeListener.refreshTab(mainTabs.getTabs().get(0));
+    TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(0));
   }
  
   public void addProjectTab(final Project project) throws IOException {
@@ -106,21 +109,23 @@ public class MainPageController implements Initializable {
     controller = loader.getController();
     controller.init(project);
     newTab.setContent(projectPage);
-    
-    for (Node child : projectPage.getChildrenUnmodifiable()) {
-      if (child instanceof TabPane) {
-        // TODO(gaborfeher): find by id.
-        ((TabPane) child).getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
-      }
-    }
-    
     mainTabs.getSelectionModel().select(newTab);
   }
   
-  private FileChooser getFileChooser() {
+  private TabPane findTabPaneChild(Parent page) {
+    for (Node child : page.getChildrenUnmodifiable()) {
+      if (child instanceof TabPane) {
+        return (TabPane) child;
+      }
+    }
+    return null;
+  }
+  
+  private FileChooser getFileChooserForHdbFiles(String title) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("zip-compressed hsqldb files", "*.hdb"));
     fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get(0));
+    fileChooser.setTitle(title);
     return fileChooser;
   }
   
@@ -129,11 +134,8 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return;
     }
-    
     DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
-    FileChooser fileChooser = getFileChooser();
-    fileChooser.setTitle("Adatbázis megnyitása");
-    
+    FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis megnyitása");
     File path = fileChooser.showOpenDialog(stage);
     if (path == null) {
       return;
@@ -178,11 +180,12 @@ public class MainPageController implements Initializable {
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
     DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
-
     if (openedFile == null && connection.isConnected()) {
-      FileChooser fileChooser = getFileChooser();
-      fileChooser.setTitle("Adatbázis mentése");
+      FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis mentése");
       openedFile = fileChooser.showSaveDialog(stage);
+      if (openedFile == null) {
+        return;
+      }
       if (!openedFile.getAbsolutePath().endsWith(".hdb")) {
         openedFile = new File(openedFile.getAbsolutePath() + ".hdb");
         if (openedFile.exists()) {
@@ -198,21 +201,37 @@ public class MainPageController implements Initializable {
     if (openedFile == null) {
       return;
     }
-    // TODO: don't delete before writing.
-    if (openedFile.exists()) {
-      try {
-        Files.delete(openedFile.toPath());
-      } catch (IOException ex) {
-        Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    }
-    
     try {
       File tmpFile = connection.saveDatabase(openedFile);
       pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
     } catch (IOException ex) {
       Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
     }    
+  }
+  
+  @FXML
+  private void handleExportSheetButtonAction(ActionEvent event) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("Excel spreadsheets (*.xls)", "*.xls"));
+    fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get(0));
+    fileChooser.setTitle("Exportálás Excel táblázatba");
+    File exportFile = fileChooser.showSaveDialog(stage);
+    if (exportFile == null) {
+      return;
+    }
+    if (!exportFile.getAbsolutePath().endsWith(".xls")) {
+      exportFile = new File(exportFile.getAbsolutePath() + ".xls");
+      if (exportFile.exists()) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("A fájl már létezik");
+        alert.setHeaderText("Felülírhatom ezt a fájlt?\n" + exportFile.getAbsolutePath());
+        if (alert.showAndWait().get() != ButtonType.OK) {
+          exportFile = null;
+        } 
+      }
+    }
+    
+    ControllerBase.exportActiveTabToXls(exportFile);
   }
 
   @Override

@@ -152,7 +152,6 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
           <groupId>org.apache.geronimo.specs</groupId>
           <artifactId>geronimo-validation_1.0_spec</artifactId>
@@ -162,6 +161,11 @@
           <groupId>org.apache.bval</groupId>
           <artifactId>org.apache.bval.bundle</artifactId>
           <version>0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.11</version>
         </dependency>
     </dependencies>
 </project>

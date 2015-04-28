@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -13,7 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -23,8 +24,16 @@ import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 
 public abstract class ControllerBase<T extends EntityWrapper> implements Initializable {
+  /**
+   * The main table displaying the data in this tab.
+   */
   @FXML private TableView<T> table;
   
+  /**
+   * The root node of this tab. The only reason we need access to it here
+   * is to store a pointer to this controller inside it as user payload. That
+   * in turn is used by TabSelectionChangeListener.
+   */
   @FXML private Node mainNode;
 
   private ResourceBundle resourceBundle;
@@ -32,67 +41,55 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
   
-  static class TableSelectionSaver<T extends EntityWrapper> {
-    TableView<T> table = null;
-    TableColumn selectedColumn = null;
-    Object selectedEntityId = null;  // null means first line (new item)
-    int selectedRow = 0;
-
-    TableSelectionSaver(TableView<T> table) {
-      this.table = table;
-      if (table.getSelectionModel().getSelectedCells().size() > 0) {
-        TablePosition selectedCell =
-            table.getSelectionModel().getSelectedCells().get(0);
-        selectedColumn = selectedCell.getTableColumn();
-        selectedEntityId = table.getItems().get(selectedCell.getRow()).getId();
-        selectedRow = selectedCell.getRow();
-      }
-    }
-    
-    void restore() {
-      if (selectedColumn != null) {
-        if (selectedEntityId != null) {
-          int row = 0;
-          while (row < table.getItems().size() && 
-                 !selectedEntityId.equals(table.getItems().get(row).getId())) {
-            row++;
-          }
-          if (row < table.getItems().size()) {
-            selectedRow = row;
-          }
-        }
-        if (selectedRow < table.getItems().size()) {
-          table.getSelectionModel().clearAndSelect(
-              selectedRow, selectedColumn);
-        }
-      } else {
-        table.getSelectionModel().clearSelection();
-      }
-    }
-  }
+  static protected ControllerBase activeTab = null;
+  
   
   public void discardNew() {
     table.getItems().clear();
     onRefresh();
   }
   
+  /**
+   * Refreshes the content of the table of this controller. The refresh
+   * task is posted to the end of the the Java FX event queue to avoid
+   * bad interactions with the processing of the current event. This protection
+   * is needed for tricky events like cell editing is finished, etc.
+   */
   public void onRefresh() {
     Platform.runLater(() -> {
-      TableSelectionSaver selectedCell = null;
-      if (table != null) {
-        selectedCell = new TableSelectionSaver(table);
-        table.getSelectionModel().clearSelection();
-      }
-      ControllerBase.this.refreshContent();
-      if (selectedCell != null) {
-        selectedCell.restore();
-      }
-      if (table != null) {
-        table.requestFocus();
-      }
+      refreshContentAndMaintainFocus();
     });
   }
   
+  public void onMyTabIsSelected() {
+    refreshContentAndMaintainFocus();
+    activeTab = this;
+  }
+  
+  /**
+   * Refreshes the content of the table immediately.
+   */
+  private void refreshContentAndMaintainFocus() {
+    TableSelectionSaver selectedCell = null;
+    if (table != null) {
+      selectedCell = new TableSelectionSaver(table);
+      table.getSelectionModel().clearSelection();
+    }
+    ControllerBase.this.refreshContent();
+    if (selectedCell != null) {
+      selectedCell.restore();
+    }
+    if (table != null) {
+      table.requestFocus();
+    }
+  }
+  
+  /**
+   * Refreshes the content of the table immediately, using queried data
+   * from the underlying database. Subclasses may add additional work
+   * inside getItemListForRefresh. This method does not care about maintaining
+   * correct focus and cell selection of the table.
+   */
   protected void refreshContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       ObservableList<T> items = table.getItems();
@@ -181,5 +178,16 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     text.setEditable(false);
     alert.setGraphic(text);
     alert.showAndWait();
+  }
+  
+  static void exportActiveTabToXls(File file) {
+    if (activeTab != null) {
+      activeTab.exportToXls(file);
+    }
+  }
+
+  private void exportToXls(File file) {  
+    ExcelExporter exporter = new ExcelExporter(table);
+    exporter.export(file);
   }
 }
