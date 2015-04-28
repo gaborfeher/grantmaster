@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -57,25 +56,30 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
    */
   public void onRefresh() {
     Platform.runLater(() -> {
-      refreshContentAndMaintainFocus();
+      refreshOtherContent();
+      refreshTableContentAndMaintainFocus();
     });
   }
   
   public void onMyTabIsSelected() {
-    refreshContentAndMaintainFocus();
+    refreshOtherContent();
+    refreshTableContentAndMaintainFocus();
     activeTab = this;
+  }
+  
+  protected void refreshOtherContent() {
   }
   
   /**
    * Refreshes the content of the table immediately.
    */
-  private void refreshContentAndMaintainFocus() {
+  protected void refreshTableContentAndMaintainFocus() {
     TableSelectionSaver selectedCell = null;
     if (table != null) {
       selectedCell = new TableSelectionSaver(table);
       table.getSelectionModel().clearSelection();
     }
-    ControllerBase.this.refreshContent();
+    ControllerBase.this.refreshTableContent();
     if (selectedCell != null) {
       selectedCell.restore();
     }
@@ -90,7 +94,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
    * inside getItemListForRefresh. This method does not care about maintaining
    * correct focus and cell selection of the table.
    */
-  protected void refreshContent() {
+  protected void refreshTableContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       ObservableList<T> items = table.getItems();
       if (items.isEmpty() ||

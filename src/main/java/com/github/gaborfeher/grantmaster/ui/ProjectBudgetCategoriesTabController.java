@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
@@ -12,6 +13,8 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWra
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.math.BigDecimal;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.scene.control.ChoiceBox;
 import javax.persistence.EntityManager;
@@ -36,10 +39,6 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
     return ProjectBudgetCategoryWrapper.createNew(project);
   }
   
-  public void filterUpdateAction(Event event) {
-    onRefresh();
-  }
-  
   public void filterResetButtonAction(ActionEvent event) {
     filterReport.setValue(null);
     onRefresh();
@@ -47,6 +46,12 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
   
   void init(Project project) {
     this.project = project;
+    filterReport.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectReport>() {
+      @Override
+      public void changed(ObservableValue<? extends ProjectReport> observable, ProjectReport oldValue, ProjectReport newValue) {
+        refreshTableContent();
+      }
+    });
   }
   
   @Override
@@ -65,19 +70,25 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
         lastLine.addBudgetAmounts(source.getEntity().getAccountingCurrencyAmount(), source.getEntity().getGrantCurrencyAmount());
       }
     }
+  }
+  
+  @Override
+  protected void refreshOtherContent() {
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+      spentGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
+      remainingAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+      remainingGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
+      budgetAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
+      budgetGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
 
-    spentAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
-    spentGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
-    remainingAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
-    remainingGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
-    budgetAccountingCurrencyColumn.setText(project.getAccountCurrency().getCode());
-    budgetGrantCurrencyColumn.setText(project.getGrantCurrency().getCode());
-    
-    ProjectReport reportValue = filterReport.getValue();
-    filterReport.getItems().clear();
-    filterReport.getItems().add(null);
-    filterReport.getItems().addAll(ProjectReportWrapper.getProjectReportsWithoutWrapping(em, project));
-    filterReport.setValue(reportValue);
+      ProjectReport reportValue = filterReport.getValue();
+      filterReport.getItems().clear();
+      filterReport.getItems().add(null);
+      filterReport.getItems().addAll(ProjectReportWrapper.getProjectReportsWithoutWrapping(em, project));
+      filterReport.setValue(reportValue);
+      return true;
+    });
   }
 
 }
