@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.core.DatabaseConnection;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
@@ -10,8 +11,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -69,9 +68,10 @@ public class MainPageController implements Initializable {
         return true;
       } else if (userChoice == saveButtonType) {
         handleSaveButtonAction(null);
-        return true;
+        return !DatabaseSingleton.INSTANCE.getUnsavedChange();
       } else {
-        return false;  // TODO(gaborfeher): log this
+        logger.warn("allowCloseDatabase(): unknown userChoice: {}", userChoice);
+        return false;
       }
     }
     return true;
@@ -132,23 +132,24 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return;
     }
-    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
     FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis megnyitása");
     File path = fileChooser.showOpenDialog(stage);
     if (path == null) {
       return;
     }
-    openedFile = path;
-    File tmpFile;
-    if ((tmpFile = connection.openDatabase(openedFile)) == null) {
+    DatabaseConnection connection = DatabaseConnection.openDatabase(path);
+    if (connection != null) {
+      DatabaseSingleton.INSTANCE.setConnection(connection);
+      openedFile = path;
+      resetAndRefreshTabs();
+      pathLabel.setText(openedFile.getAbsolutePath());
+    } else {
       Alert alert = new Alert(AlertType.ERROR);
       alert.setTitle("Adatbázis megnyitás");
       alert.setHeaderText("Hiba az adatbázisfájl megnyitása közben.");
       alert.showAndWait();
       return;
     }
-    resetAndRefreshTabs();
-    pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
   }
   
   @FXML
@@ -156,29 +157,28 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return;
     }
-    
-    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
-    closeProjectTabs();
-    openedFile = null;
-    
-    File tempDir = connection.createNewDatabase();
-    
-    boolean result = connection.transaction((EntityManager em) -> {
-      CurrencyWrapper.createDefaultCurrencies(em);
-      GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
-      return true;
-    });
-    if (!result) {
-      return;
+    DatabaseConnection connection = DatabaseConnection.createNewDatabase();
+    if (connection != null) {
+      closeProjectTabs();
+      openedFile = null;
+      DatabaseSingleton.INSTANCE.setConnection(connection);
+      boolean result = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+        CurrencyWrapper.createDefaultCurrencies(em);
+        GlobalBudgetCategoryWrapper.createDefaultBudgetCategories(em);
+        return true;
+      });
+      if (!result) {
+        DatabaseSingleton.INSTANCE.setConnection(null);
+        return;
+      }
+      resetAndRefreshTabs();
+      pathLabel.setText("új adatbázis");
     }
-    resetAndRefreshTabs();
-    pathLabel.setText("NEW DATABASE ;  tmp= " + tempDir.getAbsolutePath());    
   }
   
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
-    DatabaseSingleton connection = DatabaseSingleton.INSTANCE;
-    if (openedFile == null && connection.isConnected()) {
+    if (openedFile == null && DatabaseSingleton.INSTANCE.isConnected()) {
       FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis mentése");
       openedFile = fileChooser.showSaveDialog(stage);
       if (openedFile == null) {
@@ -200,8 +200,8 @@ public class MainPageController implements Initializable {
       return;
     }
     try {
-      File tmpFile = connection.saveDatabase(openedFile);
-      pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
+      DatabaseSingleton.INSTANCE.saveDatabase(openedFile);
+      pathLabel.setText(openedFile.getAbsolutePath());
     } catch (IOException ex) {
       logger.error(null, ex);
     }    

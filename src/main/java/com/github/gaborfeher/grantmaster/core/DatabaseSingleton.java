@@ -2,115 +2,30 @@ package com.github.gaborfeher.grantmaster.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum DatabaseSingleton {
   INSTANCE;
-  
-  private static final Logger logger = LoggerFactory.getLogger(DatabaseSingleton.class);
-
-  
-  private EntityManagerFactory entityManagerFactory;
 
   /**
    * Handles the archive file which stores the database. null if no
    * database is open.
    */
-  private DatabaseArchive archive;
-
-  /**
-   * true if there was a successful transaction since the last save.
-   */
-  private boolean unsavedChanges;
+  private DatabaseConnection connection;
   
   private DatabaseSingleton() {
   }
   
-  public void cleanup() {
-    close();
-    if (archive != null) {
-      archive.close();
-      archive = null;
-    }
-  }
-    
-  private void close() {
-    unsavedChanges = false;
-    if (entityManagerFactory != null) {
-      entityManagerFactory.close();
-      entityManagerFactory = null;
-    }
-  }
-
-  public File createNewDatabase() {
-    logger.info("createNewDatabase");
-    cleanup();
-    archive = DatabaseArchive.createNew();
-    if (archive != null && connectToFile(archive.getFile())) {
-      return archive.getFile();
-    }
-    return null;
-  }
-  
-  private boolean connectToJdbcUrl(String jdbcUrl) {
-    if (entityManagerFactory != null) {
-      throw new RuntimeException("Cannot connect while previous connection is active.");
-    }
-    entityManagerFactory = null;
-    Map<String, String> properties = new HashMap<>();
-    properties.put("javax.persistence.jdbc.url", jdbcUrl);
-    try {
-      entityManagerFactory = Persistence.createEntityManagerFactory(
-          "LocalH2ConnectionTemplate", properties);
-    } catch (PersistenceException ex) {
-      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
-    }
-    return entityManagerFactory != null;
-
-  }
-  
-  public boolean connectToMemoryFileForTesting() {
-    return connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
-  }
-  
-  private boolean connectToFile(File file) {
-    return connectToJdbcUrl("jdbc:hsqldb:file:" + new File(file, "database") +";shutdown=true");
-  }
-  
-  public File saveDatabase(File path) throws IOException {
-    logger.info("saveDatabase({})", path);
-    close();
-    archive.saveTo(path);
-    unsavedChanges = false;
-    connectToFile(archive.getFile());
-    return archive.getFile();
-  }
-  
-  /**
-   * Returns the temporary directory where the database files are extracted.
-   * @param path
-   * @return 
-   */
-  public File openDatabase(File path) {
-    logger.info("openDatabase({})", path);
-    cleanup();
-    archive = DatabaseArchive.open(path);
-    if (archive != null) {
-      connectToFile(archive.getFile());
-      return archive.getFile();
-    }
-    return null;
+  public void setConnection(DatabaseConnection connection) {
+    this.connection = connection;
   }
   
   public boolean transaction(TransactionRunner runner) {
+    EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
     if (entityManagerFactory == null) {
       return false;
     }
@@ -133,11 +48,12 @@ public enum DatabaseSingleton {
     } finally {
       entityManager.close();
     }
-    unsavedChanges = true;
+    connection.setUnsavedChanges(true);
     return true;
   }
   
   public boolean query(TransactionRunner runner) {
+    EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
     if (entityManagerFactory == null) {
       return false;
     }
@@ -151,17 +67,41 @@ public enum DatabaseSingleton {
     return result;
   }
 
+  private EntityManagerFactory getEntityManagerFactory() {
+    if (connection == null) {
+      return null;
+    }
+    return connection.getEntityManagerFactory();
+  }
+  
   public boolean isConnected() {
-    return entityManagerFactory != null;
+    return connection != null;
   }
   
   public boolean getUnsavedChange() {
-    return unsavedChanges;
+    return connection != null && connection.isUnsavedChanges();
   }
 
   public void refresh(Object entity) {
-    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    EntityManager entityManager = getEntityManagerFactory().createEntityManager();
     entityManager.refresh(entity);
     entityManager.close();
+  }
+
+  public void cleanup() {
+    if (connection != null) {
+      connection.cleanup();
+    }
+  }
+
+  public void saveDatabase(File path) throws IOException {
+    if (connection != null) {
+      connection.saveDatabase(path);
+    }
+  }
+
+  public boolean connectToMemoryFileForTesting() {
+    connection = DatabaseConnection.createNewMemoryDatabaseForTesting();
+    return connection != null;
   }
 }
