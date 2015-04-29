@@ -124,20 +124,4 @@ public class GlobalBudgetCategoryWrapperTest {
     });
   }
   
-  @Test
-  public void testGetYearlyBudgetCategorySummaries_Expenses() {
-    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
-      List<GlobalBudgetCategoryWrapper> incomes = new ArrayList<>();
-      List<GlobalBudgetCategoryWrapper> expenses = new ArrayList<>();
-      Set<String> columnNames = new HashSet<>();
-      GlobalBudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
-          em,
-          expenses,
-          incomes,
-          columnNames);
-      System.out.println(incomes.size() + " " + expenses.size());
-      return true;
-    });
-  }
-  
 }
