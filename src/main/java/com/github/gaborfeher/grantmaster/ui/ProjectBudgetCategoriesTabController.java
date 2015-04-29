@@ -16,7 +16,6 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import java.math.BigDecimal;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.Event;
 import javafx.scene.control.ChoiceBox;
 import javax.persistence.EntityManager;
 

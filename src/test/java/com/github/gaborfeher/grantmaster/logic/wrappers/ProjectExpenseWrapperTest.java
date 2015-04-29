@@ -154,7 +154,40 @@ public class ProjectExpenseWrapperTest {
       assertEquals(0, new BigDecimal("1500", Utils.MC).compareTo(expense2.getGrantCurrencyAmount()));
       return true;
     }));
-    
-    
+  }
+  
+  @Test
+  public void testCreateOvershootExpense() {
+    final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
+      return true;
+    })); 
+    newExpense.get().setState(EntityWrapper.State.EDITING_NEW);
+    newExpense.get().setProperty(
+        "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
+    newExpense.get().setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    newExpense.get().setProperty(
+        "originalAmount", new BigDecimal("1.5", Utils.MC),BigDecimal.class);
+    newExpense.get().setProperty(
+        "accountingCurrencyAmount", new BigDecimal("700000", Utils.MC), BigDecimal.class);
+    newExpense.get().setProperty(
+        "report", PROJECT1_REPORT1, ProjectReport.class);
+
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      newExpense.get().save(em);
+      return true;
+    }));
+    assertEquals(EntityWrapper.State.SAVED, newExpense.get().getState());
+
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
+      assertEquals(1, expenses.size());
+      ProjectExpenseWrapper expenseWrapper = expenses.get(0);
+      assertEquals(0, new BigDecimal("700000", Utils.MC).compareTo(
+          expenseWrapper.getAccountingCurrencyAmount()));
+      return true;
+    });
   }
 }

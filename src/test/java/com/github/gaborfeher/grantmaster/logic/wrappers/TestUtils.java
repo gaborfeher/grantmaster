@@ -12,6 +12,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
 
@@ -140,6 +141,21 @@ public class TestUtils {
       }
     }
     return null;
+  }
+
+  static ProjectBudgetCategoryWrapper findByBudgetCategory(
+      List<ProjectBudgetCategoryWrapper> list, BudgetCategory filter) {
+    ProjectBudgetCategoryWrapper result = null;
+    for (ProjectBudgetCategoryWrapper cur : list) {
+      if (cur.getBudgetCategory().getId().equals(filter.getId())) {
+        if (result != null) {
+          throw new RuntimeException("Multiple matches.");
+        } else {
+          result = cur;
+        }
+      }
+    }
+    return result;
   }
 
 }
