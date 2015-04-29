@@ -9,7 +9,15 @@ import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
 
-public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase<BudgetCategory> {
+/**
+ * Wraps a BudgetCategory entity and stores yearly spending summaries of
+ * the expenses OR incomes in that category. The currency of the summaries
+ * is the accounting currency of the expense. Each year-accounting currency
+ * pair will get a table column, i.e. an entry in computedValues.
+ */
+public class GlobalBudgetCategoryWrapper
+    extends BudgetCategoryWrapperBase<BudgetCategory> {
+  // Column Name to summary value, e.g. "2015 (HUF)" -> 1,000,000
   protected final Map<String, BigDecimal> computedValues;
   
   public GlobalBudgetCategoryWrapper(BudgetCategory budgetCategory) {
@@ -118,8 +126,6 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Budge
   /**
    * Retrieves all the budget categories. Each one is populated with yearly
    * summaries of its corresponding expense or income.
-   * @param paymentCategories
-   * @param incomeCategories 
    */
   public static void getYearlyBudgetCategorySummaries(
       EntityManager em,

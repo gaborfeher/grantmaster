@@ -5,7 +5,6 @@ import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
 
 public class ProjectBudgetCategoryWrapperTest {
   Currency HUF;
@@ -78,22 +78,18 @@ public class ProjectBudgetCategoryWrapperTest {
   public void testProjectExpenseSummariesNoFilter() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectBudgetCategoryWrapper> list = ProjectBudgetCategoryWrapper.getProjectBudgetLimits(em, PROJECT1, null);
-      assertEquals(
-          0,
-          new BigDecimal("7500.3", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentAccountingCurrency")));
-      assertEquals(
-          0,
-          new BigDecimal("75.003", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentGrantCurrency")));
-      assertEquals(
-          0,
-          new BigDecimal("2501.1", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT2).getProperty("spentAccountingCurrency")));
-      assertEquals(
-          0,
-          new BigDecimal("2502.1", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT3).getProperty("spentAccountingCurrency")));      
+      assertBigDecimalEquals(
+          "7500.3",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentAccountingCurrency"));
+      assertBigDecimalEquals(
+          "75.003",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentGrantCurrency"));
+      assertBigDecimalEquals(
+          "2501.1",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT2).getProperty("spentAccountingCurrency"));
+      assertBigDecimalEquals(
+          "2502.1",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT3).getProperty("spentAccountingCurrency"));
       return true;
     });
   }
@@ -102,14 +98,12 @@ public class ProjectBudgetCategoryWrapperTest {
   public void testProjectExpenseSummariesWithFilter() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectBudgetCategoryWrapper> list = ProjectBudgetCategoryWrapper.getProjectBudgetLimits(em, PROJECT1, PROJECT1_REPORT1);
-      assertEquals(
-          0,
-          new BigDecimal("5000.2", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentAccountingCurrency")));
-      assertEquals(
-          0,
-          new BigDecimal("50.002", Utils.MC).compareTo(
-              (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentGrantCurrency")));
+      assertBigDecimalEquals(
+          "5000.2",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentAccountingCurrency"));
+      assertBigDecimalEquals(
+          "50.002",
+          TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentGrantCurrency"));
       assertNull(TestUtils.findByBudgetCategory(list, PAYMENT_CAT2));
       assertNull(TestUtils.findByBudgetCategory(list, PAYMENT_CAT3));
       return true;

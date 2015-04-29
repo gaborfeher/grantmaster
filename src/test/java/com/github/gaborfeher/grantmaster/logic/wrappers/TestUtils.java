@@ -144,10 +144,11 @@ public class TestUtils {
     return null;
   }
 
-  static ProjectBudgetCategoryWrapper findByBudgetCategory(
-      List<ProjectBudgetCategoryWrapper> list, BudgetCategory filter) {
-    ProjectBudgetCategoryWrapper result = null;
-    for (ProjectBudgetCategoryWrapper cur : list) {
+  static BudgetCategoryWrapperBase findByBudgetCategory(
+      List list, BudgetCategory filter) {
+    BudgetCategoryWrapperBase result = null;
+    for (Object curObj : list) {
+      BudgetCategoryWrapperBase cur = (BudgetCategoryWrapperBase)curObj;
       if (cur.getBudgetCategory().getId().equals(filter.getId())) {
         if (result != null) {
           throw new RuntimeException("Multiple matches.");
@@ -159,11 +160,11 @@ public class TestUtils {
     return result;
   }
 
-  static void assertBigDecimalEquals(BigDecimal expected, BigDecimal tested) {
-    assertEquals(0, expected.compareTo(tested));
+  static void assertBigDecimalEquals(BigDecimal expected, Object tested) {
+    assertEquals(0, expected.compareTo((BigDecimal)tested));
   }
   
-  static void assertBigDecimalEquals(String expected, BigDecimal tested) {
+  static void assertBigDecimalEquals(String expected, Object tested) {
     assertBigDecimalEquals(new BigDecimal(expected, Utils.MC), tested);
   }
 }
