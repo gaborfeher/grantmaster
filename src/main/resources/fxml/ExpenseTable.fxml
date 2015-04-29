@@ -10,7 +10,7 @@
 
 <TableView xmlns:fx="http://javafx.com/fxml/1" editable="true" fx:controller="com.github.gaborfeher.grantmaster.ui.ExpenseTableController" VBox.vgrow="ALWAYS">
   <columns>
-    <TableColumn prefWidth="150" sortable="false" styleClass="editColumn">
+    <TableColumn prefWidth="115" sortable="false" styleClass="editColumn">
       <cellFactory>
         <EditButtonTableCellFactory />
       </cellFactory>
@@ -23,20 +23,20 @@
         <EntityPropertyValueFactory property="project" />
       </cellValueFactory>
     </TableColumn> 
-    <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false" styleClass="textColumn">
-      <cellFactory>
-        <DateTableCellFactory property="paymentDate" /> 
-      </cellFactory>
-      <cellValueFactory>
-        <EntityPropertyValueFactory property="paymentDate" />
-      </cellValueFactory>
-    </TableColumn>
     <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
       <cellFactory>
         <ProjectReportTableCellFactory property="report" />
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="report" />
+      </cellValueFactory>
+    </TableColumn>
+    <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false" styleClass="textColumn">
+      <cellFactory>
+        <DateTableCellFactory property="paymentDate" /> 
+      </cellFactory>
+      <cellValueFactory>
+        <EntityPropertyValueFactory property="paymentDate" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseAccountNo" prefWidth="120" sortable="false" styleClass="textColumn" >
@@ -63,7 +63,7 @@
         <EntityPropertyValueFactory property="budgetCategory" /> 
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="150">
+    <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="130">
       <cellFactory>
         <BigDecimalTableCellFactory property="originalAmount" />
       </cellFactory>

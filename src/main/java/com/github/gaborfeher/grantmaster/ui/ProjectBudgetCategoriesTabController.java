@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
@@ -64,11 +65,18 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
             project,
             report);
     BudgetCategoryWrapperBase.createBudgetSummaryList(em, paymentLines, "Összes projektbevétel és -költség", items);
+    ProjectBudgetCategoryWrapper lastLineSummary = null;
     if (items.size() > 0) {
-      ProjectBudgetCategoryWrapper lastLine = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);
-      for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(em, project, report)) {
-        lastLine.addBudgetAmounts(source.getEntity().getAccountingCurrencyAmount(), source.getEntity().getGrantCurrencyAmount());
-      }
+      lastLineSummary = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);
+    } else {
+      lastLineSummary = new ProjectBudgetCategoryWrapper("Összes projektbevétel és -költség");
+      lastLineSummary.setLimit(BigDecimal.ZERO, new ProjectBudgetLimit());
+      lastLineSummary.setIsSummary(true);
+      lastLineSummary.setState(null);
+      items.add(lastLineSummary);
+    }
+    for (ProjectSourceWrapper source : ProjectSourceWrapper.getProjectSources(em, project, report)) {
+      lastLineSummary.addBudgetAmounts(source.getEntity().getAccountingCurrencyAmount(), source.getEntity().getGrantCurrencyAmount());
     }
   }
   

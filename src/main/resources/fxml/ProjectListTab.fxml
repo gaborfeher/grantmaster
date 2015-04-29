@@ -12,9 +12,9 @@
   <children>
     <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
       <columns>
-        <TableColumn prefWidth="150" styleClass="editColumn" sortable="false" >
+        <TableColumn prefWidth="115" styleClass="editColumn" sortable="false" >
           <cellFactory>
-            <EditButtonTableCellFactory extraButtonText="Megnyitás" onAction="#handleOpenButtonAction" />
+            <EditButtonTableCellFactory extraButtonText="%OpenProject" onAction="#handleOpenButtonAction" />
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="state" /> 

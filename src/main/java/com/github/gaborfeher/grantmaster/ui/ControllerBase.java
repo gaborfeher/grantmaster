@@ -4,6 +4,7 @@ import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -106,23 +107,25 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
    */
   protected void refreshTableContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
-      ObservableList<T> items = table.getItems();
-      if (items.isEmpty() ||
-          items.get(0).getState() != EntityWrapper.State.EDITING_NEW) {
-        items.clear();
+      ObservableList<T> tableItems = table.getItems();
+      if (tableItems.isEmpty() ||
+          tableItems.get(0).getState() != EntityWrapper.State.EDITING_NEW) {
+        tableItems.clear();
         // Add the editable empty new element at first position.
         T wrapper = createNewEntity(em);
         if (wrapper != null) {
           wrapper.setState(EntityWrapper.State.EDITING_NEW);
-          items.add(wrapper);
+          tableItems.add(wrapper);
         }
       } else {
         // Keep the editable empty new element at first position, remove the
         // rest.
-        items.remove(1, items.size());
+        tableItems.remove(1, tableItems.size());
       }
-      getItemListForRefresh(em, items);
-      addMyselfAsParent(items);
+      List<T> queriedItems = new ArrayList<>();
+      getItemListForRefresh(em, queriedItems);
+      tableItems.addAll(queriedItems);
+      addMyselfAsParent(tableItems);
       return true;
     });
   }

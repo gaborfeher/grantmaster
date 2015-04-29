@@ -12,20 +12,12 @@
   <children>
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS">
       <columns>
-        <TableColumn prefWidth="150" sortable="false" styleClass="editColumn">
+        <TableColumn prefWidth="115" sortable="false" styleClass="editColumn">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>
           <cellValueFactory>
             <PropertyValueFactory property="state" /> 
-          </cellValueFactory>
-        </TableColumn>
-        <TableColumn text="%ProjectSourceAvailabilityDate" prefWidth="120" sortable="false" styleClass="textColumn">
-          <cellFactory>
-            <DateTableCellFactory property="availabilityDate" /> 
-          </cellFactory>
-          <cellValueFactory>
-            <EntityPropertyValueFactory property="availabilityDate" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
@@ -34,6 +26,14 @@
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="report" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectSourceAvailabilityDate" prefWidth="100" sortable="false" styleClass="textColumn">
+          <cellFactory>
+            <DateTableCellFactory property="availabilityDate" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="availabilityDate" /> 
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectSourceExchangeRate" styleClass="numColumn" prefWidth="100" sortable="false">

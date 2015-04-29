@@ -12,7 +12,7 @@
   <children>
     <TableView fx:id="table" VBox.vgrow="ALWAYS" editable="true">
       <columns>
-        <TableColumn editable="false" prefWidth="150" styleClass="editColumn" sortable="false">
+        <TableColumn editable="false" prefWidth="115" styleClass="editColumn" sortable="false">
           <cellFactory>
             <EditButtonTableCellFactory />
           </cellFactory>

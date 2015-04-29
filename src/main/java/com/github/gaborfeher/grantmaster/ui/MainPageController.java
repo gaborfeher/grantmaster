@@ -32,6 +32,12 @@ import org.slf4j.LoggerFactory;
 public class MainPageController implements Initializable {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MainPageController.class);
   
+  /**
+   * Number of static tabs shown. (The ones that are not open/close-able
+   * project tabs.
+   */
+  private static final int NUM_SYSTEM_TABS = 4;
+  
   @FXML private TextField pathLabel;
   @FXML Parent root;
   @FXML TabPane mainTabs;
@@ -87,7 +93,7 @@ public class MainPageController implements Initializable {
   
   private void closeProjectTabs() {
     mainTabs.getSelectionModel().selectFirst();
-    mainTabs.getTabs().remove(4, mainTabs.getTabs().size());
+    mainTabs.getTabs().remove(NUM_SYSTEM_TABS, mainTabs.getTabs().size());
   }
   
   private void resetAndRefreshTabs() {
@@ -97,9 +103,17 @@ public class MainPageController implements Initializable {
   }
  
   public void addProjectTab(final Project project) throws IOException {
+    for (int i = NUM_SYSTEM_TABS; i < mainTabs.getTabs().size(); ++i) {
+      Tab alreadyOpenTab = mainTabs.getTabs().get(i);
+      if (project.getName().equals(alreadyOpenTab.getText())) {
+        // The requested project is already open.
+        mainTabs.getSelectionModel().select(alreadyOpenTab);
+        return;
+      }
+    }
+    // Do the Java FX magic of opening the tab.
     Tab newTab = new Tab(project.getName());
     mainTabs.getTabs().add(newTab);
-    
     final ProjectTabController controller;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
     loader.setResources(ResourceBundle.getBundle("bundles.MainPage", new Locale("hu")));

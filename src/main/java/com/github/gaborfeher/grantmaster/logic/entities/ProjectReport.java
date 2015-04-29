@@ -42,7 +42,7 @@ public class ProjectReport extends EntityBase implements Serializable {
   
   @Override
   public String toString() {
-    return project.getName() + ":" + reportDate.toString();
+    return "R" + reportDate.toString();
   }
 
   public LocalDate getReportDate() {
