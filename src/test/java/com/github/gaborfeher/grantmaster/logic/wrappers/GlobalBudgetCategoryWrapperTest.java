@@ -89,7 +89,7 @@ public class GlobalBudgetCategoryWrapperTest {
   }
   
   @Test
-  public void testGetYearlyBudgetCategorySummaries_Columns() {
+  public void testGetYearlyBudgetCategorySummaries() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<GlobalBudgetCategoryWrapper> incomes = new ArrayList<>();
       List<GlobalBudgetCategoryWrapper> expenses = new ArrayList<>();
