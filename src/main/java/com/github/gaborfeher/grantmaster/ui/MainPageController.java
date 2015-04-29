@@ -2,13 +2,11 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -30,8 +28,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.persistence.EntityManager;
+import org.slf4j.LoggerFactory;
 
 public class MainPageController implements Initializable {
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MainPageController.class);
+  
   @FXML private TextField pathLabel;
   @FXML Parent root;
   @FXML TabPane mainTabs;
@@ -41,9 +42,6 @@ public class MainPageController implements Initializable {
   Stage stage;
   
   @FXML ProjectListTabController projectListTabController;
-  
-  // tmp
-  @FXML BudgetCategoriesTabController budgetCategoriesTabController;
   
   /**
    * The database file which is open. null for newly created databases.
@@ -205,7 +203,7 @@ public class MainPageController implements Initializable {
       File tmpFile = connection.saveDatabase(openedFile);
       pathLabel.setText(openedFile.getAbsolutePath() + " ;  tmp= " + tmpFile);
     } catch (IOException ex) {
-      Logger.getLogger(MainPageController.class.getName()).log(Level.SEVERE, null, ex);
+      logger.error(null, ex);
     }    
   }
   

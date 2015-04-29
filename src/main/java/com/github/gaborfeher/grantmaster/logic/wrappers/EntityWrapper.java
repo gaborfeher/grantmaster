@@ -8,13 +8,26 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Base class for all the entity wrappers. An entity wrapper wraps a JPA
+ * Entity object. It provides functions for handling computed data fields, and
+ * more importantly the wrapper bridges interaction between GUI controls and the
+ * entities.
+ * The JPA entities supported here have to be subclasses of EntityBase.
+ * The GUI controls talking to EntityWrapper objects are the Java FX tab
+ * controllers derived from ControllerBase, and the Java FX table cell
+ * implementations in the ui.cells subpackage.
+ * 
+ * @param <T> Type of entity to wrap.
+ */
 public abstract class EntityWrapper<T extends EntityBase> {
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EntityWrapper.class);
+  
   protected T entity;
   
   public static enum State {
@@ -33,6 +46,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
 
   public boolean commitEdit(String property, Object val, Class<?> valueType) {
+    logger.info("commitEdit({}, {}, {})", property, val, valueType);
     if (Objects.equals(val, getProperty(property))) {
       return true;
     }
@@ -98,7 +112,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
       entity.getClass().getMethod(setterName, paramType).invoke(entity, value);
       return true;
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-      Logger.getLogger(EntityWrapper.class.getName()).log(Level.SEVERE, null, ex);
+      logger.error("Cannot set property: EntityWrapper.setProperty({})", name, ex);
       return false;
     }
   }
@@ -110,7 +124,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     } catch (NoSuchMethodException ex) {
       return null;
     } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-      Logger.getLogger(EntityWrapper.class.getName()).log(Level.SEVERE, "Property not found: " + name, ex);
+      logger.error("Property not found: EntityWrapper.getProperty({})", name, ex);
       return null;
     }
   }

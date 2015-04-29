@@ -19,6 +19,11 @@
       <property name="javax.persistence.jdbc.password" value=""/>
       <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbc.JDBCDriver"/>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
+
+      <property name="eclipselink.logging.level" value="INFO" />
+      <property name="eclipselink.logging.parameters" value="true" />
+      <property name="eclipselink.logging.timestamp" value="false" />
+      <property name="eclipselink.logging.logger" value="com.github.gaborfeher.grantmaster.core.Slf4jSessionLogger" />				
     </properties>
   </persistence-unit>
 </persistence>

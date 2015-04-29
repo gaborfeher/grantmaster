@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -23,11 +21,14 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.DateFormatConverter;
+import org.slf4j.LoggerFactory;
 
 class ExcelExporter {
+  private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExcelExporter.class);
+
   private final TableView table;
   
-  ExcelExporter(TableView table) {
+  public ExcelExporter(TableView table) {
     this.table = table;
   }
   
@@ -124,11 +125,12 @@ class ExcelExporter {
     try (FileOutputStream out = new FileOutputStream(file)) {
       workbook.write(out);
     } catch (IOException ex) {
-      Logger.getLogger(ExcelExporter.class.getName()).log(Level.SEVERE, null, ex);
+      logger.error(null, ex);
     }
   }
 
   public void export(File file) {
+    logger.info("export({})", file);
     HSSFWorkbook workbook = createSpreadSheet();
     saveSpreadSheet(workbook, file);
   }

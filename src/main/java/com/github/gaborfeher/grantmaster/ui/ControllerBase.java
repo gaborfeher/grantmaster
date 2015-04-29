@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -21,7 +22,16 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * Base class for most of the tab controllers in this applications.
+ * All the tab controllers that are showing an (editable) table with a list
+ * of entities are derived from this class. (The entities in the table are
+ * JPA Entities wrapped in their corresponding EntityWrapper subclasses.)
+ * @param <T> 
+ */
 public abstract class ControllerBase<T extends EntityWrapper> implements Initializable {
   /**
    * The main table displaying the data in this tab.

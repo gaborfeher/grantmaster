@@ -14,7 +14,7 @@ public abstract class BetterChoiceBoxTableCell<S extends EntityWrapper, T> exten
   private class FocusChangeListener implements ChangeListener<Boolean> {
     @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-      if (newValue) {
+      if (newValue && !isEditing()) {
         startEdit();
       }
     }

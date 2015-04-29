@@ -4,16 +4,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum DatabaseSingleton {
   INSTANCE;
+  
+  private static final Logger logger = LoggerFactory.getLogger(DatabaseSingleton.class);
+
   
   private EntityManagerFactory entityManagerFactory;
 
@@ -48,6 +51,7 @@ public enum DatabaseSingleton {
   }
 
   public File createNewDatabase() {
+    logger.info("createNewDatabase");
     cleanup();
     archive = DatabaseArchive.createNew();
     if (archive != null && connectToFile(archive.getFile())) {
@@ -67,7 +71,7 @@ public enum DatabaseSingleton {
       entityManagerFactory = Persistence.createEntityManagerFactory(
           "LocalH2ConnectionTemplate", properties);
     } catch (PersistenceException ex) {
-      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, ex);
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
     }
     return entityManagerFactory != null;
 
@@ -82,6 +86,7 @@ public enum DatabaseSingleton {
   }
   
   public File saveDatabase(File path) throws IOException {
+    logger.info("saveDatabase({})", path);
     close();
     archive.saveTo(path);
     unsavedChanges = false;
@@ -95,6 +100,7 @@ public enum DatabaseSingleton {
    * @return 
    */
   public File openDatabase(File path) {
+    logger.info("openDatabase({})", path);
     cleanup();
     archive = DatabaseArchive.open(path);
     if (archive != null) {
@@ -119,7 +125,7 @@ public enum DatabaseSingleton {
         return false;
       }
     } catch (Throwable t) {
-      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, t);
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, t);
       if (transaction.isActive()) {
         transaction.rollback();
       }

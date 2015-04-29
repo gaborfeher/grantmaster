@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import com.github.gaborfeher.grantmaster.ui.MainApp;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,16 +9,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Packs and unpacks a zip file into a temporary directory. The files of
  * a HSQLDB database will be stored in the zip file.
  */
 public class DatabaseArchive {
+  private static final Logger logger = LoggerFactory.getLogger(DatabaseArchive.class);
+  
   /**
    * Directory where the database files are stored while the database is open.
    */
@@ -82,7 +86,7 @@ public class DatabaseArchive {
     try {
       return Files.createTempDirectory("gmtmp").toFile();
     } catch (IOException ex) {
-      Logger.getLogger(DatabaseSingleton.class.getName()).log(Level.SEVERE, null, ex);
+      logger.error(null, ex);
       return null;
     }
   }
