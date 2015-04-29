@@ -14,13 +14,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
+  private static final Logger logger = LoggerFactory.getLogger(ProjectExpenseWrapper.class);
+
   @NotNull(message="%ValidationErrorExpenseAmount")
   @DecimalMin(value="0.01", message="%ValidationErrorExpenseAmount")
   private BigDecimal accountingCurrencyAmount;
   
-  private BigDecimal accountingCurrencyAmountNotEdited;
+  private final BigDecimal accountingCurrencyAmountNotEdited;
   
   private BigDecimal grantCurrencyAmount;
   
@@ -34,49 +38,64 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
   }
   
+  /**
+   * Adds an expense source allocation to this expense. In other words,
+   * spent money is added. Not that grantCurrencyAmount is updated but
+   * accountingCurrencyAmount is not, because it is assumed that
+   * recalculateAllocations is taking care of it.
+   */
+  private void addAllocation(
+      ProjectSource source,
+      BigDecimal accountingCurrencyAmountToTake) {
+    grantCurrencyAmount = grantCurrencyAmount.add(
+        accountingCurrencyAmountToTake.divide(source.getExchangeRate(), Utils.MC), Utils.MC);
+    ExpenseSourceAllocation allocation = new ExpenseSourceAllocation();
+    allocation.setExpense(entity);
+    allocation.setSource(source);
+    allocation.setAccountingCurrencyAmount(accountingCurrencyAmountToTake);
+    entity.getSourceAllocations().add(allocation);
+  }
+  
+  /**
+   * Recalculate the sourceAllocations array. So that this expense uses the
+   * earliest free sources for its cost. Preconditions: the
+   * accountingCurrencyAmount member variable should store the desired value
+   * of this expense. sourceAllocations should be empty, and any previously
+   * used allocations should be deleted (and flushed) from the database.
+   */
   private void recalculateAllocations(EntityManager em) {
-    BigDecimal remainingAccountingCurrencyAmount = getAccountingCurrencyAmount();
+    BigDecimal remainingAccountingCurrencyAmount = accountingCurrencyAmount;
     grantCurrencyAmount = BigDecimal.ZERO;
-    ProjectExpense expense = (ProjectExpense) entity;
-    List<ProjectSourceWrapper> sources = ProjectSourceWrapper.getProjectSources(em, expense.getProject(), null);
-    expense.setSourceAllocations(new ArrayList<ExpenseSourceAllocation>());
+    List<ProjectSourceWrapper> sources =
+        ProjectSourceWrapper.getProjectSourceListForAllocation(em, entity.getProject());
+    entity.setSourceAllocations(new ArrayList<>());
     
     for (int i = 0; i < sources.size(); ++i) {
       ProjectSource source = sources.get(i).getEntity();
       if (remainingAccountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
-        break;
+        break;  // Done
       }
-      if (source.getRemainingAccountingCurrencyAmount().compareTo(BigDecimal.ZERO) > 0) {
-        BigDecimal take = remainingAccountingCurrencyAmount.min(source.getRemainingAccountingCurrencyAmount());
-        if (i == sources.size() - 1) {
-          take = remainingAccountingCurrencyAmount;  // Allow of going below zero balance for the last source.
-        }
+      // Minimum of needed amount and available amount from this source:
+      BigDecimal take = remainingAccountingCurrencyAmount.min(source.getRemainingAccountingCurrencyAmount());
+      if (i == sources.size() - 1) {
+        // Allow of going below zero balance for the last source.
+        take = remainingAccountingCurrencyAmount;
+      }
+      if (take.compareTo(BigDecimal.ZERO) > 0) {
         remainingAccountingCurrencyAmount = remainingAccountingCurrencyAmount.subtract(take, Utils.MC);
-        grantCurrencyAmount = grantCurrencyAmount.add(take.divide(source.getExchangeRate(), Utils.MC), Utils.MC);
-        ExpenseSourceAllocation allocation = new ExpenseSourceAllocation();
-        allocation.setExpense(expense);
-        allocation.setSource(source);
-        allocation.setAccountingCurrencyAmount(take);
-        expense.getSourceAllocations().add(allocation);
+        addAllocation(source, take);
       }
     }
     exchangeRate = accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
-    for (ExpenseSourceAllocation allocation : expense.getSourceAllocations()) {
+    for (ExpenseSourceAllocation allocation : entity.getSourceAllocations()) {
       em.persist(allocation);
     }
   }
   
   public static void updateExpenseAllocations(EntityManager em, Project project, LocalDate startingFrom) {
     // Get list of expenses to update.
-    List<ProjectExpenseWrapper> expensesToUpdate;
-    if (startingFrom != null) {
-      expensesToUpdate = getProjectExpenseListQuery(em, project, false, " AND e.report.reportDate >= :date").
-          setParameter("date", startingFrom).
-          getResultList();
-    } else {
-      expensesToUpdate = getProjectExpenseListQuery(em, project, false, "").getResultList();
-    }
-    
+    List<ProjectExpenseWrapper> expensesToUpdate =
+        getProjectExpenseListForAllocation(em, project, startingFrom);
     // Delete allocations and flush this to database. (Accounting currency amounts
     // are still kept in the database.)
     for (ProjectExpenseWrapper e : expensesToUpdate) {
@@ -129,7 +148,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
 
     if (entity.getSourceAllocations() == null || entity.getSourceAllocations().isEmpty()) {
-      System.out.println("save failed with empty alloc list");
+      logger.error("saving expense failed with empty alloc list");
       return false;
     }
     return true;
@@ -173,14 +192,33 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     em.remove(mergedExpense);
     em.flush();
     updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
-    getParent().onRefresh();
+    refresh();
   }
   
   public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {
     return getProjectExpenseListQuery(em, project, true, "").getResultList();
   }
   
-  public static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
+  /**
+   * @return List of expenses in the order they should be taken when allocating
+   * sources.( Note that filtering is only based on report date, therefore
+   * earlier expenses in a report may be have their allocations recalculated
+   * unnecessarily.)
+   */
+  public static List<ProjectExpenseWrapper> getProjectExpenseListForAllocation(
+      EntityManager em,
+      Project project,
+      LocalDate earliestReportDate) {
+    if (earliestReportDate != null) {
+      return getProjectExpenseListQuery(em, project, false, " AND e.report.reportDate >= :date").
+          setParameter("date", earliestReportDate).
+          getResultList();
+    } else {
+      return getProjectExpenseListQuery(em, project, false, "").getResultList();
+    }
+  }
+  
+  private static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
     String sortString = descending ? " DESC" : "";
     String queryString =
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +

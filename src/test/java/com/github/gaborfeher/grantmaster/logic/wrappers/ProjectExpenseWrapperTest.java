@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
 
 public class ProjectExpenseWrapperTest {
   Currency HUF;
@@ -47,12 +48,14 @@ public class ProjectExpenseWrapperTest {
           em, PROJECT1, LocalDate.of(2015, 4, 1));
       PROJECT1_REPORT2 = TestUtils.createProjectReport(
           em, PROJECT1, LocalDate.of(2015, 8, 1));
+      // The below is the order in which the sources will be filled, because
+      // report date takes precedence at sorting.
       TestUtils.createProjectSource(
           em, PROJECT1, LocalDate.of(2015, 2, 1), PROJECT1_REPORT1, "100", "1000");
       TestUtils.createProjectSource(
           em, PROJECT1, LocalDate.of(2015, 4, 1), PROJECT1_REPORT1, "200", "1000");
       TestUtils.createProjectSource(
-          em, PROJECT1, LocalDate.of(2015, 6, 1), PROJECT1_REPORT1, "300", "1000");
+          em, PROJECT1, LocalDate.of(2015, 3, 1), PROJECT1_REPORT2, "300", "1000");
       return true;
     }));
   }
@@ -98,12 +101,82 @@ public class ProjectExpenseWrapperTest {
       assertNull(expense.getComment1());
       assertNull(expense.getComment2());
       assertEquals(HUF, expense.getOriginalCurrency());  // should be default
-      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(
-          expense.getOriginalAmount()));
-      assertEquals(0, new BigDecimal("100000.5", Utils.MC).compareTo(
-          expenseWrapper.getAccountingCurrencyAmount()));
+      assertBigDecimalEquals("100000.5", expense.getOriginalAmount());
+      assertBigDecimalEquals("100000.5", expenseWrapper.getAccountingCurrencyAmount());
       return true;
     });
+  }
+
+  /**
+   * Make sure that the sorting used for recalculating
+   * project expense-source allocations
+   * is correct.
+   */
+  @Test
+  public void testSortingForAllocation() {
+    final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId2 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId3 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId4 = new ObjectHolder<>();
+    // Setup.
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expenseId1.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 2, 1),
+              PROJECT1_REPORT2,
+              "200421",
+              HUF,
+              "200000.1"
+          ).getId());  
+      expenseId2.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 4, 2),
+              PROJECT1_REPORT1,
+              "200422",
+              HUF,
+              "200000.2"
+          ).getId());
+      expenseId3.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 1, 1),
+              PROJECT1_REPORT2,
+              "200423",
+              HUF,
+              "200000.3"
+          ).getId());
+      expenseId4.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 4, 1),
+              PROJECT1_REPORT1,
+              "200424",
+              HUF,
+              "200000.4"
+          ).getId());
+      return true;
+    }));
+    // Check order.
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses =
+          ProjectExpenseWrapper.getProjectExpenseListForAllocation(em, PROJECT1, null);
+      assertEquals(4, expenses.size());
+      assertEquals(expenseId4.get(), expenses.get(0).getId());
+      assertEquals(expenseId2.get(), expenses.get(1).getId());
+      assertEquals(expenseId3.get(), expenses.get(2).getId());
+      assertEquals(expenseId1.get(), expenses.get(3).getId());
+      return true;
+    }));
   }
 
   @Test
@@ -144,14 +217,87 @@ public class ProjectExpenseWrapperTest {
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
       ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
-      assertEquals(0, new BigDecimal("100000", Utils.MC).compareTo(expense1.getAccountingCurrencyAmount()));
-      assertEquals(0, new BigDecimal("200", Utils.MC).compareTo(expense1.getExchangeRate()));
-      assertEquals(0, new BigDecimal("500", Utils.MC).compareTo(expense1.getGrantCurrencyAmount()));
       
-      assertEquals(0, new BigDecimal("200000", Utils.MC).compareTo(expense2.getAccountingCurrencyAmount()));
+      assertBigDecimalEquals("100000", expense1.getAccountingCurrencyAmount());
+      assertBigDecimalEquals("200", expense1.getExchangeRate());
+      assertBigDecimalEquals("500", expense1.getGrantCurrencyAmount());
+      assertBigDecimalEquals("200000", expense2.getAccountingCurrencyAmount());
       BigDecimal value133_33 = new BigDecimal("200000", Utils.MC).divide(new BigDecimal("1500", Utils.MC), Utils.MC);
-      assertEquals(0, value133_33.compareTo(expense2.getExchangeRate()));
-      assertEquals(0, new BigDecimal("1500", Utils.MC).compareTo(expense2.getGrantCurrencyAmount()));
+      assertBigDecimalEquals(value133_33, expense2.getExchangeRate());
+      assertBigDecimalEquals("1500", expense2.getGrantCurrencyAmount());
+      return true;
+    }));
+  }
+  
+  @Test
+  public void testShiftExpenseBackward() {
+    final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId2 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId3 = new ObjectHolder<>();
+    // Setup.
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expenseId1.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 2, 1),
+              PROJECT1_REPORT1,
+              "200042",
+              HUF,
+              "200000.1"
+          ).getId());  
+      expenseId2.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 2, 2),
+              PROJECT1_REPORT1,
+              "200043",
+              HUF,
+              "200000.2"
+          ).getId());
+      expenseId3.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2014, 1, 1),
+              PROJECT1_REPORT2,
+              "2000044",
+              HUF,
+              "200000.3"
+          ).getId());
+      return true;
+    }));
+    // Sanity checks.
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
+      assertEquals(3, expenses.size());
+      ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
+      ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
+      ProjectExpenseWrapper expense3 = TestUtils.findExpenseById(em, PROJECT1, expenseId3.get());
+      assertBigDecimalEquals("200000.1", expense1.getAccountingCurrencyAmount());
+      assertBigDecimalEquals("200000.2", expense2.getAccountingCurrencyAmount());
+      assertBigDecimalEquals("200000.3", expense3.getAccountingCurrencyAmount());
+      return true;
+    }));
+    // Commit deletion
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      TestUtils.findExpenseById(em, PROJECT1, expenseId2.get()).delete(em);
+      return true;
+    }));
+    // Check results.
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
+      assertEquals(2, expenses.size());
+      ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
+      ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
+      ProjectExpenseWrapper expense3 = TestUtils.findExpenseById(em, PROJECT1, expenseId3.get());
+      assertBigDecimalEquals("200000.1", expense1.getAccountingCurrencyAmount());
+      assertNull(expense2);
+      assertBigDecimalEquals("200000.3", expense3.getAccountingCurrencyAmount());
       return true;
     }));
   }
@@ -172,6 +318,7 @@ public class ProjectExpenseWrapperTest {
         "originalAmount", new BigDecimal("1.5", Utils.MC),BigDecimal.class);
     newExpense.get().setProperty(
         "accountingCurrencyAmount", new BigDecimal("700000", Utils.MC), BigDecimal.class);
+    // 700000 is more than the combined value of all the sources.
     newExpense.get().setProperty(
         "report", PROJECT1_REPORT1, ProjectReport.class);
 
@@ -185,8 +332,7 @@ public class ProjectExpenseWrapperTest {
       List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
       assertEquals(1, expenses.size());
       ProjectExpenseWrapper expenseWrapper = expenses.get(0);
-      assertEquals(0, new BigDecimal("700000", Utils.MC).compareTo(
-          expenseWrapper.getAccountingCurrencyAmount()));
+      assertBigDecimalEquals("700000", expenseWrapper.getAccountingCurrencyAmount());
       return true;
     });
   }

@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
-
   public ProjectSourceWrapper(ProjectSource source, BigDecimal usedAccountingCurrencyAmount) {
     super(source);
     if (source.getExchangeRate() == null || source.getGrantCurrencyAmount() == null) {
@@ -28,16 +27,26 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
   public BigDecimal getGrantCurrencyAmount() {
     return entity.getGrantCurrencyAmount();
   }
-
+  
   public static List<ProjectSourceWrapper> getProjectSources(
       EntityManager em, Project project, ProjectReport filterReport) {
+    return getProjectSources(em, project, filterReport, true);
+  }
+  
+  public static List<ProjectSourceWrapper> getProjectSourceListForAllocation(EntityManager em, Project project) {
+    return getProjectSources(em, project, null, false);
+  }
+
+  public static List<ProjectSourceWrapper> getProjectSources(
+      EntityManager em, Project project, ProjectReport filterReport, boolean descending) {
+    String sortString = descending ? " DESC" : "";
     TypedQuery<ProjectSourceWrapper> query = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper(s, COALESCE(SUM(a.accountingCurrencyAmount), 0.0)) " +
             "FROM ProjectSource s LEFT OUTER JOIN ExpenseSourceAllocation a ON a.source = s LEFT OUTER JOIN ProjectReport r ON s.report = r " +
             "WHERE s.project = :project " +
             "  AND (:filterReportId IS NULL OR s.report.id = :filterReportId) " +
             "GROUP BY s, r " +
-            "ORDER BY r.reportDate, s.availabilityDate, s.id", ProjectSourceWrapper.class);
+            "ORDER BY r.reportDate " + sortString + ", s.availabilityDate " + sortString + ", s.id " + sortString, ProjectSourceWrapper.class);
     query.setParameter("project", project);
     query.setParameter("filterReportId", filterReport == null ? null : filterReport.getId());
     return query.getResultList();

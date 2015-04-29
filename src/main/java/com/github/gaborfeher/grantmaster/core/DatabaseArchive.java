@@ -76,7 +76,7 @@ public class DatabaseArchive {
       }
     }
     if (!main.delete()) {
-      System.out.println("failed to delete " + main);
+      logger.error("failed to delete file {}", main);
     }
   }
   

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
+import static org.junit.Assert.assertEquals;
 
 public class TestUtils {
   public static Project createProject(
@@ -42,7 +43,7 @@ public class TestUtils {
     ProjectSource projectSource = new ProjectSource();
     projectSource.setProject(project);
     projectSource.setReport(report);
-    projectSource.setAvailabilityDate(LocalDate.of(2015, 2, 1));
+    projectSource.setAvailabilityDate(date);
     projectSource.setExchangeRate(new BigDecimal(exchangeRate, Utils.MC));
     projectSource.setGrantCurrencyAmount(
         new BigDecimal(accountingCurrencyAmount, Utils.MC));
@@ -158,4 +159,11 @@ public class TestUtils {
     return result;
   }
 
+  static void assertBigDecimalEquals(BigDecimal expected, BigDecimal tested) {
+    assertEquals(0, expected.compareTo(tested));
+  }
+  
+  static void assertBigDecimalEquals(String expected, BigDecimal tested) {
+    assertBigDecimalEquals(new BigDecimal(expected, Utils.MC), tested);
+  }
 }

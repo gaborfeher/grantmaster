@@ -130,7 +130,9 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
   
   public void refresh() {
-    parent.onRefresh();
+    if (parent != null) {
+      parent.onRefresh();
+    }
   }
 
   protected boolean save(EntityManager em) {
@@ -182,10 +184,6 @@ public abstract class EntityWrapper<T extends EntityBase> {
     this.isSummary = isSummary;
   }
 
-  public ControllerBase getParent() {
-    return parent;
-  }
-  
   public void setParent(ControllerBase parent) {
     this.parent = parent;
   }

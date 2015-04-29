@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class ProjectBudgetCategoryWrapperTest {
   Currency HUF;
   Currency USD;
@@ -107,7 +106,6 @@ public class ProjectBudgetCategoryWrapperTest {
           0,
           new BigDecimal("5000.2", Utils.MC).compareTo(
               (BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentAccountingCurrency")));
-      System.out.println((BigDecimal) TestUtils.findByBudgetCategory(list, PAYMENT_CAT1).getProperty("spentGrantCurrency"));
       assertEquals(
           0,
           new BigDecimal("50.002", Utils.MC).compareTo(
