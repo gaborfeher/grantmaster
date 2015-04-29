@@ -17,16 +17,10 @@ public class DateTableCellFactory<S extends EntityWrapper> implements Callback<T
         LocalDate.class);  
   }        
 
-  /**
-   * @return the property
-   */
   public String getProperty() {
     return property;
   }
 
-  /**
-   * @param property the property to set
-   */
   public void setProperty(String property) {
     this.property = property;
   }

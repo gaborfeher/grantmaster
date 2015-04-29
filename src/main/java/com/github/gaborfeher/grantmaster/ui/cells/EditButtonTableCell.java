@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.List;
 import java.util.Optional;
@@ -8,17 +9,26 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 import javax.persistence.EntityManager;
 
+/**
+ * This table cell should be used in the first column of all the editable
+ * tables used in this program. (Tables with EntityWrapper rows, controlled
+ * by a subclass of ControllerBase.) This table provides Edit/Create/Delete
+ * buttons depending on the state of the row, and optionally a user-defined
+ * additional button.
+ */
 public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
-  final Button saveButton = new Button("Létrehoz");
-  final Button discardButton = new Button("Töröl");
-  final Button deleteButton = new Button("Töröl");
+  final Button saveButton =
+      new Button(Utils.getString("EditCell.CreateEntity"));
+  final Button discardButton =
+      new Button(Utils.getString("EditCell.DiscardEntity"));
+  final Button deleteButton =
+      new Button(Utils.getString("EditCell.DeleteEntity"));
   
   final HBox editDeleteBox = new HBox();
   final HBox saveDiscardBox = new HBox(saveButton, discardButton);
@@ -87,9 +97,8 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   
   void handleDeleteButtonClick() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("Bejegyzés törlés");
-    alert.setHeaderText("Biztos, hogy töröljem?");
-    alert.setContentText("A törlés végleges, nem lehet visszavonni.");
+    alert.setTitle(Utils.getString("EditCell.DeleteConfirmTitle"));
+    alert.setContentText(Utils.getString("EditCell.DeleteConfirmQuestion"));
     Optional<ButtonType> result = alert.showAndWait();
     if (result.get() != ButtonType.OK) {
       return;
@@ -101,10 +110,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
     })) {
       entityWrapper.refresh();
     } else {
-      alert = new Alert(AlertType.ERROR);
-      alert.setTitle("Hiba");
-      alert.setHeaderText("Nem sikerült a törlés.");
-      alert.showAndWait();
+      entityWrapper.getParent().showBackendFailureDialog("delete");
     }
   }
   

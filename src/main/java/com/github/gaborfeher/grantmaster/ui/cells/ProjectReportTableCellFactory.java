@@ -14,6 +14,5 @@ public class ProjectReportTableCellFactory<S>
   public TableCell<S, ProjectReport> call(TableColumn<S, ProjectReport> param) {
     return new ProjectReportTableCell(property);
   }
-
   
 }

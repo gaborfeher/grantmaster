@@ -1,7 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import java.util.Set;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -10,7 +9,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javax.validation.ConstraintViolation;
 
 public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
   final String property;

@@ -1,13 +1,10 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
-import java.math.BigDecimal;
 import javax.persistence.EntityManager;
 
 public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrapper> {
@@ -31,7 +28,10 @@ public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrap
   public void getItemListForRefresh(EntityManager em, List<ProjectSourceWrapper> items) {
     List<ProjectSourceWrapper> projectTransfers = ProjectSourceWrapper.getProjectSources(em, project, null);
     items.addAll(projectTransfers);
-    
+  }
+
+  @Override
+  protected void refreshOtherContent() {
     String grantCurrency = project.getGrantCurrency().getCode();
     String accountingCurrency = project.getAccountCurrency().getCode();
     

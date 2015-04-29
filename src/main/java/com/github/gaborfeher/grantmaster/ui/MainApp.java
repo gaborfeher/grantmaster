@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.application.Application;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 public class MainApp extends Application {
   private static final Logger logger = LoggerFactory.getLogger(MainApp.class);
   
+  public final static String VERSION_STRING = "v0.7";
+  
   private MainPageController controller;
 
   @Override
@@ -27,28 +30,27 @@ public class MainApp extends Application {
     });
     super.init();
   }
-
   
   @Override
   public void start(Stage stage) throws Exception {
     logger.info("startup");
     
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPage.fxml"));
-    loader.setResources(ResourceBundle.getBundle("bundles.MainPage", new Locale("hu")));
+    loader.setResources(Utils.getResourceBundle());
     Parent root = loader.load();
     controller = loader.getController();
     controller.setStage(stage);
 
     Scene scene = new Scene(root);
     scene.getStylesheets().add("/styles/Styles.css");
-    stage.setTitle("GrantMaster - Költségvetés Tervező - v0.6");
+    stage.setTitle(Utils.getString("AppName") + " - " + VERSION_STRING);
     stage.setMaximized(true);
     stage.setScene(scene);
     stage.show();
     
     scene.getWindow().setOnCloseRequest((WindowEvent ev) -> {
       if (!controller.shutdown()) {
-        ev.consume();  // Prevent closing application.
+        ev.consume();  // Prevent the closing of this application.
       } else {
         logger.info("shutdown");
       }

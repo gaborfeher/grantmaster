@@ -29,7 +29,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EntityWrapper.class);
   
   protected T entity;
-  
+
   public static enum State {
     EDITING_NEW,
     SAVED;
@@ -188,6 +188,10 @@ public abstract class EntityWrapper<T extends EntityBase> {
     this.parent = parent;
   }
 
+  public ControllerBase getParent() {
+    return parent;
+  }
+  
   public Long getId() {
     if (entity == null) {
       return null;

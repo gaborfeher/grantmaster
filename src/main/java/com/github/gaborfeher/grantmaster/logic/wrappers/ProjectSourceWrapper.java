@@ -74,6 +74,5 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     source.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
     return new ProjectSourceWrapper(source, BigDecimal.ZERO);
   }
-
   
 }

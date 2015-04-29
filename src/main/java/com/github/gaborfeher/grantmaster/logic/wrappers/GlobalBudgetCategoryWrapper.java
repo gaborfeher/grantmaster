@@ -160,8 +160,7 @@ public class GlobalBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Budge
         budgetCategoryMap,
         columnNames);
   }
-  
-  
+
   public static void createDefaultBudgetCategories(EntityManager em) {
     String groupName = "Személyi jellegű ráfordítások";
     BudgetCategory.Direction direction = BudgetCategory.Direction.PAYMENT;

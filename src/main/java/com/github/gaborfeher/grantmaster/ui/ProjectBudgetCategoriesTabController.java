@@ -1,23 +1,25 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import java.util.List;
+import java.math.BigDecimal;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.ChoiceBox;
+import javax.persistence.EntityManager;
+
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
-import java.util.List;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
-import java.math.BigDecimal;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ChoiceBox;
-import javax.persistence.EntityManager;
 
 public class ProjectBudgetCategoriesTabController extends ControllerBase<ProjectBudgetCategoryWrapper> {  
   @FXML TableColumn<GlobalBudgetCategoryWrapper, BigDecimal> spentGrantCurrencyColumn;
@@ -63,12 +65,14 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
             em,
             project,
             report);
-    BudgetCategoryWrapperBase.createBudgetSummaryList(em, paymentLines, "Összes projektbevétel és -költség", items);
+    BudgetCategoryWrapperBase.createBudgetSummaryList(
+        em, paymentLines, Utils.getString("ProjectSumIncomesAndExpenses"), items);
     ProjectBudgetCategoryWrapper lastLineSummary = null;
     if (items.size() > 0) {
       lastLineSummary = (ProjectBudgetCategoryWrapper) items.get(items.size() - 1);
     } else {
-      lastLineSummary = new ProjectBudgetCategoryWrapper("Összes projektbevétel és -költség");
+      lastLineSummary = new ProjectBudgetCategoryWrapper(
+          Utils.getString("ProjectSumIncomesAndExpenses"));
       lastLineSummary.setLimit(BigDecimal.ZERO, new ProjectBudgetLimit());
       lastLineSummary.setIsSummary(true);
       lastLineSummary.setState(null);
@@ -78,7 +82,7 @@ public class ProjectBudgetCategoriesTabController extends ControllerBase<Project
       lastLineSummary.addBudgetAmounts(source.getEntity().getAccountingCurrencyAmount(), source.getEntity().getGrantCurrencyAmount());
     }
   }
-  
+
   @Override
   protected void refreshOtherContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {

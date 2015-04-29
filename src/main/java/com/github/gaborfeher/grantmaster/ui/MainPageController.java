@@ -2,6 +2,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseConnection;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
@@ -9,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -58,11 +58,11 @@ public class MainPageController implements Initializable {
   private boolean allowCloseDatabase() {
     if (DatabaseSingleton.INSTANCE.getUnsavedChange()) {
       Alert alert = new Alert(AlertType.NONE);
-      alert.setTitle("Mentés");
-      alert.setHeaderText("Mentsük az adatokat bezárás előtt?");
-      ButtonType saveButtonType = new ButtonType("Mentés");
-      ButtonType discardButtonType = new ButtonType("Bezárás");
-      ButtonType cancelButtonType = new ButtonType("Mégse");
+      alert.setTitle(Utils.getString("SaveBeforeCloseTitle"));
+      alert.setHeaderText(Utils.getString("SaveBeforeCloseQuestion"));
+      ButtonType saveButtonType = new ButtonType(Utils.getString("SaveBeforeCloseSave"));
+      ButtonType discardButtonType = new ButtonType(Utils.getString("SaveBeforeCloseClose"));
+      ButtonType cancelButtonType = new ButtonType(Utils.getString("SaveBeforeCloseCancel"));
       alert.getButtonTypes().add(saveButtonType);
       alert.getButtonTypes().add(discardButtonType);
       alert.getButtonTypes().add(cancelButtonType);
@@ -116,7 +116,7 @@ public class MainPageController implements Initializable {
     mainTabs.getTabs().add(newTab);
     final ProjectTabController controller;
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
-    loader.setResources(ResourceBundle.getBundle("bundles.MainPage", new Locale("hu")));
+    loader.setResources(Utils.getResourceBundle());
     Parent projectPage = loader.load();
     controller = loader.getController();
     controller.init(project);
@@ -146,7 +146,7 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return;
     }
-    FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis megnyitása");
+    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("OpenDatabase"));
     File path = fileChooser.showOpenDialog(stage);
     if (path == null) {
       return;
@@ -159,8 +159,8 @@ public class MainPageController implements Initializable {
       pathLabel.setText(openedFile.getAbsolutePath());
     } else {
       Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle("Adatbázis megnyitás");
-      alert.setHeaderText("Hiba az adatbázisfájl megnyitása közben.");
+      alert.setTitle(Utils.getString("OpenDatabase"));
+      alert.setHeaderText(Utils.getString("OpenDatabaseError"));
       alert.showAndWait();
     }
   }
@@ -185,14 +185,14 @@ public class MainPageController implements Initializable {
         return;
       }
       resetAndRefreshTabs();
-      pathLabel.setText("új adatbázis");
+      pathLabel.setText(Utils.getString("MainPage.StatusNewDatabase"));
     }
   }
   
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
     if (openedFile == null && DatabaseSingleton.INSTANCE.isConnected()) {
-      FileChooser fileChooser = getFileChooserForHdbFiles("Adatbázis mentése");
+      FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("SaveDatabase"));
       openedFile = fileChooser.showSaveDialog(stage);
       if (openedFile == null) {
         return;
@@ -201,8 +201,8 @@ public class MainPageController implements Initializable {
         openedFile = new File(openedFile.getAbsolutePath() + ".hdb");
         if (openedFile.exists()) {
           Alert alert = new Alert(AlertType.CONFIRMATION);
-          alert.setTitle("A fájl már létezik");
-          alert.setHeaderText("Felülírhatom ezt a fájlt?\n" + openedFile.getAbsolutePath());
+          alert.setTitle(Utils.getString("SaveDatabase"));
+          alert.setHeaderText(Utils.getString("SaveOverrideQuestion") + "\n" + openedFile.getAbsolutePath());
           if (alert.showAndWait().get() != ButtonType.OK) {
             openedFile = null;
           } 
@@ -225,7 +225,7 @@ public class MainPageController implements Initializable {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("Excel spreadsheets (*.xls)", "*.xls"));
     fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get(0));
-    fileChooser.setTitle("Exportálás Excel táblázatba");
+    fileChooser.setTitle(Utils.getString("ExportToExcel"));
     File exportFile = fileChooser.showSaveDialog(stage);
     if (exportFile == null) {
       return;
@@ -234,8 +234,11 @@ public class MainPageController implements Initializable {
       exportFile = new File(exportFile.getAbsolutePath() + ".xls");
       if (exportFile.exists()) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("A fájl már létezik");
-        alert.setHeaderText("Felülírhatom ezt a fájlt?\n" + exportFile.getAbsolutePath());
+        alert.setTitle(Utils.getString("ExportToExcel"));
+        alert.setHeaderText(
+            Utils.getString("SaveOverrideQuestion") +
+            "\n" + 
+            exportFile.getAbsolutePath());
         if (alert.showAndWait().get() != ButtonType.OK) {
           exportFile = null;
         } 

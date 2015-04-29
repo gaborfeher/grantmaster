@@ -11,7 +11,8 @@ public class CurrencyWrapper extends EntityWrapper {
     
   public static List<CurrencyWrapper> getCurrencyWrappers(EntityManager em) {
     return em.createQuery(
-          "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper(c) FROM Currency c", CurrencyWrapper.class).getResultList();
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper(c) FROM Currency c",
+        CurrencyWrapper.class).getResultList();
   }
   
   public static void createDefaultCurrencies(EntityManager em) {

@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import java.io.File;
 import java.net.URL;
@@ -15,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -23,8 +23,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for most of the tab controllers in this applications.
@@ -169,14 +167,14 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
 
   public void showBackendFailureDialog(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Hiba");
-    alert.setContentText("Nem sikerült a létrehozás\n(" + message + ")");
+    alert.setTitle(Utils.getString("BackendErrorTitle"));
+    alert.setContentText(Utils.getString("BackendErrorText") + "\n(" + message + ")");
     alert.showAndWait();
   }
   
   public void showValidationFailureDialog(
       Set<ConstraintViolation<T>> constraintViolations) {
-    String message = "Problémák:\n";
+    String message = Utils.getString("ValidationProblems") + ":\n";
     for (ConstraintViolation<T> violation : constraintViolations) {
       String violationMessage = violation.getMessage();
       if (violationMessage.length() > 0 && violationMessage.charAt(0) == '%') {
@@ -186,9 +184,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
       message += "*" + violationMessage+ "\n";
     }
     Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Bevitel hiba");
-    //alert.setHeaderText("Problémák:");
-    //alert.setContentText(message);
+    alert.setTitle(Utils.getString("ValidationTitle"));
     alert.setResizable(true);
     TextArea text = new TextArea(message);
     text.setWrapText(true);

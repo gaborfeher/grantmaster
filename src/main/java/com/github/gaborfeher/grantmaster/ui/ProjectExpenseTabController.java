@@ -1,10 +1,11 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import javafx.fxml.FXML;
-import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 import java.util.List;
 import javax.persistence.EntityManager;
+
+import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
 
 public class ProjectExpenseTabController extends ControllerBase<ProjectExpenseWrapper> {
   @FXML ExpenseTableController tableController;

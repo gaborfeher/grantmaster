@@ -1,16 +1,12 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.ValidatorFactorySingleton;
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 
 public class ProjectWrapper extends EntityWrapper<Project> {
   public ProjectWrapper(Project project) {
@@ -44,7 +40,7 @@ public class ProjectWrapper extends EntityWrapper<Project> {
     ProjectReport projectReport = new ProjectReport();
     projectReport.setProject(newProject);
     projectReport.setReportDate(LocalDate.now());
-    projectReport.setNote("Alapértelmezett report.");
+    projectReport.setNote(Utils.getString("ProjectDefaultReportName"));
     newProject.setReports(Arrays.asList(projectReport));
     return new ProjectWrapper(newProject);
   }

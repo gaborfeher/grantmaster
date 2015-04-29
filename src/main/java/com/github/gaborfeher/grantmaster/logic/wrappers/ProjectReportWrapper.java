@@ -54,5 +54,4 @@ public class ProjectReportWrapper extends EntityWrapper<ProjectReport> {
     }
   }
 
-  
 }

@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
@@ -31,6 +32,6 @@ class DateStringConverter extends MultiStringConverter<LocalDate> {
 
   @Override
   public String getParseError() {
-    return "Ismeretlen dátumformátum.";
+    return Utils.getString("Edit.UnknownDateFormat");
   }
 }

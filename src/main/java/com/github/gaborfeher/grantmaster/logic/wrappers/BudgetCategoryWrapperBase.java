@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import java.math.BigDecimal;
@@ -34,7 +35,8 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
       if (current.getGroupName() != null) {
         if (currentGroupName == null || groupSum == null) {
           currentGroupName = current.getGroupName();
-          groupSum = current.createFakeCopy(current.getGroupName() + " mind\u00f6sszesen");
+          groupSum = current.createFakeCopy(
+              current.getGroupName() + " " + Utils.getString("Summary.TotalSuffix"));
         } else {
           groupSum.addSummaryValues(current, BigDecimal.ONE);
         }
@@ -68,9 +70,12 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
       List<BudgetCategoryWrapperBase> paymentCategories,
       List<BudgetCategoryWrapperBase> incomeCategories,
       List<BudgetCategoryWrapperBase> output) {
-    BudgetCategoryWrapperBase expenseSum = createBudgetSummaryList(em, paymentCategories, "K\u00f6lts\u00e9gek mind\u00f6sszesen", output);
-    BudgetCategoryWrapperBase incomeSum = createBudgetSummaryList(em, incomeCategories, "Bev\u00e9telek mind\u00f6sszesen", output);
-    BudgetCategoryWrapperBase finalSum = incomeSum.createFakeCopy("K\u00fcl\u00f6nbs\u00e9g");
+    BudgetCategoryWrapperBase expenseSum = createBudgetSummaryList(
+        em, paymentCategories, Utils.getString("Summary.ExpenseSummary"), output);
+    BudgetCategoryWrapperBase incomeSum = createBudgetSummaryList(
+        em, incomeCategories, Utils.getString("Summary.IncomeSummary"), output);
+    BudgetCategoryWrapperBase finalSum = incomeSum.createFakeCopy(
+        Utils.getString("Summary.Difference"));
     if (expenseSum != null) {
       finalSum.addSummaryValues(expenseSum, new BigDecimal(-1));
     }

@@ -1,7 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.TransactionRunner;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
@@ -57,61 +56,67 @@ public class SearchTabController
 
   @Override
   public void getItemListForRefresh(EntityManager em, List<ProjectExpenseWrapper> items) {
-    budgetCategory.getItems().clear();
-    budgetCategory.getItems().add(null);
-    budgetCategory.getItems().addAll(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
-    project.getItems().clear();
-    project.getItems().add(null);
-    project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping(em));
-    
-    tableController.accountingCurrencyAmountColumn.setCellValueFactory(
-        new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
-      @Override
-      public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
-        ProjectExpenseWrapper expenseWrapper = p.getValue();
-        ProjectExpense expense = p.getValue().getEntity();
-        String result =
-            String.format(
-                "%2.2f %s",
-                expenseWrapper.getAccountingCurrencyAmount(),
-                expense.getProject().getAccountCurrency().getCode());
-        return new ReadOnlyObjectWrapper<Object>(result);
-      }
-    });
-    tableController.accountingCurrencyAmountColumn.setCellFactory(
-        new Callback<TableColumn<ProjectExpenseWrapper, Object>, TableCell<ProjectExpenseWrapper, Object>>() {
-      @Override
-      public TableCell<ProjectExpenseWrapper, Object> call(TableColumn<ProjectExpenseWrapper, Object> p) {
-        return (TableCell<ProjectExpenseWrapper, Object>) TableColumn.DEFAULT_CELL_FACTORY.call(p);
-      }
-    });
-       
-    tableController.grantCurrencyAmountColumn.setCellValueFactory(
-        new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
-      @Override
-      public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
-        ProjectExpenseWrapper expenseWrapper = p.getValue();
-        ProjectExpense expense = p.getValue().getEntity();
-        String result =
-            String.format(
-                "%2.2f %s",
-                expenseWrapper.getGrantCurrencyAmount(),
-                expense.getProject().getGrantCurrency());
-        return new ReadOnlyObjectWrapper<Object>(result);
-      }
-    });
-    tableController.grantCurrencyAmountColumn.setCellFactory(
-        new Callback<TableColumn<ProjectExpenseWrapper, Object>, TableCell<ProjectExpenseWrapper, Object>>() {
-      @Override
-      public TableCell<ProjectExpenseWrapper, Object> call(TableColumn<ProjectExpenseWrapper, Object> p) {
-        return (TableCell<ProjectExpenseWrapper, Object>) TableColumn.DEFAULT_CELL_FACTORY.call(p);
-      }
-    });
-
     items.clear();
     if (searchResults != null) {
       items.addAll(searchResults);
     }
+  }
+
+  @Override
+  protected void refreshOtherContent() {
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      budgetCategory.getItems().clear();
+      budgetCategory.getItems().add(null);
+      budgetCategory.getItems().addAll(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
+      project.getItems().clear();
+      project.getItems().add(null);
+      project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping(em));
+
+      tableController.accountingCurrencyAmountColumn.setCellValueFactory(
+          new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
+        @Override
+        public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+          ProjectExpenseWrapper expenseWrapper = p.getValue();
+          ProjectExpense expense = p.getValue().getEntity();
+          String result =
+              String.format(
+                  "%2.2f %s",
+                  expenseWrapper.getAccountingCurrencyAmount(),
+                  expense.getProject().getAccountCurrency().getCode());
+          return new ReadOnlyObjectWrapper<Object>(result);
+        }
+      });
+      tableController.accountingCurrencyAmountColumn.setCellFactory(
+          new Callback<TableColumn<ProjectExpenseWrapper, Object>, TableCell<ProjectExpenseWrapper, Object>>() {
+        @Override
+        public TableCell<ProjectExpenseWrapper, Object> call(TableColumn<ProjectExpenseWrapper, Object> p) {
+          return (TableCell<ProjectExpenseWrapper, Object>) TableColumn.DEFAULT_CELL_FACTORY.call(p);
+        }
+      });
+
+      tableController.grantCurrencyAmountColumn.setCellValueFactory(
+          new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {
+        @Override
+        public ObservableValue<Object> call(TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object> p) {
+          ProjectExpenseWrapper expenseWrapper = p.getValue();
+          ProjectExpense expense = p.getValue().getEntity();
+          String result =
+              String.format(
+                  "%2.2f %s",
+                  expenseWrapper.getGrantCurrencyAmount(),
+                  expense.getProject().getGrantCurrency());
+          return new ReadOnlyObjectWrapper<Object>(result);
+        }
+      });
+      tableController.grantCurrencyAmountColumn.setCellFactory(
+          new Callback<TableColumn<ProjectExpenseWrapper, Object>, TableCell<ProjectExpenseWrapper, Object>>() {
+        @Override
+        public TableCell<ProjectExpenseWrapper, Object> call(TableColumn<ProjectExpenseWrapper, Object> p) {
+          return (TableCell<ProjectExpenseWrapper, Object>) TableColumn.DEFAULT_CELL_FACTORY.call(p);
+        }
+      });
+      return true;
+    });
   }
 
   @Override

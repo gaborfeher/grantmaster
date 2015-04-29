@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
+import com.github.gaborfeher.grantmaster.core.Utils;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -47,6 +48,6 @@ class BigDecimalStringConverter extends MultiStringConverter<BigDecimal> {
 
   @Override
   public String getParseError() {
-    return "Ismeretlen számformátum.";
+    return Utils.getString("Edit.UnknownNumberFormat");
   }
 }
