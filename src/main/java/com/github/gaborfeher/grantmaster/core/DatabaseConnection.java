@@ -28,15 +28,15 @@ public class DatabaseConnection {
   private boolean unsavedChanges;
   private EntityManagerFactory entityManagerFactory;
   
-  public void cleanup() {
-    close();
+  public void close() {
+    disconnect();
     if (archive != null) {
       archive.close();
       archive = null;
     }
   }
     
-  private void close() {
+  private void disconnect() {
     unsavedChanges = false;
     if (getEntityManagerFactory() != null) {
       getEntityManagerFactory().close();
@@ -71,7 +71,7 @@ public class DatabaseConnection {
   
   public void saveDatabase(File path) throws IOException {
     logger.info("saveDatabase({})", path);
-    close();
+    disconnect();
     archive.saveTo(path);
     unsavedChanges = false;
     connectToFile();
@@ -85,7 +85,7 @@ public class DatabaseConnection {
       return null;
     }
     if (!newConnection.connectToFile()) {
-      newConnection.cleanup();
+      newConnection.close();
       return null;
     }
     return newConnection;
@@ -110,7 +110,7 @@ public class DatabaseConnection {
       return null;
     }
     if (!newConnection.connectToFile()) {
-      newConnection.cleanup();
+      newConnection.close();
       return null;
     }
     return newConnection;

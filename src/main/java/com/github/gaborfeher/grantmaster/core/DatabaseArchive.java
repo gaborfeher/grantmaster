@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.core;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +30,15 @@ public class DatabaseArchive {
     this.tempDir = tempDir;
   }
 
+  @Override
+  protected void finalize() throws Throwable {
+    try {
+      close();
+    } finally {
+      super.finalize();
+    }
+  }
+
   public void close() {
     if (tempDir != null) {
       simpleRecursiveDelete(tempDir);
@@ -44,9 +54,9 @@ public class DatabaseArchive {
     if (tempDir == null) {
       return null;
     }
-    try (
-        FileInputStream fileInputStream = new FileInputStream(path);
-        ZipInputStream zipInputStrem = new ZipInputStream(fileInputStream)) {
+    try (ZipInputStream zipInputStrem = new ZipInputStream(
+             new BufferedInputStream(
+                 new FileInputStream(path)))) {
       ZipEntry zipEntry;
       while ((zipEntry = zipInputStrem.getNextEntry()) != null) {
         File fileToWrite = new File(tempDir, zipEntry.getName());

@@ -87,7 +87,7 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return false;
     }
-    DatabaseSingleton.INSTANCE.cleanup();
+    DatabaseSingleton.INSTANCE.close();
     return true;
   }
   
@@ -162,7 +162,6 @@ public class MainPageController implements Initializable {
       alert.setTitle("Adatbázis megnyitás");
       alert.setHeaderText("Hiba az adatbázisfájl megnyitása közben.");
       alert.showAndWait();
-      return;
     }
   }
   

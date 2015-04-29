@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum DatabaseSingleton {
@@ -21,6 +20,9 @@ public enum DatabaseSingleton {
   }
   
   public void setConnection(DatabaseConnection connection) {
+    if (this.connection != null) {
+      this.connection.close();
+    }
     this.connection = connection;
   }
   
@@ -88,9 +90,9 @@ public enum DatabaseSingleton {
     entityManager.close();
   }
 
-  public void cleanup() {
+  public void close() {
     if (connection != null) {
-      connection.cleanup();
+      connection.close();
     }
   }
 

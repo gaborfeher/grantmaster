@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.MyValidatorFactory;
+import com.github.gaborfeher.grantmaster.core.ValidatorFactorySingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.time.LocalDate;

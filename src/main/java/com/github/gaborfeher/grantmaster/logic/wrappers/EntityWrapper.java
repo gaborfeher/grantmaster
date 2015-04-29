@@ -1,7 +1,7 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.MyValidatorFactory;
+import com.github.gaborfeher.grantmaster.core.ValidatorFactorySingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
 import com.github.gaborfeher.grantmaster.ui.ControllerBase;
 import java.lang.reflect.InvocationTargetException;
@@ -142,7 +142,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
   
   private Set<ConstraintViolation> checkValidationConstraints() {
-    Validator validator = MyValidatorFactory.SINGLE_INSTANCE.getValidator();
+    Validator validator = ValidatorFactorySingleton.SINGLE_INSTANCE.getValidator();
     Set<ConstraintViolation> constraintViolations = new HashSet<>();
     constraintViolations.addAll(validator.validate(entity));
     constraintViolations.addAll(validator.validate(this));
