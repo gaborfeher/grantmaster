@@ -11,7 +11,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -47,11 +46,11 @@ public class ProjectBudgetLimit extends EntityBase implements  Serializable {
       return false;
     }
     if (budgetGrantCurrency != null &&
-        budgetGrantCurrency.compareTo(BigDecimal.ZERO) <= 0) {
+        budgetGrantCurrency.compareTo(BigDecimal.ZERO) < 0) {
       return false;
     }
     if (budgetPercentage != null &&
-        budgetPercentage.compareTo(BigDecimal.ZERO) <= 0) {
+        budgetPercentage.compareTo(BigDecimal.ZERO) < 0) {
       return false;
     }
     return true;
