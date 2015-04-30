@@ -1,8 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.core.Utils;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class MainApp extends Application {
   private static final Logger logger = LoggerFactory.getLogger(MainApp.class);
   
-  public final static String VERSION_STRING = "v0.7";
+  public final static String VERSION_STRING = "v0.8";
   
   private MainPageController controller;
 
