@@ -1,12 +1,13 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
 import java.util.List;
 import javax.persistence.EntityManager;
 
-public class ProjectReportsTabController extends ControllerBase {
+public class ProjectReportsTabController extends TablePageControllerBase {
   Project project;
     
   void init(Project project) {

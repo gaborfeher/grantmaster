@@ -1,4 +1,4 @@
-package com.github.gaborfeher.grantmaster.ui;
+package com.github.gaborfeher.grantmaster.ui.framework;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
@@ -13,7 +14,7 @@ import java.util.TreeSet;
 import javafx.scene.control.TableColumn;
 import javax.persistence.EntityManager;
 
-public class BudgetCategoriesTabController extends ControllerBase<GlobalBudgetCategoryWrapper> {
+public class BudgetCategoriesTabController extends TablePageControllerBase<GlobalBudgetCategoryWrapper> {
 
   public BudgetCategoriesTabController() {
   }

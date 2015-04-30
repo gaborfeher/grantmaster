@@ -7,9 +7,11 @@ import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javax.persistence.EntityManager;
 
-class ProjectReportTableCell<S extends EntityWrapper> extends BetterChoiceBoxTableCell<S, ProjectReport> {
+class ProjectReportTableCell<S extends EditableTableRowItem>
+    extends BetterChoiceBoxTableCell<S, ProjectReport> {
   private static class ProjectReportStringConverter extends MultiStringConverter<ProjectReport> {
     @Override
     public String toString(ProjectReport object) {
@@ -29,7 +31,7 @@ class ProjectReportTableCell<S extends EntityWrapper> extends BetterChoiceBoxTab
   protected void refreshChoiceItems() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       Project project;
-      EntityWrapper entity = getEntityWrapper();
+      EditableTableRowItem entity = getEntityWrapper();
       if (entity.getEntity() instanceof ProjectSource) {
         project = ((ProjectSource) entity.getEntity()).getProject();
       } else if (entity.getEntity() instanceof ProjectExpense) {

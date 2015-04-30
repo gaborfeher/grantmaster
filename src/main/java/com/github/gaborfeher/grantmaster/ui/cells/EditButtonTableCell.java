@@ -3,6 +3,8 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import java.util.List;
 import java.util.Optional;
 import javafx.event.ActionEvent;
@@ -22,7 +24,8 @@ import javax.persistence.EntityManager;
  * buttons depending on the state of the row, and optionally a user-defined
  * additional button.
  */
-public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, EntityWrapper.State> {
+public class EditButtonTableCell<S extends EditableTableRowItem>
+    extends TableCell<S, RowEditState> {
   final Button saveButton =
       new Button(Utils.getString("EditCell.CreateEntity"));
   final Button discardButton =
@@ -65,7 +68,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
   }
   
   @Override
-  protected void updateItem(EntityWrapper.State state, boolean empty) {
+  protected void updateItem(RowEditState state, boolean empty) {
     super.updateItem(state, empty);
     EntityWrapper e = getEntityWrapper();
     if (empty || e == null || state == null) {
@@ -108,7 +111,7 @@ public class EditButtonTableCell<S extends EntityWrapper> extends TableCell<S, E
       entityWrapper.delete(em);
       return true;
     })) {
-      entityWrapper.refresh();
+      entityWrapper.requestTableRefresh();
     } else {
       entityWrapper.getParent().showBackendFailureDialog("delete");
     }

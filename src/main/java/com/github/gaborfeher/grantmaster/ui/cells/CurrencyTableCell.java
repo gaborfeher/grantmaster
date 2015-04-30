@@ -2,10 +2,11 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javax.persistence.EntityManager;
 
-class CurrencyTableCell<S extends EntityWrapper> extends BetterChoiceBoxTableCell<S, Currency> {
+class CurrencyTableCell<S extends EditableTableRowItem>
+    extends BetterChoiceBoxTableCell<S, Currency> {
 
   public CurrencyTableCell(String property) {
     super(new CurrencyStringConverter(), property, Currency.class);

@@ -1,12 +1,13 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 
-public class EntityPropertyValueFactory<S extends EntityWrapper, T> implements Callback<TableColumn.CellDataFeatures<S,T>,ObservableValue<T>> {
+public class EntityPropertyValueFactory<S extends EditableTableRowItem, T>
+    implements Callback<TableColumn.CellDataFeatures<S,T>,ObservableValue<T>> {
   private String property;
 
   public EntityPropertyValueFactory() {

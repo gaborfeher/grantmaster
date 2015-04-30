@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -10,7 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S, T> {
+public class TextFieldTableCell<S extends EditableTableRowItem, T>
+    extends TableCell<S, T> {
   final String property;
   final TextField editTextField;
   final MultiStringConverter<T> stringConverter;
@@ -51,8 +53,8 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
     );
   }
 
-  private EntityWrapper getEntityWrapper() {
-    return (EntityWrapper) getTableRow().getItem();
+  private EditableTableRowItem getEntityWrapper() {
+    return (EditableTableRowItem) getTableRow().getItem();
   }
 
   private void parseAndCommit(String val) {
@@ -86,7 +88,7 @@ public class TextFieldTableCell<S extends EntityWrapper, T> extends TableCell<S,
       userCancelled = true;
       cancelEdit();
       getEntityWrapper().validate(true);  // Show validation error dialog.
-      getEntityWrapper().refresh();
+      getEntityWrapper().requestTableRefresh();
     }
   }
 

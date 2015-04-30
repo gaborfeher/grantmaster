@@ -1,4 +1,4 @@
-package com.github.gaborfeher.grantmaster.ui;
+package com.github.gaborfeher.grantmaster.ui.framework;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
 import javafx.scene.control.TableColumn;

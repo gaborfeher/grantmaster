@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
@@ -60,7 +61,7 @@ public class ProjectWrapperTest {
   @Test
   public void testCreateProject() {
     final ProjectWrapper newWrapper = ProjectWrapper.createNew();
-    newWrapper.setState(EntityWrapper.State.EDITING_NEW);
+    newWrapper.setState(RowEditState.EDITING_NEW);
     newWrapper.setProperty("name", "testProject", String.class);
     newWrapper.setProperty("grantCurrency", USD, Currency.class);
     newWrapper.setProperty("accountCurrency", HUF, Currency.class);
@@ -68,7 +69,7 @@ public class ProjectWrapperTest {
     
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) ->
         newWrapper.save(em)));
-    assertEquals(EntityWrapper.State.SAVED, newWrapper.getState());
+    assertEquals(RowEditState.SAVED, newWrapper.getState());
     
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       Project project = em.find(Project.class, newWrapper.getId());

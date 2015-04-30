@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import java.util.List;
 import java.math.BigDecimal;
 import javafx.beans.value.ChangeListener;
@@ -21,7 +22,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWra
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 
-public class ProjectBudgetCategoriesTabController extends ControllerBase<ProjectBudgetCategoryWrapper> {  
+public class ProjectBudgetCategoriesTabController extends TablePageControllerBase<ProjectBudgetCategoryWrapper> {  
   @FXML TableColumn<GlobalBudgetCategoryWrapper, BigDecimal> spentGrantCurrencyColumn;
   @FXML TableColumn<GlobalBudgetCategoryWrapper, BigDecimal> spentAccountingCurrencyColumn;  
   @FXML TableColumn<GlobalBudgetCategoryWrapper, BigDecimal> remainingGrantCurrencyColumn;

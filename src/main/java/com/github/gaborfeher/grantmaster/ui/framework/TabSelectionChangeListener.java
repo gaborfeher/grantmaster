@@ -1,4 +1,4 @@
-package com.github.gaborfeher.grantmaster.ui;
+package com.github.gaborfeher.grantmaster.ui.framework;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 public class TabSelectionChangeListener implements ChangeListener<Tab> {
   private static final Logger logger = LoggerFactory.getLogger(TabSelectionChangeListener.class);
   
-  static void activateTab(Tab tab) {
+  public static void activateTab(Tab tab) {
     logger.info("activate tab {}", tab.getText());
     Object controller = tab.getContent().getProperties().get("controller");
-    ((ControllerBase) controller).onMyTabIsSelected(); 
+    ((TablePageControllerBase) controller).onMyTabIsSelected(); 
   }
   
   @Override

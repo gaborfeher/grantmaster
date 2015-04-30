@@ -3,10 +3,11 @@ package com.github.gaborfeher.grantmaster.ui.cells;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javax.persistence.EntityManager;
 
-class BudgetCategoryTableCell<S extends EntityWrapper> extends BetterChoiceBoxTableCell<S, Object> {
+class BudgetCategoryTableCell<S extends EditableTableRowItem>
+    extends BetterChoiceBoxTableCell<S, Object> {
   BudgetCategory.Direction direction;
 
   public BudgetCategoryTableCell(String property, BudgetCategory.Direction direction) {

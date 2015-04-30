@@ -1,5 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.ui.framework.TabSelectionChangeListener;
 import com.github.gaborfeher.grantmaster.core.DatabaseConnection;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
@@ -273,7 +275,7 @@ public class MainPageController implements Initializable {
       }
     }
     
-    ControllerBase.exportActiveTabToXls(exportFile);
+    TablePageControllerBase.exportActiveTabToXls(exportFile);
   }
 
   @Override

@@ -4,10 +4,6 @@ import com.github.gaborfeher.grantmaster.core.Utils;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-/**
- *
- * @author gabor
- */
 class DateStringConverter extends MultiStringConverter<LocalDate> {
   
   public DateStringConverter() {

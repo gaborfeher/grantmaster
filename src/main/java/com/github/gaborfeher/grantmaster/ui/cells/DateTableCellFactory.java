@@ -1,12 +1,13 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import java.time.LocalDate;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 
-public class DateTableCellFactory<S extends EntityWrapper> implements Callback<TableColumn<S, LocalDate>, TableCell<S, LocalDate>> {
+public class DateTableCellFactory<S extends EditableTableRowItem>
+    implements Callback<TableColumn<S, LocalDate>, TableCell<S, LocalDate>> {
   private String property;
   
   @Override  

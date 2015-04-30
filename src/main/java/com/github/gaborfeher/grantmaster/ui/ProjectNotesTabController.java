@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectNoteWrapper;
@@ -8,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 
-public class ProjectNotesTabController extends ControllerBase<ProjectNoteWrapper> {
+public class ProjectNotesTabController extends TablePageControllerBase<ProjectNoteWrapper> {
   
   Project project;
   

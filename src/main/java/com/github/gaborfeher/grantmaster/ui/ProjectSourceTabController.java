@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -7,7 +8,7 @@ import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import javax.persistence.EntityManager;
 
-public class ProjectSourceTabController extends ControllerBase<ProjectSourceWrapper> {
+public class ProjectSourceTabController extends TablePageControllerBase<ProjectSourceWrapper> {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> grantCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> usedAccountingCurrencyAmountColumn;

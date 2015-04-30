@@ -1,4 +1,4 @@
-package com.github.gaborfeher.grantmaster.ui;
+package com.github.gaborfeher.grantmaster.ui.framework;
 
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
@@ -28,10 +28,13 @@ import javax.validation.ConstraintViolation;
  * Base class for most of the tab controllers in this applications.
  * All the tab controllers that are showing an (editable) table with a list
  * of entities are derived from this class. (The entities in the table are
- * JPA Entities wrapped in their corresponding EntityWrapper subclasses.)
+ * objects implementing EditableTableRowItems. In current implementation, they
+ * are all JPA Entities wrapped in their corresponding EntityWrapper
+ * subclasses.)
  * @param <T> 
  */
-public abstract class ControllerBase<T extends EntityWrapper> implements Initializable {
+public abstract class TablePageControllerBase<T extends EditableTableRowItem>
+    implements Initializable {
   /**
    * The main table displaying the data in this tab.
    */
@@ -49,7 +52,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
   protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
   
-  static protected ControllerBase activeTab = null;
+  static protected TablePageControllerBase activeTab = null;
   
   
   public void discardNew() {
@@ -90,7 +93,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
       selectedCell = new TableSelectionSaver(table);
       table.getSelectionModel().clearSelection();
     }
-    ControllerBase.this.refreshTableContent();
+    TablePageControllerBase.this.refreshTableContent();
     if (selectedCell != null) {
       selectedCell.restore();
     }
@@ -109,12 +112,12 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       ObservableList<T> tableItems = table.getItems();
       if (tableItems.isEmpty() ||
-          tableItems.get(0).getState() != EntityWrapper.State.EDITING_NEW) {
+          tableItems.get(0).getState() != RowEditState.EDITING_NEW) {
         tableItems.clear();
         // Add the editable empty new element at first position.
         T wrapper = createNewEntity(em);
         if (wrapper != null) {
-          wrapper.setState(EntityWrapper.State.EDITING_NEW);
+          wrapper.setState(RowEditState.EDITING_NEW);
           tableItems.add(wrapper);
         }
       } else {
@@ -195,7 +198,7 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     alert.showAndWait();
   }
   
-  static void exportActiveTabToXls(File file) {
+  public static void exportActiveTabToXls(File file) {
     if (activeTab != null) {
       activeTab.exportToXls(file);
     }

@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
@@ -72,7 +73,7 @@ public class ProjectExpenseWrapperTest {
       newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
       return true;
     })); 
-    newExpense.get().setState(EntityWrapper.State.EDITING_NEW);
+    newExpense.get().setState(RowEditState.EDITING_NEW);
     newExpense.get().setProperty(
         "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
     newExpense.get().setProperty(
@@ -88,7 +89,7 @@ public class ProjectExpenseWrapperTest {
       newExpense.get().save(em);
       return true;
     }));
-    assertEquals(EntityWrapper.State.SAVED, newExpense.get().getState());
+    assertEquals(RowEditState.SAVED, newExpense.get().getState());
     
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
@@ -309,7 +310,7 @@ public class ProjectExpenseWrapperTest {
       newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
       return true;
     })); 
-    newExpense.get().setState(EntityWrapper.State.EDITING_NEW);
+    newExpense.get().setState(RowEditState.EDITING_NEW);
     newExpense.get().setProperty(
         "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
     newExpense.get().setProperty(
@@ -326,7 +327,7 @@ public class ProjectExpenseWrapperTest {
       newExpense.get().save(em);
       return true;
     }));
-    assertEquals(EntityWrapper.State.SAVED, newExpense.get().getState());
+    assertEquals(RowEditState.SAVED, newExpense.get().getState());
 
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);

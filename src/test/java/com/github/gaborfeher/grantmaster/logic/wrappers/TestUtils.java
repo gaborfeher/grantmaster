@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
 import com.github.gaborfeher.grantmaster.core.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
@@ -61,7 +62,7 @@ public class TestUtils {
       Currency originalCurrency,
       String accountingCurrencyAmount) {
     ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(em, project);
-    newWrapper.setState(EntityWrapper.State.EDITING_NEW);
+    newWrapper.setState(RowEditState.EDITING_NEW);
     newWrapper.setProperty("paymentDate", date, LocalDate.class);
     newWrapper.setProperty(
         "budgetCategory",

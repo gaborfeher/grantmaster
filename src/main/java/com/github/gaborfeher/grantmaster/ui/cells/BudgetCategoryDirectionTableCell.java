@@ -1,9 +1,9 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 
-class BudgetCategoryDirectionTableCell<S extends EntityWrapper>
+class BudgetCategoryDirectionTableCell<S extends EditableTableRowItem>
     extends BetterChoiceBoxTableCell<S, BudgetCategory.Direction> {
 
   public BudgetCategoryDirectionTableCell(String property) {

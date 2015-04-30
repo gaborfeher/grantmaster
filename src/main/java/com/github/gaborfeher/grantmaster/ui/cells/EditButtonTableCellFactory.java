@@ -1,6 +1,8 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.event.ActionEvent;
@@ -14,13 +16,13 @@ import javafx.util.Callback;
 /**
  * Factory for EditButtonTableCell.
  */
-public class EditButtonTableCellFactory<S extends EntityWrapper>
-    implements Callback<TableColumn<S, EntityWrapper.State>, TableCell<S, EntityWrapper.State>> {
+public class EditButtonTableCellFactory<S extends EditableTableRowItem>
+    implements Callback<TableColumn<S, RowEditState>, TableCell<S, RowEditState>> {
   private String extraButtonText;
   private EventHandler<ActionEvent> onAction;
   
   @Override
-  public TableCell<S, EntityWrapper.State> call(TableColumn<S, EntityWrapper.State> p) {
+  public TableCell<S, RowEditState> call(TableColumn<S, RowEditState> p) {
     List<Node> extraButtons = new ArrayList<>();
     if (extraButtonText != null) {
       Button button = new Button();

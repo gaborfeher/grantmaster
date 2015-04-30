@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
@@ -20,7 +21,7 @@ import javafx.util.Callback;
 import javax.persistence.EntityManager;
 
 public class SearchTabController
-    extends ControllerBase<ProjectExpenseWrapper> {
+    extends TablePageControllerBase<ProjectExpenseWrapper> {
   @FXML private ExpenseTableController tableController;
   
   @FXML private ChoiceBox<Project> project;

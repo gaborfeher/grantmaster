@@ -1,9 +1,11 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
 import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.core.ValidatorFactorySingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
-import com.github.gaborfeher.grantmaster.ui.ControllerBase;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,29 +21,25 @@ import org.slf4j.LoggerFactory;
  * more importantly the wrapper bridges interaction between GUI controls and the
  * entities.
  * The JPA entities supported here have to be subclasses of EntityBase.
- * The GUI controls talking to EntityWrapper objects are the Java FX tab
+ * The GUI controls talking to EditableTableRowItem objects are the Java FX tab
  * controllers derived from ControllerBase, and the Java FX table cell
  * implementations in the ui.cells subpackage.
  * 
  * @param <T> Type of entity to wrap.
  */
-public abstract class EntityWrapper<T extends EntityBase> {
+public abstract class EntityWrapper<T extends EntityBase> implements EditableTableRowItem {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EntityWrapper.class);
   
   protected T entity;
 
-  public static enum State {
-    EDITING_NEW,
-    SAVED;
-  }
   
-  private State state;
+  private RowEditState state;
   private boolean isSummary;
-  private ControllerBase parent;
+  private TablePageControllerBase parent;
   
   public EntityWrapper(T entity) {
     this.entity = entity;
-    state = State.SAVED;
+    state = RowEditState.SAVED;
     isSummary = false;
   }
 
@@ -54,7 +52,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     if (!setProperty(property, val, valueType)) {
       return false;
     }
-    if (state == EntityWrapper.State.EDITING_NEW) {
+    if (state == RowEditState.EDITING_NEW) {
       // Nothing is to be done for newly created objects here. The user has to
       // click the create button to commit them.
       return true;
@@ -67,7 +65,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
     if (DatabaseSingleton.INSTANCE.transaction(
         (EntityManager em) -> save(em))) {
-      refresh();
+      requestTableRefresh();
       return true;
     } else {
       parent.showBackendFailureDialog("EntityWrapper.commitEdit(): merge");
@@ -76,16 +74,16 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
   
   public boolean saveNewInstance() {
-    if (state != State.EDITING_NEW) {
+    if (state != RowEditState.EDITING_NEW) {
       // TODO(gaborfeher): Log.
       return false;
     }
     if (!validate(true)) {
-      refresh();
+      requestTableRefresh();
       return false;
     }
     boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> save(em));
-    refresh();
+    requestTableRefresh();
     if (success == true) {
       return true;
     } else {
@@ -94,11 +92,11 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
   }
   
-  public State getState() {
+  public RowEditState getState() {
     return state;
   }
   
-  public void setState(State state) {
+  public void setState(RowEditState state) {
     this.state = state;
   }
   
@@ -117,6 +115,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
   }
   
+  @Override
   public Object getProperty(String name) {
     try {
       String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
@@ -129,7 +128,8 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
   }
   
-  public void refresh() {
+  @Override
+  public void requestTableRefresh() {
     if (parent != null) {
       parent.onRefresh();
     }
@@ -137,7 +137,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
 
   protected boolean save(EntityManager em) {
     entity = em.merge(entity);
-    setState(State.SAVED);
+    setState(RowEditState.SAVED);
     return true;
   }
   
@@ -149,6 +149,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     return constraintViolations;
   }
   
+  @Override
   public boolean validate(boolean showDialog) {
     Set<ConstraintViolation> constraintViolations = checkValidationConstraints();
     if (constraintViolations.isEmpty()) {
@@ -169,13 +170,14 @@ public abstract class EntityWrapper<T extends EntityBase> {
   }
   
   public void discardEdits() {
-    if (state == State.EDITING_NEW) {
+    if (state == RowEditState.EDITING_NEW) {
       parent.discardNew();
     } else {
       parent.onRefresh();
     }
   }
   
+  @Override
   public boolean getIsSummary() {
     return isSummary;
   }
@@ -184,11 +186,12 @@ public abstract class EntityWrapper<T extends EntityBase> {
     this.isSummary = isSummary;
   }
 
-  public void setParent(ControllerBase parent) {
+  @Override
+  public void setParent(TablePageControllerBase parent) {
     this.parent = parent;
   }
 
-  public ControllerBase getParent() {
+  public TablePageControllerBase getParent() {
     return parent;
   }
   
@@ -200,6 +203,7 @@ public abstract class EntityWrapper<T extends EntityBase> {
     }
   }
   
+  @Override
   public T getEntity() {
     return entity;
   }

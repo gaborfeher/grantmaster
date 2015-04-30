@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.cell.ChoiceBoxTableCell;
@@ -10,7 +11,8 @@ import javafx.util.StringConverter;
  * Adds some user friendliness and EntityWrapper-editing capabilities for
  * the standard Java FX choicebox table cell.
  */
-public abstract class BetterChoiceBoxTableCell<S extends EntityWrapper, T> extends ChoiceBoxTableCell<S, T> {
+public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T>
+    extends ChoiceBoxTableCell<S, T> {
   /**
    * The property of the edited EntityWrapper which will be updated on
    * commit.
@@ -41,8 +43,8 @@ public abstract class BetterChoiceBoxTableCell<S extends EntityWrapper, T> exten
     focusedProperty().addListener(new FocusChangeListener());
   }
   
-  protected EntityWrapper getEntityWrapper() {
-    return (EntityWrapper) getTableRow().getItem();
+  protected EditableTableRowItem getEntityWrapper() {
+    return (EditableTableRowItem) getTableRow().getItem();
   }
   
   @Override  

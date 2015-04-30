@@ -1,14 +1,17 @@
 package com.github.gaborfeher.grantmaster.ui;
 
+import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.ui.framework.TabSelectionChangeListener;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javax.persistence.EntityManager;
 
-public class ProjectTabController extends ControllerBase {
+public class ProjectTabController extends TablePageControllerBase {
   @FXML TabPane projectTabs;
   @FXML ProjectExpenseTabController projectExpenseTabController;
   @FXML ProjectSourceTabController projectSourceTabController;
@@ -37,7 +40,7 @@ public class ProjectTabController extends ControllerBase {
   }
 
   @Override
-  protected EntityWrapper createNewEntity(EntityManager em) {
+  protected EditableTableRowItem createNewEntity(EntityManager em) {
     throw new UnsupportedOperationException("Not supported.");
   }
   
