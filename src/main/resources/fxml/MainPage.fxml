@@ -12,6 +12,7 @@
       <children>
         <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" />
         <Button text="%SaveDatabase" onAction="#handleSaveButtonAction" />
+        <Button text="%SaveAsDatabase" onAction="#handleSaveAsButtonAction" />
         <Button text="%NewDatabase" onAction="#handleNewButtonAction" />
         <Button text="%ExportSheet" onAction="#handleExportSheetButtonAction" />
       </children>

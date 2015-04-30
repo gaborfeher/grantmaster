@@ -189,28 +189,38 @@ public class MainPageController implements Initializable {
     }
   }
   
+  private File selectFileForSaving() {
+    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("SaveDatabase"));
+    File selectedFile = fileChooser.showSaveDialog(stage);
+    if (selectedFile == null) {
+      return null;
+    }
+    if (!selectedFile.getAbsolutePath().endsWith(".hdb")) {
+      selectedFile = new File(selectedFile.getAbsolutePath() + ".hdb");
+      // The save dialog normally checks if the file exists, but now we need
+      // to check again for the .hdb file.
+      if (selectedFile.exists()) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(Utils.getString("SaveDatabase"));
+        alert.setHeaderText(Utils.getString("SaveOverrideQuestion") + "\n" + selectedFile.getAbsolutePath());
+        if (alert.showAndWait().get() != ButtonType.OK) {
+          return null;
+        } 
+      }
+    }
+    return selectedFile;
+  }
+  
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
-    if (openedFile == null && DatabaseSingleton.INSTANCE.isConnected()) {
-      FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("SaveDatabase"));
-      openedFile = fileChooser.showSaveDialog(stage);
+    if (!DatabaseSingleton.INSTANCE.isConnected()) {
+      return;
+    }
+    if (openedFile == null) {
+      openedFile = selectFileForSaving();
       if (openedFile == null) {
         return;
       }
-      if (!openedFile.getAbsolutePath().endsWith(".hdb")) {
-        openedFile = new File(openedFile.getAbsolutePath() + ".hdb");
-        if (openedFile.exists()) {
-          Alert alert = new Alert(AlertType.CONFIRMATION);
-          alert.setTitle(Utils.getString("SaveDatabase"));
-          alert.setHeaderText(Utils.getString("SaveOverrideQuestion") + "\n" + openedFile.getAbsolutePath());
-          if (alert.showAndWait().get() != ButtonType.OK) {
-            openedFile = null;
-          } 
-        }
-      }
-    }
-    if (openedFile == null) {
-      return;
     }
     try {
       DatabaseSingleton.INSTANCE.saveDatabase(openedFile);
@@ -218,6 +228,24 @@ public class MainPageController implements Initializable {
     } catch (IOException ex) {
       logger.error(null, ex);
     }    
+  }
+  
+  @FXML
+  private void handleSaveAsButtonAction(ActionEvent event) {
+    if (!DatabaseSingleton.INSTANCE.isConnected()) {
+      return;
+    }
+    File selectedFile = selectFileForSaving();
+    if (selectedFile == null) {
+      return;
+    }
+    openedFile = selectedFile;
+    try {
+      DatabaseSingleton.INSTANCE.saveDatabase(openedFile);
+      pathLabel.setText(openedFile.getAbsolutePath());
+    } catch (IOException ex) {
+      logger.error(null, ex);
+    }   
   }
   
   @FXML
