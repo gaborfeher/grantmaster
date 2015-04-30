@@ -26,13 +26,15 @@ public class ProjectWrapper extends EntityWrapper<Project> {
 
   public static List<ProjectWrapper> getProjects(EntityManager em) {
     return em.createQuery(
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) FROM Project p",
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper(p) " +
+            "FROM Project p " +
+            "ORDER BY p.name",
         ProjectWrapper.class).
             getResultList();
   }
   
   public static List<Project> getProjectsWithoutWrapping(EntityManager em) {
-    return em.createQuery("SELECT p FROM Project p", Project.class).getResultList();
+    return em.createQuery("SELECT p FROM Project p ORDER BY p.name", Project.class).getResultList();
   }
   
   public static ProjectWrapper createNew() {

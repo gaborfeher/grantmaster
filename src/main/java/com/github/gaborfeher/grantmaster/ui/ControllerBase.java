@@ -76,6 +76,8 @@ public abstract class ControllerBase<T extends EntityWrapper> implements Initial
     activeTab = this;
   }
   
+  // TODO(gaborfeher): Some subclasses are using detached entitites in this,
+  // so they don't pick up subsequent changes after the first resresh.
   protected void refreshOtherContent() {
   }
   
