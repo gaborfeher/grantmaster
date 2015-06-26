@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.SearchTabController">
+  <children>
+    <GridPane>
+      <Label text="%ExpenseSearchProject" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+      <ChoiceBox fx:id="project" GridPane.rowIndex="0" GridPane.columnIndex="1" />  
+      
+      <Label text="%BudgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+      <ChoiceBox fx:id="budgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+      
+      <Label text="%BudgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+      <TextField fx:id="budgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="1" />   
+      
+      <Label text="%ExpenseSearchInterval" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+      <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" >
+        <children>
+          <DatePicker fx:id="startDate" />
+          <Label text="-" />
+          <DatePicker fx:id="endDate" />
+        </children>
+      </HBox>
+      <Label text="%ExpenseAccountNo" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+      <TextField fx:id="accountNo" GridPane.rowIndex="4" GridPane.columnIndex="1" />  
+      
+      <Label text="%ExpensePartnerName" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+      <TextField fx:id="partnerName" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+      
+      <Label text="%ExpenseComment1" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+      <TextField fx:id="comment1" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+      <Label text="%ExpenseComment2" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+      <TextField fx:id="comment2" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+      
+      <Button text="%ExpenseSearchButton" onAction="#search" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+    </GridPane>
+    <fx:include source="ExpenseTable.fxml" fx:id="table" />
+    
+  </children>
+</VBox>

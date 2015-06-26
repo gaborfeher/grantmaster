@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectBudgetCategoriesTabController">
+  <children>
+    <GridPane>
+      <children>
+        <Label text="%ProjectBudgetLimitsFilter" GridPane.rowIndex="0" GridPane.columnIndex="0" /> 
+        <ChoiceBox fx:id="filterReport" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <Button onAction="#filterResetButtonAction" text="%ProjectBudgetLimitsFilterResetButton"
+                GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2" /> 
+      </children>
+    </GridPane>
+    <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS" >
+      <rowFactory>
+        <SummaryHighlighterRowFactory />
+      </rowFactory>
+      <columns>
+        <TableColumn prefWidth="115" sortable="false" styleClass="editColumn">
+          <cellFactory>
+            <EditButtonTableCellFactory />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="state" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%BudgetCategory" prefWidth="400" sortable="false" styleClass="textColumn">
+          <cellFactory>
+            <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>  
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="budgetCategory" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">
+          <cellFactory>
+            <BigDecimalTableCellFactory property="budgetPercentage" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="budgetPercentage" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn prefWidth="350" text="%BudgetLimitValueColumn">
+          <columns>
+            <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="budgetAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="budgetAccountingCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="budgetGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="true" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="budgetGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="budgetGrantCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+          </columns>
+        </TableColumn>
+        <TableColumn text="%BudgetLimitSpentColumn" prefWidth="350" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
+          <columns>
+            <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="spentAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="spentAccountingCurrency" />
+              </cellValueFactory>              
+            </TableColumn>
+            <TableColumn fx:id="spentGrantCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="spentGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="spentGrantCurrency" />
+              </cellValueFactory>              
+            </TableColumn>
+          </columns>
+        </TableColumn>
+        <TableColumn prefWidth="350" text="%BudgetLimitRemainingColumn">
+          <columns>
+            <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="remainingAccountingCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="remainingAccountingCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="remainingGrantCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
+              <cellFactory>
+                <BigDecimalTableCellFactory property="remainingGrantCurrency" /> 
+              </cellFactory>
+              <cellValueFactory>
+                <EntityPropertyValueFactory property="remainingGrantCurrency" />
+              </cellValueFactory>
+            </TableColumn>
+          </columns>
+        </TableColumn>   
+      </columns>
+    </TableView>
+  </children> 
+</VBox>

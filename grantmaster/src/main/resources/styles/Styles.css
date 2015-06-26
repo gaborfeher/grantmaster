@@ -1,0 +1,74 @@
+.numColumn {
+  -fx-alignment: bottom-right;
+}
+
+.numColumn .text-field {
+  -fx-padding: 0px;
+  -fx-background-color: white;
+  -fx-background-insets: 0;
+}
+
+.numColumn .text-field:focused {
+  -fx-background-color: white;
+  -fx-background-insets: 0;
+}
+
+.textColumn {
+  -fx-alignment: bottom-left;
+}
+
+.textColumn TextField {
+  -fx-padding: 0px;
+}
+
+.textColumn .text-field {
+  -fx-background-color: white;
+  -fx-background-insets: 0;
+}
+
+.textColumn .text-field:focused {
+  -fx-background-color: white;
+  -fx-background-insets: 0;
+}
+
+.summaryRow {
+  -fx-font-weight: bold;
+  -fx-background-color: #cfe7f5;
+}
+
+TableView .editColumn Button {
+  -fx-font-size: 1.0em;
+  -fx-padding: 3px;
+  -fx-margin: 1px;
+}
+
+.editColumn {
+  -fx-alignment: center;
+}
+
+.editColumn HBox {
+  -fx-alignment: center;
+}
+
+.table-cell:selected {
+  -fx-color: black;
+  -fx-font-color: black;
+  -fx-text-color: black;
+  -fx-background: -fx-control-inner-background ;
+  -fx-background-color: -fx-table-cell-border-color, -fx-background ;
+  -fx-background-insets: 0, 3 ;
+  -fx-table-cell-border-color: gray;
+}
+
+//.choice-box {
+//  -fx-background-color: red;
+//  -fx-text-fill: black;
+//}
+
+.choice-box .label {
+  -fx-text-fill: black;
+}
+
+.choice-box .arrow, .choice-box .arrow-button {
+  -fx-background-color: black;
+}

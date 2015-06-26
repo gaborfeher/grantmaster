@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectListTabController">
+  <children>
+    <TableView fx:id="table" editable="true" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn prefWidth="115" styleClass="editColumn" sortable="false" >
+          <cellFactory>
+            <EditButtonTableCellFactory extraButtonText="%OpenProject" onAction="#handleOpenButtonAction" />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="state" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectName" prefWidth="150" styleClass="textColumn" sortable="false">
+            <cellFactory>
+            <StringTableCellFactory property="name" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="name" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectAccountCurrency" prefWidth="150" styleClass="textColumn" sortable="false">
+          <cellFactory>
+            <CurrencyTableCellFactory property="accountCurrency" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="accountCurrency" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectGrantCurrency" prefWidth="150" styleClass="textColumn" sortable="false">
+          <cellFactory>
+            <CurrencyTableCellFactory property="grantCurrency" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="grantCurrency" />
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%ProjectIncomeType" prefWidth="300" styleClass="textColumn" sortable="false">
+          <cellFactory>
+            <BudgetCategoryTableCellFactory property="incomeType" direction="INCOME" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="incomeType" />
+          </cellValueFactory>
+        </TableColumn>
+        
+      </columns>
+    </TableView>                
+  </children>
+</VBox>

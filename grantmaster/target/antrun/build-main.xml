@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <delete>
+    <fileset includes="**/META-INF/*.DSA" dir="/home/gabor/gm/grantmaster/grantmaster/target/classes"/>
+    <fileset includes="**/META-INF/*.RSA" dir="/home/gabor/gm/grantmaster/grantmaster/target/classes"/>
+    <fileset includes="**/META-INF/*.SF" dir="/home/gabor/gm/grantmaster/grantmaster/target/classes"/>
+  </delete>
+</target>
+</project>

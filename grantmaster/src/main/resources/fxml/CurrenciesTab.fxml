@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.*?>
+<?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.CurrenciesTabController">
+  <children>
+    <TableView fx:id="table" VBox.vgrow="ALWAYS" editable="true" >
+      <columns>
+        <TableColumn prefWidth="115" styleClass="editColumn" sortable="false" >
+          <cellFactory>
+            <EditButtonTableCellFactory />
+          </cellFactory>
+          <cellValueFactory>
+            <PropertyValueFactory property="state" /> 
+          </cellValueFactory>
+        </TableColumn>
+        <TableColumn text="%CurrencyNameColumn" prefWidth="150" styleClass="textColumn" sortable="false" >
+          <cellFactory>
+            <StringTableCellFactory property="code" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="code" /> 
+          </cellValueFactory>
+        </TableColumn>
+      </columns>
+    </TableView>                
+  </children>
+</VBox>
