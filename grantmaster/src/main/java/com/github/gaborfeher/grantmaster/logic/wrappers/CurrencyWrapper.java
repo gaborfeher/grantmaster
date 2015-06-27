@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import java.util.List;
 import javax.persistence.EntityManager;

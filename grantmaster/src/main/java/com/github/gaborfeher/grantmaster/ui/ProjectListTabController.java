@@ -1,10 +1,10 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
-import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
-import com.github.gaborfeher.grantmaster.ui.cells.EditButtonTableCell;
+import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.EditButtonTableCell;
 import java.io.IOException;
 import java.util.List;
 import javafx.event.ActionEvent;

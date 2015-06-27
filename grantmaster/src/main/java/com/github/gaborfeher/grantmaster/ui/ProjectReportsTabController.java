@@ -1,8 +1,8 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
 import java.util.List;
 import javax.persistence.EntityManager;

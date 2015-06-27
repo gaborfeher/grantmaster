@@ -1,7 +1,8 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
-import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.PropertyTableCellFactoryBase;
+import com.github.gaborfeher.grantmaster.framework.base.EditableTableRowItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;

@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;

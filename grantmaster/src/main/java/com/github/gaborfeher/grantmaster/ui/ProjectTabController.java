@@ -1,10 +1,10 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
-import com.github.gaborfeher.grantmaster.ui.framework.TabSelectionChangeListener;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TabSelectionChangeListener;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
-import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.base.EditableTableRowItem;
 import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;

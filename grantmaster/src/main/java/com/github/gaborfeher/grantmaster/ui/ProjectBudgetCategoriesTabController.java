@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import java.util.List;
 import java.math.BigDecimal;
 import javafx.beans.value.ChangeListener;
@@ -11,8 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.ChoiceBox;
 import javax.persistence.EntityManager;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;

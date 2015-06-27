@@ -1,6 +1,7 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.time.LocalDate;

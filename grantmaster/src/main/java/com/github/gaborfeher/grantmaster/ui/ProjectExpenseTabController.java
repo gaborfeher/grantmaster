@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import javafx.fxml.FXML;
 import java.util.List;
 import javax.persistence.EntityManager;

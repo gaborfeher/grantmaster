@@ -1,7 +1,7 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;

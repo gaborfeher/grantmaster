@@ -1,6 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import java.math.BigDecimal;
 import java.util.HashMap;

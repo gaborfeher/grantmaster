@@ -1,8 +1,8 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.ui.framework.RowEditState;
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;

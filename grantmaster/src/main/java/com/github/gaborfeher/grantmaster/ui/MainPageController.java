@@ -1,10 +1,10 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
-import com.github.gaborfeher.grantmaster.ui.framework.TabSelectionChangeListener;
-import com.github.gaborfeher.grantmaster.core.DatabaseConnection;
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TabSelectionChangeListener;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseConnection;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;

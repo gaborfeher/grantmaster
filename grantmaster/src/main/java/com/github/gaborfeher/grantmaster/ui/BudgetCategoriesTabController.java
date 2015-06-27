@@ -1,11 +1,11 @@
 package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.ui.framework.TablePageControllerBase;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBase;
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
-import com.github.gaborfeher.grantmaster.ui.cells.BigDecimalTableCellFactory;
-import com.github.gaborfeher.grantmaster.ui.cells.EntityPropertyValueFactory;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.BigDecimalTableCellFactory;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.EntityPropertyValueFactory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

@@ -5,6 +5,7 @@
  */
 package com.github.gaborfeher.grantmaster.logic.entities;
 
+import com.github.gaborfeher.grantmaster.framework.base.EntityBase;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;

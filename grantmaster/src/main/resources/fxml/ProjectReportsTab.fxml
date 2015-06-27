@@ -6,6 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
+<?import com.github.gaborfeher.grantmaster.framework.ui.cells.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectReportsTabController">

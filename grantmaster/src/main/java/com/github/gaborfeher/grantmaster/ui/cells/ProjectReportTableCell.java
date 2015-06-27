@@ -1,13 +1,15 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
-import com.github.gaborfeher.grantmaster.logic.wrappers.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectReportWrapper;
-import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.BetterChoiceBoxTableCell;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.MultiStringConverter;
+import com.github.gaborfeher.grantmaster.framework.base.EditableTableRowItem;
 import javax.persistence.EntityManager;
 
 class ProjectReportTableCell<S extends EditableTableRowItem>

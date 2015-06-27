@@ -1,8 +1,9 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
-import com.github.gaborfeher.grantmaster.core.Utils;
+import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
-import com.github.gaborfeher.grantmaster.logic.entities.EntityBase;
+import com.github.gaborfeher.grantmaster.framework.base.EntityBase;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManager;

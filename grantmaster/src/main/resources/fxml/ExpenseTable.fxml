@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
+<?import com.github.gaborfeher.grantmaster.framework.ui.cells.*?>
 
 <TableView xmlns:fx="http://javafx.com/fxml/1" editable="true" fx:controller="com.github.gaborfeher.grantmaster.ui.ExpenseTableController" VBox.vgrow="ALWAYS">
   <columns>

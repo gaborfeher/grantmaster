@@ -1,5 +1,6 @@
 package com.github.gaborfeher.grantmaster.logic.entities;
 
+import com.github.gaborfeher.grantmaster.framework.base.EntityBase;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;

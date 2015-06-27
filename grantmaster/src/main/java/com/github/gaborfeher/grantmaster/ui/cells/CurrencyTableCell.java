@@ -1,8 +1,9 @@
 package com.github.gaborfeher.grantmaster.ui.cells;
 
-import com.github.gaborfeher.grantmaster.core.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
-import com.github.gaborfeher.grantmaster.ui.framework.EditableTableRowItem;
+import com.github.gaborfeher.grantmaster.framework.ui.cells.BetterChoiceBoxTableCell;
+import com.github.gaborfeher.grantmaster.framework.base.EditableTableRowItem;
 import javax.persistence.EntityManager;
 
 class CurrencyTableCell<S extends EditableTableRowItem>
