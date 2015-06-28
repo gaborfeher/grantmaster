@@ -1,6 +1,5 @@
 package com.github.gaborfeher.grantmaster.framework.base;
 
-import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tab;
@@ -17,7 +16,9 @@ public class TabSelectionChangeListener implements ChangeListener<Tab> {
   public static void activateTab(Tab tab) {
     logger.info("activate tab {}", tab.getText());
     Object controller = tab.getContent().getProperties().get("controller");
-    ((TablePageControllerBase) controller).onMyTabIsSelected(); 
+    if (controller != null && controller instanceof TablePageControllerBase) {
+      ((TablePageControllerBase) controller).onMyTabIsSelected(); 
+    }
   }
   
   @Override

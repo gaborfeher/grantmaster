@@ -3,6 +3,7 @@ package com.github.gaborfeher.grantmaster.ui;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 public class MainApp extends Application {
   private static final Logger logger = LoggerFactory.getLogger(MainApp.class);
-  
-  public final static String VERSION_STRING = "v0.8";
   
   private MainPageController controller;
 
@@ -38,10 +37,11 @@ public class MainApp extends Application {
     Parent root = loader.load();
     controller = loader.getController();
     controller.setStage(stage);
-
+    System.out.println("getHostServices() " + getHostServices());
+    controller.setHostServices(getHostServices());
     Scene scene = new Scene(root);
     scene.getStylesheets().add("/styles/Styles.css");
-    stage.setTitle(Utils.getString("AppName") + " - " + VERSION_STRING);
+    stage.setTitle(Utils.getString("AppName"));
     stage.setMaximized(true);
     stage.setScene(scene);
     stage.show();

@@ -20,6 +20,9 @@
     <TextField fx:id="pathLabel" editable="false" />
     <TabPane VBox.vgrow="ALWAYS" fx:id="mainTabs">
       <tabs>
+        <Tab text="%AboutTabName" closable="false">
+          <fx:include source="AboutTab.fxml" fx:id="aboutTab" />
+        </Tab>
         <Tab text="%ProjectsTabName" closable="false">
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>

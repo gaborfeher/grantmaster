@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,7 +39,7 @@ public class MainPageController implements Initializable {
    * Number of static tabs shown. (The ones that are not open/close-able
    * project tabs.
    */
-  private static final int NUM_SYSTEM_TABS = 4;
+  private static final int NUM_SYSTEM_TABS = 5;
   
   @FXML private TextField pathLabel;
   @FXML Parent root;
@@ -49,6 +50,7 @@ public class MainPageController implements Initializable {
   Stage stage;
   
   @FXML ProjectListTabController projectListTabController;
+  @FXML AboutTabController aboutTabController;
   
   /**
    * The database file which is open. null for newly created databases.
@@ -100,8 +102,8 @@ public class MainPageController implements Initializable {
   
   private void resetAndRefreshTabs() {
     closeProjectTabs();
-    mainTabs.getSelectionModel().selectFirst();
-    TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(0));
+    mainTabs.getSelectionModel().select(1);
+    TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(1));
   }
  
   public void addProjectTab(final Project project) throws IOException {
@@ -288,5 +290,8 @@ public class MainPageController implements Initializable {
     this.stage = stage;
   }
 
- 
+  void setHostServices(HostServices hostServices) {
+    aboutTabController.setHostServices(hostServices);
+  }
+
 }
