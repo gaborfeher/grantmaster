@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Packs and unpacks a zip file into a temporary directory. The files of
- * a HSQLDB database will be stored in the zip file.
+ * a HSQLDB database will be stored in the zip file. This class does not
+ * care about the contents of the zipped files.
  */
 public class DatabaseArchive {
   private static final Logger logger = LoggerFactory.getLogger(DatabaseArchive.class);
@@ -49,14 +50,14 @@ public class DatabaseArchive {
     return new DatabaseArchive(createTempDir());
   }
   
-  public static DatabaseArchive open(File path) {
+  public static DatabaseArchive open(File archiveFile) {
     File tempDir = createTempDir();
     if (tempDir == null) {
       return null;
     }
     try (ZipInputStream zipInputStrem = new ZipInputStream(
              new BufferedInputStream(
-                 new FileInputStream(path)))) {
+                 new FileInputStream(archiveFile)))) {
       ZipEntry zipEntry;
       while ((zipEntry = zipInputStrem.getNextEntry()) != null) {
         File fileToWrite = new File(tempDir, zipEntry.getName());
@@ -99,11 +100,11 @@ public class DatabaseArchive {
     }
   }
 
-  public File getFile() {
+  File getDirectory() {
     return tempDir;
   }
 
-  public void saveTo(File path) throws IOException {
+  public void saveToArchiveFile(File archiveFile) throws IOException {
     Path tempFile = Files.createTempFile("gmsave", ".hdb");
     try (
         FileOutputStream fileOutputStream = new FileOutputStream(tempFile.toFile());
@@ -115,6 +116,6 @@ public class DatabaseArchive {
         zipOutputStream.closeEntry();
       }
     }
-    Files.move(tempFile, path.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.move(tempFile, archiveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 }

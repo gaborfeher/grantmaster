@@ -7,6 +7,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Stores a DatabaseConnection and provides convenience methods for using it.
+ */
 public enum DatabaseSingleton {
   INSTANCE;
 

@@ -1,9 +1,12 @@
 package com.github.gaborfeher.grantmaster.framework.utils;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
@@ -17,6 +20,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DatabaseConnection {
   private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
+  
+  private final String PROPERTIES_FILE = "grantmaster.properties";
 
   /**
    * The unpacked database files used by the database engine.
@@ -27,6 +32,7 @@ public class DatabaseConnection {
    */
   private boolean unsavedChanges;
   private EntityManagerFactory entityManagerFactory;
+  private Properties properties;
   
   public void close() {
     disconnect();
@@ -41,6 +47,44 @@ public class DatabaseConnection {
     if (getEntityManagerFactory() != null) {
       getEntityManagerFactory().close();
       entityManagerFactory = null;
+    }
+  }
+    
+  private void loadProperties() {
+    File propertiesFile = new File(archive.getDirectory(), PROPERTIES_FILE);
+    properties = new Properties();
+    try {
+      if (propertiesFile.exists() && !propertiesFile.isDirectory()) {
+        properties.load(new FileReader(propertiesFile));
+      }
+    } catch (IOException ex) {
+    }
+  }
+  
+  private void storeProperties() {
+    try {
+      File propertiesFile = new File(archive.getDirectory(), PROPERTIES_FILE);
+      properties.store(new FileWriter(propertiesFile), "This is a GrantMaster database archive.\nhttps://github.com/gaborfeher/grantmaster");
+    } catch (IOException ex) {
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(
+          "Cannot write properties file", ex);
+    }
+  }
+  
+  private boolean checkProperties() {
+    final int CURRENT_FORMAT_VERSION = 1;
+    final String FORMAT_VERSION = "format.version";
+    if (!properties.containsKey(FORMAT_VERSION)) {
+      properties.put(FORMAT_VERSION, String.format("%d", CURRENT_FORMAT_VERSION));
+      return true;
+    }
+    int formatVersion = Integer.parseInt((String) properties.get(FORMAT_VERSION));
+    switch (formatVersion) {
+      case CURRENT_FORMAT_VERSION:
+        return true;
+      // Earlier versions can be handled here.
+      default:
+        return false;
     }
   }
   
@@ -58,7 +102,6 @@ public class DatabaseConnection {
       LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
     }
     return getEntityManagerFactory() != null;
-
   }
   
   private boolean connectToMemoryFileForTesting() {
@@ -66,13 +109,19 @@ public class DatabaseConnection {
   }
   
   private boolean connectToFile() {
-    return connectToJdbcUrl("jdbc:hsqldb:file:" + new File(archive.getFile(), "database") +";shutdown=true");
+    File databaseFile = new File(archive.getDirectory(), "database");
+    if (!connectToJdbcUrl("jdbc:hsqldb:file:" + databaseFile +";shutdown=true")) {
+      return false;
+    }
+    loadProperties();
+    return checkProperties();
   }
   
   public void saveDatabase(File path) throws IOException {
     logger.info("saveDatabase({})", path);
     disconnect();
-    archive.saveTo(path);
+    storeProperties();
+    archive.saveToArchiveFile(path);
     unsavedChanges = false;
     connectToFile();
   }
@@ -100,7 +149,6 @@ public class DatabaseConnection {
     }
     return newConnection;
   }
-  
   
   public static DatabaseConnection openDatabase(File path) {
     logger.info("openDatabase({})", path);
