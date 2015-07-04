@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-This file is a part of GrantMaster.
+GrantMaster: a Budget Tracker for NGOs
 Copyright (C) 2015  Gábor Fehér <feherga@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -15,16 +13,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectExpenseTabController">
-  <children>
-    <fx:include source="ExpenseTable.fxml" fx:id="table" />
-  </children>
-</VBox>
