@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -56,6 +57,25 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
   }
   
+  @AssertTrue(message="%ValidationErrorExpenseConsistency")
+  private boolean isValid() {
+    ProjectExpense expense = getEntity();
+    if (expense.getProject() == null ||
+        expense.getProject().getAccountCurrency() == null ||
+        expense.getOriginalCurrency() == null ||
+        expense.getOriginalAmount() == null ||
+        accountingCurrencyAmount == null) {
+      return false;
+    }
+    Project project = expense.getProject();
+    if (!expense.getOriginalCurrency().equals(project.getAccountCurrency())) {
+      // Nothing to check if they are not equal.
+      return true;
+    }
+    return 0 == expense.getOriginalAmount().compareTo(accountingCurrencyAmount);
+  }
+      
+      
   /**
    * Adds an expense source allocation to this expense. In other words,
    * spent money is added. Not that grantCurrencyAmount is updated but

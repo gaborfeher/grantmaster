@@ -68,6 +68,10 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
     if (getEntityWrapper() != null &&  // TODO(gaborfeher): Investigate why these are needed.
         getEntityWrapper().commitEdit(property, val, valueClass)) {
       updateItem(val, false);
+    } else {
+      cancelEdit();
+      getEntityWrapper().validate(true);  // Show validation error dialog if needed.
+      getEntityWrapper().requestTableRefresh();
     }
   }
   
