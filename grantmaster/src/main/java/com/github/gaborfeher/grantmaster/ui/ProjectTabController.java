@@ -14,7 +14,7 @@ import javax.persistence.EntityManager;
 public class ProjectTabController extends TablePageControllerBase {
   @FXML TabPane projectTabs;
   @FXML ProjectExpenseTabController projectExpenseTabController;
-  @FXML ProjectSourceTabController projectSourceTabController;
+  @FXML ProjectSourcesTabController projectSourcesTabController;
   @FXML ProjectBudgetCategoriesTabController projectBudgetCategoriesTabController;
   @FXML ProjectNotesTabController projectNotesTabController;
   @FXML ProjectReportsTabController projectReportsTabController;
@@ -22,7 +22,7 @@ public class ProjectTabController extends TablePageControllerBase {
   void init(Project project) {
     projectTabs.getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
     projectExpenseTabController.init(project);
-    projectSourceTabController.init(project);
+    projectSourcesTabController.init(project);
     projectBudgetCategoriesTabController.init(project);
     projectNotesTabController.init(project);
     projectReportsTabController.init(project);

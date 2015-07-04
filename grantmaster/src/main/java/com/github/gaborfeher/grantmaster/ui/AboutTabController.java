@@ -8,7 +8,6 @@ public class AboutTabController {
   HostServices hostServices;
 
   public void setHostServices(HostServices hostServices) {
-    System.out.println("setHostServices " + hostServices);
     this.hostServices = hostServices;
   }
 

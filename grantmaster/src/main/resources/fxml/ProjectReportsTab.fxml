@@ -21,7 +21,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn> 
-        <TableColumn text="%ProjectReportDate" prefWidth="200" styleClass="textColumn" sortable="false">
+        <TableColumn text="%ProjectTab.ReportsTab.Date" prefWidth="200" styleClass="textColumn" sortable="false">
           <cellFactory>
             <DateTableCellFactory property="reportDate" />
           </cellFactory>
@@ -29,7 +29,7 @@
             <EntityPropertyValueFactory property="reportDate" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectReportNote" prefWidth="700" styleClass="textColumn" sortable="false">
+        <TableColumn text="%ProjectTab.ReportsTab.Note" prefWidth="700" styleClass="textColumn" sortable="false">
           <cellFactory>
             <StringTableCellFactory property="note" /> 
           </cellFactory>

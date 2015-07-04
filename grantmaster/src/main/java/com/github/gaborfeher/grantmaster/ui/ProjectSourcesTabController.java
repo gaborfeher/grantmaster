@@ -8,7 +8,7 @@ import javafx.scene.control.TableColumn;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectSourceWrapper;
 import javax.persistence.EntityManager;
 
-public class ProjectSourceTabController extends TablePageControllerBase<ProjectSourceWrapper> {
+public class ProjectSourcesTabController extends TablePageControllerBase<ProjectSourceWrapper> {
   @FXML TableColumn<ProjectSourceWrapper, Float> accountingCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> grantCurrencyAmountColumn;
   @FXML TableColumn<ProjectSourceWrapper, Float> usedAccountingCurrencyAmountColumn;
@@ -18,7 +18,7 @@ public class ProjectSourceTabController extends TablePageControllerBase<ProjectS
   
   private Project project;
 
-  public ProjectSourceTabController() {
+  public ProjectSourcesTabController() {
   }
 
   void init(Project project) {

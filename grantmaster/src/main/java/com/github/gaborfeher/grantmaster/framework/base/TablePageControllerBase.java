@@ -1,9 +1,7 @@
 package com.github.gaborfeher.grantmaster.framework.base;
 
-import com.github.gaborfeher.grantmaster.framework.base.EditableTableRowItem;
 import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
-import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,9 +51,6 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
   protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
   
-  static protected TablePageControllerBase activeTab = null;
-  
-  
   public void discardNew() {
     table.getItems().clear();
     onRefresh();
@@ -77,7 +72,6 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
   public void onMyTabIsSelected() {
     refreshOtherContent();
     refreshTableContentAndMaintainFocus();
-    activeTab = this;
   }
   
   // TODO(gaborfeher): Some subclasses are using detached entitites in this,
@@ -200,8 +194,9 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
   }
   
   public static void exportActiveTabToXls(File file) {
-    if (activeTab != null) {
-      activeTab.exportToXls(file);
+    TablePageControllerBase activeController = TabSelectionChangeListener.getActiveTabController();
+    if (activeController != null) {
+      activeController.exportToXls(file);
     }
   }
 

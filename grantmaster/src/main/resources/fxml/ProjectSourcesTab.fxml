@@ -9,7 +9,7 @@
 <?import com.github.gaborfeher.grantmaster.framework.ui.cells.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectSourceTabController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.ProjectSourcesTabController">
   <children>
     <TableView editable="true" fx:id="table" VBox.vgrow="ALWAYS">
       <columns>
@@ -29,7 +29,7 @@
             <EntityPropertyValueFactory property="report" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectSourceAvailabilityDate" prefWidth="100" sortable="false" styleClass="textColumn">
+        <TableColumn text="%ProjectTab.SourcesTab.AvailabilityDate" prefWidth="100" sortable="false" styleClass="textColumn">
           <cellFactory>
             <DateTableCellFactory property="availabilityDate" /> 
           </cellFactory>
@@ -37,7 +37,7 @@
             <EntityPropertyValueFactory property="availabilityDate" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectSourceExchangeRate" styleClass="numColumn" prefWidth="100" sortable="false">
+        <TableColumn text="%ProjectTab.SourcesTab.ExchangeRate" styleClass="numColumn" prefWidth="100" sortable="false">
           <cellFactory>
             <BigDecimalTableCellFactory property="exchangeRate" /> 
           </cellFactory>
@@ -45,7 +45,7 @@
             <EntityPropertyValueFactory property="exchangeRate" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectSourceAmount">
+        <TableColumn text="%ProjectTab.SourcesTab.Amount">
           <columns>
             <TableColumn fx:id="accountingCurrencyAmountColumn" styleClass="numColumn" prefWidth="120" editable="false" sortable="false">
               <cellFactory>
@@ -65,7 +65,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn text="%ProjectSourceUsedAmount">
+        <TableColumn text="%ProjectTab.SourcesTab.UsedAmount">
           <columns>
             <TableColumn fx:id="usedAccountingCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
@@ -85,7 +85,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn text="%ProjectSourceRemainingAmount">
+        <TableColumn text="%ProjectTab.SourcesTab.RemainingAmount">
           <columns>
             <TableColumn fx:id="remainingAccountingCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>

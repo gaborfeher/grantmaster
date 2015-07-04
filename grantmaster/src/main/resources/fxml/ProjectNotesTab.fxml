@@ -20,12 +20,12 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn> 
-        <TableColumn text="%ProjectNotesEntryTime" editable="false" prefWidth="200" styleClass="textColumn">
+        <TableColumn text="%ProjectTab.NotesTab.EntryTime" editable="false" prefWidth="200" styleClass="textColumn">
           <cellValueFactory>
             <EntityPropertyValueFactory property="entryTime" />
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectNotesNote" prefWidth="700" styleClass="textColumn">
+        <TableColumn text="%ProjectTab.NotesTab.Note" prefWidth="700" styleClass="textColumn">
           <cellFactory>
             <StringTableCellFactory property="note" /> 
           </cellFactory>

@@ -15,25 +15,26 @@
         <Button text="%SaveAsDatabase" onAction="#handleSaveAsButtonAction" />
         <Button text="%NewDatabase" onAction="#handleNewButtonAction" />
         <Button text="%ExportSheet" onAction="#handleExportSheetButtonAction" />
+        <Button text="%ContextHelp" onAction="#handleContextHelpButtonAction" />
       </children>
     </HBox>
     <TextField fx:id="pathLabel" editable="false" />
     <TabPane VBox.vgrow="ALWAYS" fx:id="mainTabs">
       <tabs>
-        <Tab text="%AboutTabName" closable="false">
-          <fx:include source="AboutTab.fxml" fx:id="aboutTab" />
-        </Tab>
-        <Tab text="%ProjectsTabName" closable="false">
+        <Tab text="%ProjectListTabName" userData="%ProjectListTabTooltip" closable="false">
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>
-        <Tab text="%BudgetCategoriesTabName" closable="false">
+        <Tab text="%BudgetCategoriesTabName" userData="%BudgetCategoriesTabTooltip" closable="false">
           <fx:include source="BudgetCategoriesTab.fxml" fx:id="budgetCategoriesTab" />
         </Tab>
-        <Tab text="%CurrenciesTabName" closable="false">
+        <Tab text="%CurrenciesTabName" userData="%CurrenciesTabTooltip" closable="false">
           <fx:include source="CurrenciesTab.fxml" />
         </Tab>
         <Tab text="%SearchTabName" closable="false">
           <fx:include source="SearchTab.fxml" />
+        </Tab>
+        <Tab text="%AboutTabName" closable="false">
+          <fx:include source="AboutTab.fxml" fx:id="aboutTab" />
         </Tab>
       </tabs>
     </TabPane>      

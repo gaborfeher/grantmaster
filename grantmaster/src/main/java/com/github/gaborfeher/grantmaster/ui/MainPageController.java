@@ -18,16 +18,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javax.persistence.EntityManager;
 import org.slf4j.LoggerFactory;
@@ -102,7 +105,7 @@ public class MainPageController implements Initializable {
   
   private void resetAndRefreshTabs() {
     closeProjectTabs();
-    mainTabs.getSelectionModel().select(1);
+    mainTabs.getSelectionModel().select(0);
     TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(1));
   }
  
@@ -280,10 +283,35 @@ public class MainPageController implements Initializable {
     TablePageControllerBase.exportActiveTabToXls(exportFile);
   }
 
+  @FXML
+  private void handleContextHelpButtonAction(ActionEvent event) {
+   final Popup popup = new Popup();
+
+    Tab activeTab = TabSelectionChangeListener.getActiveTab();
+    if (activeTab == null || activeTab.getUserData() == null) {
+      return;
+    }
+    // The help text is currently stored in userData.
+    // TODO(gaborfeher): Find a better place.
+    String helpText = (String) activeTab.getUserData();
+    Label popupLabel = new Label(helpText);
+    popupLabel.setStyle("-fx-border-color: black;");
+    popup.setAutoHide(true);
+    popup.setAutoFix(true);
+    // Calculate popup placement coordinates.
+    Node eventSource = (Node) event.getSource();
+    Bounds sourceNodeBounds = eventSource.localToScreen(eventSource.getBoundsInLocal());
+    popup.setX(sourceNodeBounds.getMinX() - 5.0);
+    popup.setY(sourceNodeBounds.getMaxY() + 5.0);
+    popup.getContent().addAll(popupLabel);
+    popup.show(stage);
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     projectListTabController.init(this);
     mainTabs.getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
+    mainTabs.getSelectionModel().select(4);
   }    
 
   void setStage(Stage stage) {

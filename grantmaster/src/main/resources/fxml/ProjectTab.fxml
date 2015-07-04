@@ -12,19 +12,19 @@
   <children>
     <TabPane VBox.vgrow="ALWAYS" fx:id="projectTabs">
       <tabs>
-        <Tab text="%ProjectBudgetCategoriesTabName" closable="false" >
+        <Tab text="%ProjectTab.BudgetCategoriesTab.Name" userData="%ProjectTab.BudgetCategoriesTab.Help" closable="false" >
           <fx:include source="ProjectBudgetCategoriesTab.fxml" fx:id="projectBudgetCategoriesTab" />
         </Tab>
-        <Tab text="%SourcesTabName" closable="false" >
-          <fx:include source="ProjectSourceTab.fxml" fx:id="projectSourceTab" />
+        <Tab text="%ProjectTab.SourcesTab.Name" userData="%ProjectTab.SourcesTab.Help" closable="false" >
+          <fx:include source="ProjectSourcesTab.fxml" fx:id="projectSourcesTab" />
         </Tab>
-        <Tab text="%ProjectExpensesTabName" closable="false" >
+        <Tab text="%ProjectTab.ExpensesTab.Name" userData="%ProjectTab.ExpensesTab.Help" closable="false" >
           <fx:include source="ProjectExpenseTab.fxml" fx:id="projectExpenseTab" />
         </Tab>
-        <Tab text="%ProjectReportsTabName" closable="false" >
+        <Tab text="%ProjectTab.ReportsTab.Name" userData="%ProjectTab.ReportsTab.Help" closable="false" >
           <fx:include source="ProjectReportsTab.fxml" fx:id="projectReportsTab" />
         </Tab>
-        <Tab text="%ProjectNotesTabName" closable="false" >
+        <Tab text="%ProjectTab.NotesTab.Name" userData="%ProjectTab.NotesTab.Help" closable="false" >
           <fx:include source="ProjectNotesTab.fxml" fx:id="projectNotesTab" />
         </Tab>
       </tabs>

@@ -4,8 +4,8 @@
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
 <?import com.github.gaborfeher.grantmaster.ui.cells.*?>
 <?import com.github.gaborfeher.grantmaster.framework.ui.cells.*?>
 
