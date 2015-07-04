@@ -44,6 +44,8 @@ public class MainPageController implements Initializable {
    */
   private static final int NUM_SYSTEM_TABS = 5;
   
+  private static final int ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT = 0;
+  
   @FXML private TextField pathLabel;
   @FXML Parent root;
   @FXML TabPane mainTabs;
@@ -105,8 +107,8 @@ public class MainPageController implements Initializable {
   
   private void resetAndRefreshTabs() {
     closeProjectTabs();
-    mainTabs.getSelectionModel().select(0);
-    TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(1));
+    mainTabs.getSelectionModel().select(ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT);
+    TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT));
   }
  
   public void addProjectTab(final Project project) throws IOException {
