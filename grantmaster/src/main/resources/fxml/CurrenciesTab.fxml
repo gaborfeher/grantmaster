@@ -20,7 +20,7 @@
             <PropertyValueFactory property="state" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%CurrencyNameColumn" prefWidth="150" styleClass="textColumn" sortable="false" >
+        <TableColumn text="%CurrenciesTab.NameColumn" prefWidth="150" styleClass="textColumn" sortable="false" >
           <cellFactory>
             <StringTableCellFactory property="code" />
           </cellFactory>

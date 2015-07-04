@@ -153,7 +153,7 @@ public class MainPageController implements Initializable {
     if (!allowCloseDatabase()) {
       return;
     }
-    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("OpenDatabase"));
+    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("MainPage.OpenDatabase"));
     File path = fileChooser.showOpenDialog(stage);
     if (path == null) {
       return;
@@ -166,7 +166,7 @@ public class MainPageController implements Initializable {
       pathLabel.setText(openedFile.getAbsolutePath());
     } else {
       Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle(Utils.getString("OpenDatabase"));
+      alert.setTitle(Utils.getString("MainPage.OpenDatabase"));
       alert.setHeaderText(Utils.getString("OpenDatabaseError"));
       alert.showAndWait();
     }
@@ -197,7 +197,7 @@ public class MainPageController implements Initializable {
   }
   
   private File selectFileForSaving() {
-    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("SaveDatabase"));
+    FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("MainPage.SaveDatabase"));
     File selectedFile = fileChooser.showSaveDialog(stage);
     if (selectedFile == null) {
       return null;
@@ -208,7 +208,7 @@ public class MainPageController implements Initializable {
       // to check again for the .hdb file.
       if (selectedFile.exists()) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(Utils.getString("SaveDatabase"));
+        alert.setTitle(Utils.getString("MainPage.SaveDatabase"));
         alert.setHeaderText(Utils.getString("SaveOverrideQuestion") + "\n" + selectedFile.getAbsolutePath());
         if (alert.showAndWait().get() != ButtonType.OK) {
           return null;
@@ -260,7 +260,7 @@ public class MainPageController implements Initializable {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("Excel spreadsheets (*.xls)", "*.xls"));
     fileChooser.setSelectedExtensionFilter(fileChooser.getExtensionFilters().get(0));
-    fileChooser.setTitle(Utils.getString("ExportToExcel"));
+    fileChooser.setTitle(Utils.getString("MainPage.ExportToExcel"));
     File exportFile = fileChooser.showSaveDialog(stage);
     if (exportFile == null) {
       return;
@@ -269,7 +269,7 @@ public class MainPageController implements Initializable {
       exportFile = new File(exportFile.getAbsolutePath() + ".xls");
       if (exportFile.exists()) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle(Utils.getString("ExportToExcel"));
+        alert.setTitle(Utils.getString("MainPage.ExportToExcel"));
         alert.setHeaderText(
             Utils.getString("SaveOverrideQuestion") +
             "\n" + 

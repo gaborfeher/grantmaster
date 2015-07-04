@@ -9,16 +9,16 @@
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="mainNode" fx:controller="com.github.gaborfeher.grantmaster.ui.SearchTabController">
   <children>
     <GridPane>
-      <Label text="%ExpenseSearchProject" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+      <Label text="%SearchTab.Project" GridPane.rowIndex="0" GridPane.columnIndex="0" />
       <ChoiceBox fx:id="project" GridPane.rowIndex="0" GridPane.columnIndex="1" />  
       
       <Label text="%BudgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="0" />
       <ChoiceBox fx:id="budgetCategory" GridPane.rowIndex="1" GridPane.columnIndex="1" />
       
-      <Label text="%BudgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+      <Label text="%SearchTab.BudgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="0" />
       <TextField fx:id="budgetCategoryGroup" GridPane.rowIndex="2" GridPane.columnIndex="1" />   
       
-      <Label text="%ExpenseSearchInterval" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+      <Label text="%SearchTab.Interval" GridPane.rowIndex="3" GridPane.columnIndex="0" />
       <HBox GridPane.rowIndex="3" GridPane.columnIndex="1" >
         <children>
           <DatePicker fx:id="startDate" />
@@ -38,7 +38,7 @@
       <Label text="%ExpenseComment2" GridPane.rowIndex="7" GridPane.columnIndex="0" />
       <TextField fx:id="comment2" GridPane.rowIndex="7" GridPane.columnIndex="1" />
       
-      <Button text="%ExpenseSearchButton" onAction="#search" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+      <Button text="%SearchTab.Button" onAction="#search" GridPane.rowIndex="8" GridPane.columnIndex="0" />
     </GridPane>
     <fx:include source="ExpenseTable.fxml" fx:id="table" />
     

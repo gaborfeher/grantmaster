@@ -13,9 +13,9 @@
   <children>
     <GridPane>
       <children>
-        <Label text="%ProjectBudgetLimitsFilter" GridPane.rowIndex="0" GridPane.columnIndex="0" /> 
+        <Label text="%ProjectTab.BudgetCategoriesTab.LimitsFilter" GridPane.rowIndex="0" GridPane.columnIndex="0" /> 
         <ChoiceBox fx:id="filterReport" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-        <Button onAction="#filterResetButtonAction" text="%ProjectBudgetLimitsFilterResetButton"
+        <Button onAction="#filterResetButtonAction" text="%ProjectTab.BudgetCategoriesTab.FilterResetButton"
                 GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2" /> 
       </children>
     </GridPane>
@@ -40,7 +40,7 @@
             <EntityPropertyValueFactory property="budgetCategory" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn text="%ProjectBudgetLimitColumnPercentage" styleClass="numColumn" sortable="false">
+        <TableColumn text="%ProjectTab.BudgetCategoriesTab.LimitColumnPercentage" styleClass="numColumn" sortable="false">
           <cellFactory>
             <BigDecimalTableCellFactory property="budgetPercentage" />
           </cellFactory>
@@ -48,7 +48,7 @@
             <EntityPropertyValueFactory property="budgetPercentage" /> 
           </cellValueFactory>
         </TableColumn>
-        <TableColumn prefWidth="350" text="%BudgetLimitValueColumn">
+        <TableColumn prefWidth="350" text="%ProjectTab.BudgetCategoriesTab.LimitColumn">
           <columns>
             <TableColumn fx:id="budgetAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
               <cellFactory>
@@ -68,7 +68,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn text="%BudgetLimitSpentColumn" prefWidth="350" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
+        <TableColumn text="%ProjectTab.BudgetCategoriesTab.SpentColumn" prefWidth="350" fx:id="spentColumn" styleClass="numColumn" editable="false" sortable="false">
           <columns>
             <TableColumn fx:id="spentAccountingCurrencyColumn" styleClass="numColumn" editable="false" sortable="false" prefWidth="120">
               <cellFactory>
@@ -88,7 +88,7 @@
             </TableColumn>
           </columns>
         </TableColumn>
-        <TableColumn prefWidth="350" text="%BudgetLimitRemainingColumn">
+        <TableColumn prefWidth="350" text="%ProjectTab.BudgetCategoriesTab.RemainingColumn">
           <columns>
             <TableColumn fx:id="remainingAccountingCurrencyColumn" styleClass="numColumn" sortable="false" editable="false" prefWidth="120">
               <cellFactory>

@@ -10,30 +10,30 @@
   <children>
     <HBox>
       <children>
-        <Button text="%OpenDatabase" onAction="#handleOpenButtonAction" />
-        <Button text="%SaveDatabase" onAction="#handleSaveButtonAction" />
-        <Button text="%SaveAsDatabase" onAction="#handleSaveAsButtonAction" />
-        <Button text="%NewDatabase" onAction="#handleNewButtonAction" />
-        <Button text="%ExportSheet" onAction="#handleExportSheetButtonAction" />
-        <Button text="%ContextHelp" onAction="#handleContextHelpButtonAction" />
+        <Button text="%MainPage.OpenDatabase" onAction="#handleOpenButtonAction" />
+        <Button text="%MainPage.SaveDatabase" onAction="#handleSaveButtonAction" />
+        <Button text="%MainPage.SaveAsDatabase" onAction="#handleSaveAsButtonAction" />
+        <Button text="%MainPage.NewDatabase" onAction="#handleNewButtonAction" />
+        <Button text="%MainPage.ExportSheet" onAction="#handleExportSheetButtonAction" />
+        <Button text="%MainPage.ContextHelp" onAction="#handleContextHelpButtonAction" />
       </children>
     </HBox>
     <TextField fx:id="pathLabel" editable="false" />
     <TabPane VBox.vgrow="ALWAYS" fx:id="mainTabs">
       <tabs>
-        <Tab text="%ProjectListTabName" userData="%ProjectListTabTooltip" closable="false">
+        <Tab text="%ProjectListTab.Name" userData="%ProjectListTab.Help" closable="false">
           <fx:include source="ProjectListTab.fxml" fx:id="projectListTab" />
         </Tab>
-        <Tab text="%BudgetCategoriesTabName" userData="%BudgetCategoriesTabTooltip" closable="false">
+        <Tab text="%BudgetCategoriesTab.Name" userData="%BudgetCategoriesTab.Help" closable="false">
           <fx:include source="BudgetCategoriesTab.fxml" fx:id="budgetCategoriesTab" />
         </Tab>
-        <Tab text="%CurrenciesTabName" userData="%CurrenciesTabTooltip" closable="false">
+        <Tab text="%CurrenciesTab.Name" userData="%CurrenciesTab.Help" closable="false">
           <fx:include source="CurrenciesTab.fxml" />
         </Tab>
-        <Tab text="%SearchTabName" closable="false">
+        <Tab text="%SearchTab.Name" closable="false">
           <fx:include source="SearchTab.fxml" />
         </Tab>
-        <Tab text="%AboutTabName" closable="false">
+        <Tab text="%AboutTab.Name" userData="%AboutTab.Help" closable="false">
           <fx:include source="AboutTab.fxml" fx:id="aboutTab" />
         </Tab>
       </tabs>
