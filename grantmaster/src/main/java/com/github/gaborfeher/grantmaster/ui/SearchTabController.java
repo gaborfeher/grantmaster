@@ -71,6 +71,21 @@ public class SearchTabController
     });
     onRefresh();
   }
+  
+  @FXML
+  private void reset() {
+    project.setValue(null);
+    startDate.setValue(null);
+    endDate.setValue(null);
+    budgetCategory.setValue(null);
+    budgetCategoryGroup.setText(null);
+    accountNo.setText(null);
+    partnerName.setText(null);
+    comment1.setText(null);
+    comment2.setText(null);
+    searchResults.clear();
+    onRefresh();
+  }
 
   @Override
   public void getItemListForRefresh(EntityManager em, List<ProjectExpenseWrapper> items) {
@@ -83,12 +98,16 @@ public class SearchTabController
   @Override
   protected void refreshOtherContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      BudgetCategory selectedBudgetCategory = budgetCategory.getSelectionModel().getSelectedItem();
       budgetCategory.getItems().clear();
       budgetCategory.getItems().add(null);
       budgetCategory.getItems().addAll(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT));
+      budgetCategory.getSelectionModel().select(selectedBudgetCategory);
+      Project selectedProject = project.getSelectionModel().getSelectedItem();
       project.getItems().clear();
       project.getItems().add(null);
       project.getItems().addAll(ProjectWrapper.getProjectsWithoutWrapping(em));
+      project.getSelectionModel().select(selectedProject);
 
       tableController.accountingCurrencyAmountColumn.setCellValueFactory(
           new Callback<TableColumn.CellDataFeatures<ProjectExpenseWrapper, Object>, ObservableValue<Object>>() {

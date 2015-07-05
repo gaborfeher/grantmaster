@@ -54,8 +54,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
       <Label text="%ExpenseComment2" GridPane.rowIndex="7" GridPane.columnIndex="0" />
       <TextField fx:id="comment2" GridPane.rowIndex="7" GridPane.columnIndex="1" />
-      
-      <Button text="%SearchTab.Button" onAction="#search" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+      <HBox GridPane.rowIndex="8" GridPane.columnIndex="0" GridPane.columnSpan="2" >
+        <Button text="%SearchTab.SearchButton" onAction="#search" />
+        <Button text="%SearchTab.ResetButton" onAction="#reset" />
+      </HBox>
     </GridPane>
     <fx:include source="ExpenseTable.fxml" fx:id="table" />
     

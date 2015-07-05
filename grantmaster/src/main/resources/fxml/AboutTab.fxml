@@ -24,18 +24,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?import javafx.scene.text.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.gaborfeher.grantmaster.ui.AboutTabController" >
-  <padding><javafx.geometry.Insets bottom="10" left="10" right="10" top="10" />
+  <padding>
+    <javafx.geometry.Insets bottom="10" left="10" right="10" top="10" />
   </padding>
   <children>
     <TextFlow>
-      <Text>GrantMaster v0.9 (2015.06.28)</Text>
+      <Text>GrantMaster v0.9 (2015-07-05)</Text>
     </TextFlow>
     <TextFlow>
       <Hyperlink onAction="#onLinkClick" >https://github.com/gaborfeher/grantmaster</Hyperlink>
     </TextFlow>
     <TextFlow>
-      <Text text="%Disclaimer1" />
-      <Text style="-fx-font-weight: bold;" text="%Disclaimer2" />
+      <Text text="%AboutTab.Disclaimer1" />
+      <Text style="-fx-font-weight: bold;" text="%AboutTab.Disclaimer2" />
       <Text text="${'\n\n'}" />
     </TextFlow>
     <TextArea editable="false" fx:id="license" VBox.vgrow="ALWAYS" />
