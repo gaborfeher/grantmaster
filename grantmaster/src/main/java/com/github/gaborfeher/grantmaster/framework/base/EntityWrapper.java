@@ -44,7 +44,6 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EntityWrapper.class);
   
   protected T entity;
-
   
   private RowEditState state;
   private boolean isSummary;
@@ -68,6 +67,12 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     if (state == RowEditState.EDITING_NEW) {
       // Nothing is to be done for newly created objects here. The user has to
       // click the create button to commit them.
+
+      // Refresh the whole table. Currently this is only needed when the two
+      // amount fields of a newly created expense are tied together and one
+      // of them is edited, causing the other to refresh. It's simpler design
+      // to do this update always, not only in that case.
+      requestTableRefresh();
       return true;
     }
     if (!validate(false)) {

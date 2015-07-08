@@ -116,26 +116,35 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
   
   /**
    * Refreshes the content of the table immediately, using queried data
-   * from the underlying database. Subclasses may add additional work
-   * inside getItemListForRefresh. This method does not care about maintaining
-   * correct focus and cell selection of the table.
+   * from the underlying database. The data is retrieved using
+   * getItemListForRefresh, which subclasses may override. This method does not
+   * care about maintaining correct focus and cell selection state of the table.
    */
   protected void refreshTableContent() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      // The basic idea is to remove all the items from |table| and then add
+      // them back. Apparently this is the best way to update a table in
+      // Java FX.
       ObservableList<T> tableItems = table.getItems();
-      if (tableItems.isEmpty() ||
-          tableItems.get(0).getState() != RowEditState.EDITING_NEW) {
-        tableItems.clear();
-        // Add the editable empty new element at first position.
-        T wrapper = createNewEntity(em);
-        if (wrapper != null) {
-          wrapper.setState(RowEditState.EDITING_NEW);
-          tableItems.add(wrapper);
-        }
+      // There is one more trick. The first row of the table is never stored
+      // in the database, it's the row that the user can use to enter data for
+      // a new entity. That row is saved and restored here, using the following
+      // variable.
+      T newEntityWrapper = null;
+      if (!tableItems.isEmpty() &&
+          tableItems.get(0).getState() == RowEditState.EDITING_NEW) {
+        newEntityWrapper = tableItems.get(0);
       } else {
-        // Keep the editable empty new element at first position, remove the
-        // rest.
-        tableItems.remove(1, tableItems.size());
+        newEntityWrapper = createNewEntity(em);
+        if (newEntityWrapper != null) {
+          newEntityWrapper.setState(RowEditState.EDITING_NEW);
+        }
+      }
+
+      tableItems.clear();
+
+      if (newEntityWrapper != null) {
+        tableItems.add(newEntityWrapper);
       }
       List<T> queriedItems = new ArrayList<>();
       getItemListForRefresh(em, queriedItems);

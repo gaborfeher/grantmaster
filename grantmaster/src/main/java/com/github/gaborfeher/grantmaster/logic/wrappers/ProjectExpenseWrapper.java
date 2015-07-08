@@ -206,9 +206,29 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
 
   @Override
   public boolean setProperty(String name, Object value, Class<?> paramType) {
+    // If the below condition holds, then the two amount values are tied
+    // together: updating one should update the other.
+    boolean amountsAreInterlocked = entity.getOriginalCurrency() != null &&
+          entity.getOriginalCurrency().equals(entity.getProject().getAccountCurrency());
     if ("accountingCurrencyAmount".equals(name)) {
+      BigDecimal backup = accountingCurrencyAmount;
       accountingCurrencyAmount = (BigDecimal) value;
+      if (amountsAreInterlocked) {
+        if (!super.setProperty("originalAmount", value, paramType)) {
+          accountingCurrencyAmount = backup;
+          return false;
+        }
+      }
       return true;
+    } else if ("originalAmount".equals(name)) {
+      if (super.setProperty(name, value, paramType)) {
+        if (amountsAreInterlocked) {
+          accountingCurrencyAmount = (BigDecimal) value;
+        }
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return super.setProperty(name, value, paramType);
     }

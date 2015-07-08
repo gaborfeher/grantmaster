@@ -337,4 +337,66 @@ public class ProjectExpenseWrapperTest {
       return true;
     });
   }
+  
+  @Test
+  public void testSetOriginalAmountWhenTied() {
+    final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.set(TestUtils.createProjectExpense(em, PROJECT1, SOME_GRANT, LocalDate.of(2015, 7, 8), PROJECT1_REPORT1, "15.0", HUF, "15.0"));
+      return true;
+    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.get().setProperty("originalAmount", new BigDecimal("16", Utils.MC), BigDecimal.class);
+      return true;
+    }));
+    assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
+    assertBigDecimalEquals("16", expense.get().getProperty("accountingCurrencyAmount"));
+  }
+  
+  @Test
+  public void testSetOriginalAmountWhenNotTied() {
+    final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.set(TestUtils.createProjectExpense(em, PROJECT1, SOME_GRANT, LocalDate.of(2015, 7, 8), PROJECT1_REPORT1, "15.0", EUR, "4500.0"));
+      return true;
+    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.get().setProperty("originalAmount", new BigDecimal("16", Utils.MC), BigDecimal.class);
+      return true;
+    }));
+    assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
+    assertBigDecimalEquals("4500", expense.get().getProperty("accountingCurrencyAmount"));
+  }
+  
+  
+  @Test
+  public void testSetAccountingCurrencyAmountWhenTied() {
+    final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.set(TestUtils.createProjectExpense(em, PROJECT1, SOME_GRANT, LocalDate.of(2015, 7, 8), PROJECT1_REPORT1, "15.0", HUF, "15.0"));
+      return true;
+    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.get().setProperty("accountingCurrencyAmount", new BigDecimal("16", Utils.MC), BigDecimal.class);
+      return true;
+    }));
+    assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
+    assertBigDecimalEquals("16", expense.get().getProperty("accountingCurrencyAmount"));
+  }
+  
+  @Test
+  public void testSetAccountingCurrencyAmountWhenNotTied() {
+    final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.set(TestUtils.createProjectExpense(em, PROJECT1, SOME_GRANT, LocalDate.of(2015, 7, 8), PROJECT1_REPORT1, "15.0", EUR, "4500.0"));
+      return true;
+    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expense.get().setProperty("accountingCurrencyAmount", new BigDecimal("4600", Utils.MC), BigDecimal.class);
+      return true;
+    }));
+    assertBigDecimalEquals("15", expense.get().getProperty("originalAmount"));
+    assertBigDecimalEquals("4600", expense.get().getProperty("accountingCurrencyAmount"));
+  }  
+  
 }

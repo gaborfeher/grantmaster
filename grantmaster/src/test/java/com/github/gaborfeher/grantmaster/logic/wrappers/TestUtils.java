@@ -63,6 +63,7 @@ public class TestUtils {
       String accountingCurrencyAmount) {
     ProjectExpenseWrapper newWrapper = ProjectExpenseWrapper.createNew(em, project);
     newWrapper.setState(RowEditState.EDITING_NEW);
+    newWrapper.setProperty("originalCurrency", originalCurrency, Currency.class);
     newWrapper.setProperty("paymentDate", date, LocalDate.class);
     newWrapper.setProperty(
         "budgetCategory",
