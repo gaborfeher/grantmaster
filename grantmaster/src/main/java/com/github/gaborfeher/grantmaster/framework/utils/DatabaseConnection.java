@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
@@ -41,6 +42,17 @@ public class DatabaseConnection {
   private final String PROPERTIES_FILE = "grantmaster.properties";
 
   /**
+   * The archive file from which the database was unpacked. null for newly
+   * created and unsaved databases.
+   */
+  private File originalArchiveFile;
+  
+  /**
+   * Lock on the opened archive file (originalArchiveFile).
+   */
+  private MyFileLock lock;
+  
+  /**
    * The unpacked database files used by the database engine.
    */
   private DatabaseArchive archive;
@@ -56,6 +68,11 @@ public class DatabaseConnection {
     if (archive != null) {
       archive.close();
       archive = null;
+    }
+    originalArchiveFile = null;
+    if (lock != null) {
+      lock.release();
+      lock = null;
     }
   }
     
@@ -125,6 +142,11 @@ public class DatabaseConnection {
     return connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
   }
   
+  /**
+   * Given an unpacked database archive, build up a database connection
+   * to the database files.
+   * @return true on success.
+   */
   private boolean connectToFile() {
     File databaseFile = new File(archive.getDirectory(), "database");
     if (!connectToJdbcUrl("jdbc:hsqldb:file:" + databaseFile +";shutdown=true")) {
@@ -134,19 +156,50 @@ public class DatabaseConnection {
     return checkProperties();
   }
   
-  public void saveDatabase(File path) throws IOException {
-    logger.info("saveDatabase({})", path);
-    disconnect();
-    storeProperties();
-    archive.saveToArchiveFile(path);
-    unsavedChanges = false;
-    connectToFile();
+  private boolean saveDatabaseInternal(File path) {
+    try {
+      disconnect();
+      storeProperties();
+      archive.saveToArchiveFile(path);
+      unsavedChanges = false;
+      connectToFile();
+      return true;
+    } catch (IOException ex) {
+      logger.error(null, ex);
+      return false;
+    }
+  }
+  
+  public boolean saveDatabase() {
+    logger.info("saveDatabase()");
+    return saveDatabaseInternal(originalArchiveFile);
+  }
+  
+  public boolean saveAsDatabase(File path) {
+    MyFileLock newLock = MyFileLock.lockFile(path);
+    if (newLock == null) {
+      return false;
+    }
+    logger.info("saveAsDatabase({})", path);
+    if (saveDatabaseInternal(path)) {
+      originalArchiveFile = path;
+      if (lock != null) {
+        lock.release();
+      }
+      lock = newLock;
+      return true;
+    } else {
+      newLock.release();
+      return false;
+    }
   }
 
   public static DatabaseConnection createNewDatabase() {
     logger.info("createNewDatabase");
     DatabaseConnection newConnection = new DatabaseConnection();
     newConnection.archive = DatabaseArchive.createNew();
+    newConnection.originalArchiveFile = null;
+    newConnection.lock = null;
     if (newConnection.archive == null) {
       return null;
     }
@@ -166,15 +219,25 @@ public class DatabaseConnection {
     }
     return newConnection;
   }
-  
-  public static DatabaseConnection openDatabase(File path) {
+
+  public static DatabaseConnection openDatabase(File path, List<String> errors) {
     logger.info("openDatabase({})", path);
     DatabaseConnection newConnection = new DatabaseConnection();
+    newConnection.lock = MyFileLock.lockFile(path);
+    if (newConnection.lock == null) {
+      errors.add("DatabaseConnection.LockingError");
+      return null;
+    }
     newConnection.archive = DatabaseArchive.open(path);
+    newConnection.originalArchiveFile = path;
+    
     if (newConnection.archive == null) {
+      errors.add("DatabaseConnection.UnpackError");
+      newConnection.close();
       return null;
     }
     if (!newConnection.connectToFile()) {
+      errors.add("DatabaseConnection.ConnectionError");
       newConnection.close();
       return null;
     }
@@ -191,6 +254,10 @@ public class DatabaseConnection {
 
   void setUnsavedChanges(boolean unsavedChanges) {
     this.unsavedChanges = unsavedChanges;
+  }
+  
+  public File getOriginalArchiveFile() {
+    return originalArchiveFile;
   }
 
 }

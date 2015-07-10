@@ -28,6 +28,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrap
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.HostServices;
@@ -73,14 +74,7 @@ public class MainPageController implements Initializable {
   
   @FXML ProjectListTabController projectListTabController;
   @FXML AboutTabController aboutTabController;
-  
-  /**
-   * The database file which is open. null for newly created databases.
-   * This is the file what the user sees at save/open, not the temporary
-   * directory where we extract the databases.
-   */
-  File openedFile;
-  
+    
   private boolean allowCloseDatabase() {
     if (DatabaseSingleton.INSTANCE.getUnsavedChange()) {
       Alert alert = new Alert(AlertType.NONE);
@@ -167,6 +161,26 @@ public class MainPageController implements Initializable {
     return fileChooser;
   }
   
+  private void tryOpenFile(File path) {
+    List<String> errors = new ArrayList<>();
+    DatabaseConnection connection = DatabaseConnection.openDatabase(path, errors);
+    if (connection != null) {
+      DatabaseSingleton.INSTANCE.setConnection(connection);
+      resetAndRefreshTabs();
+      pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
+    } else {
+      Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle(Utils.getString("MainPage.OpenDatabase"));
+      alert.setHeaderText(Utils.getString("MainPage.OpenDatabaseError"));
+      String content = "";
+      for (String error : errors) {
+        content += Utils.getString(error) + "\n";
+      }
+      alert.setContentText(content);
+      alert.showAndWait();
+    }    
+  }
+  
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {
     if (!allowCloseDatabase()) {
@@ -177,18 +191,7 @@ public class MainPageController implements Initializable {
     if (path == null) {
       return;
     }
-    DatabaseConnection connection = DatabaseConnection.openDatabase(path);
-    if (connection != null) {
-      DatabaseSingleton.INSTANCE.setConnection(connection);
-      openedFile = path;
-      resetAndRefreshTabs();
-      pathLabel.setText(openedFile.getAbsolutePath());
-    } else {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle(Utils.getString("MainPage.OpenDatabase"));
-      alert.setHeaderText(Utils.getString("OpenDatabaseError"));
-      alert.showAndWait();
-    }
+    tryOpenFile(path);
   }
   
   @FXML
@@ -199,7 +202,6 @@ public class MainPageController implements Initializable {
     DatabaseConnection connection = DatabaseConnection.createNewDatabase();
     if (connection != null) {
       closeProjectTabs();
-      openedFile = null;
       DatabaseSingleton.INSTANCE.setConnection(connection);
       boolean result = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
         CurrencyWrapper.createDefaultCurrencies(em);
@@ -242,18 +244,16 @@ public class MainPageController implements Initializable {
     if (!DatabaseSingleton.INSTANCE.isConnected()) {
       return;
     }
-    if (openedFile == null) {
-      openedFile = selectFileForSaving();
-      if (openedFile == null) {
+    if (DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile() == null) {
+      File pathToSave = selectFileForSaving();
+      if (pathToSave == null) {
         return;
       }
+      DatabaseSingleton.INSTANCE.saveAsDatabase(pathToSave);
+    } else {
+      DatabaseSingleton.INSTANCE.saveDatabase();
     }
-    try {
-      DatabaseSingleton.INSTANCE.saveDatabase(openedFile);
-      pathLabel.setText(openedFile.getAbsolutePath());
-    } catch (IOException ex) {
-      logger.error(null, ex);
-    }    
+    pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
   
   @FXML
@@ -265,13 +265,8 @@ public class MainPageController implements Initializable {
     if (selectedFile == null) {
       return;
     }
-    openedFile = selectedFile;
-    try {
-      DatabaseSingleton.INSTANCE.saveDatabase(openedFile);
-      pathLabel.setText(openedFile.getAbsolutePath());
-    } catch (IOException ex) {
-      logger.error(null, ex);
-    }   
+    DatabaseSingleton.INSTANCE.saveAsDatabase(selectedFile);
+    pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
   
   @FXML

@@ -116,10 +116,24 @@ public enum DatabaseSingleton {
     }
   }
 
-  public void saveDatabase(File path) throws IOException {
+  public boolean saveDatabase() {
     if (connection != null) {
-      connection.saveDatabase(path);
+      return connection.saveDatabase();
+    } else {
+      return false;
     }
+  }
+  
+  public boolean saveAsDatabase(File path) {
+    if (connection != null) {
+      return connection.saveAsDatabase(path);
+    } else {
+      return false;
+    }
+  }
+  
+  public File getCurrentlyOpenArchiveFile() {
+    return connection.getOriginalArchiveFile();
   }
 
   public boolean connectToMemoryFileForTesting() {
