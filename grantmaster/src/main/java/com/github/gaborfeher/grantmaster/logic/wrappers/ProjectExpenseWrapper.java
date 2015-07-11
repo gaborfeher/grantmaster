@@ -23,6 +23,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
+import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -150,6 +151,9 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   
   @Override
   public boolean save(EntityManager em) {
+    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
+      return false;
+    }
     super.save(em);
     BigDecimal editedAccountingCurrencyAmount = null;
     if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
@@ -244,13 +248,17 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   }
   
   @Override
-  public void delete(EntityManager em) {
+  public boolean delete(EntityManager em) {
+    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
+      return false;
+    }
     LocalDate startDate = entity.getPaymentDate();
     ProjectExpense mergedExpense = em.find(ProjectExpense.class, entity.getId());
     em.remove(mergedExpense);
     em.flush();
     updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
     requestTableRefresh();
+    return true;
   }
   
   public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {

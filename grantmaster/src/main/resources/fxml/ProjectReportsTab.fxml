@@ -54,6 +54,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <EntityPropertyValueFactory property="note" /> 
           </cellValueFactory>
         </TableColumn>
+        <TableColumn text="%ProjectTab.ReportsTab.Status" sortable="false">
+          <cellFactory>
+            <ProjectReportStatusTableCellFactory property="status" /> 
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="status" />
+          </cellValueFactory>
+        </TableColumn>
       </columns>
     </TableView> 
   </children>

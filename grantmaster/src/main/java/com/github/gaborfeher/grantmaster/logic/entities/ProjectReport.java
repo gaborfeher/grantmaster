@@ -53,6 +53,13 @@ public class ProjectReport extends EntityBase implements Serializable {
   @Column(nullable = true)
   private String note;
   
+  public static enum Status {
+    OPEN,
+    CLOSED;
+  }
+  @Column(nullable = false)
+  private Status status = Status.OPEN;
+  
   @Override
   public Long getId() {
     return id;
@@ -85,5 +92,13 @@ public class ProjectReport extends EntityBase implements Serializable {
 
   public void setProject(Project project) {
     this.project = project;
+  }
+  
+  public Status getStatus() {
+    return status;
+  }
+  
+  public void setStatus(Status status) {
+    this.status = status;
   }
 }

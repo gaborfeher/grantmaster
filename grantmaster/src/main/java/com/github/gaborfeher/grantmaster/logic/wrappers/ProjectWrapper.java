@@ -32,7 +32,7 @@ public class ProjectWrapper extends EntityWrapper<Project> {
   }
   
   @Override
-  public void delete(EntityManager em) {
+  public boolean delete(EntityManager em) {
     entity = em.find(Project.class, entity.getId());
     ProjectExpenseWrapper.removeProjectExpenses(em, entity);
     ProjectSourceWrapper.removeProjectSources(em, entity);
@@ -40,6 +40,7 @@ public class ProjectWrapper extends EntityWrapper<Project> {
     ProjectNoteWrapper.removeProjectNotes(em, entity);
     ProjectReportWrapper.removeReports(em, entity);
     em.remove(entity);
+    return true;
   }
 
   public static List<ProjectWrapper> getProjects(EntityManager em) {

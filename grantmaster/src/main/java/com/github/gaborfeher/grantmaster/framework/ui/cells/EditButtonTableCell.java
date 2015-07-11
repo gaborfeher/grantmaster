@@ -125,12 +125,13 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
     }
     EntityWrapper entityWrapper = getEntityWrapper();
     if (DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
-      entityWrapper.delete(em);
-      return true;
+      return entityWrapper.delete(em);
     })) {
       entityWrapper.requestTableRefresh();
     } else {
-      entityWrapper.getParent().showBackendFailureDialog("delete");
+      entityWrapper.getParent().showFailureDialog(
+          "Dialog.Delete.FailureTitle",
+          "Dialog.Delete.FailureContent");
     }
   }
   

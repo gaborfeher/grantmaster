@@ -81,9 +81,20 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
 
   @Override
   public boolean save(EntityManager em) {
+    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
+      return false;
+    }
     super.save(em);
     ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getAvailabilityDate());
     return true;
+  }
+  
+  @Override
+  public boolean delete(EntityManager em) {
+    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
+      return false;
+    }
+    return super.delete(em);
   }
   
   public static ProjectSourceWrapper createNew(EntityManager em, Project project) {

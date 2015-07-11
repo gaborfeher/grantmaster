@@ -86,7 +86,8 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       requestTableRefresh();
       return true;
     } else {
-      parent.showBackendFailureDialog("EntityWrapper.commitEdit(): merge");
+      parent.showFailureDialog(
+          "Dialog.Edit.FailureTitle", "Dialog.Edit.FailureContent");
       return false;
     }
   }
@@ -180,11 +181,12 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     }
   }
   
-  public void delete(EntityManager em) {
+  public boolean delete(EntityManager em) {
     if (entity != null) {
       entity = (T) em.find(entity.getClass(), entity.getId());
       em.remove(entity);
     }
+    return true;
   }
   
   public void discardEdits() {

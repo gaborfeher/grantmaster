@@ -32,6 +32,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -195,6 +196,13 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle(Utils.getString("BackendErrorTitle"));
     alert.setContentText(Utils.getString("BackendErrorText") + "\n(" + message + ")");
+    alert.showAndWait();
+  }
+  
+  public void showFailureDialog(String title, String content) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(Utils.getString(title));
+    alert.getDialogPane().setContent(new Label(Utils.getString(content)));
     alert.showAndWait();
   }
   

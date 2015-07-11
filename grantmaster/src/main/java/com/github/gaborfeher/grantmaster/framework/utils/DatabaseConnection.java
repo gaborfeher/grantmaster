@@ -83,15 +83,21 @@ public class DatabaseConnection {
       entityManagerFactory = null;
     }
   }
-    
+  
+  final static String FORMAT_VERSION = "format.version";
+  final int CURRENT_FORMAT_VERSION = 2;
+ 
   private void loadProperties() {
     File propertiesFile = new File(archive.getDirectory(), PROPERTIES_FILE);
     properties = new Properties();
     try {
-      if (propertiesFile.exists() && !propertiesFile.isDirectory()) {
+      if (propertiesFile.exists()) {
         properties.load(new FileReader(propertiesFile));
+      } else {
+        properties.put(FORMAT_VERSION, String.format("%d", CURRENT_FORMAT_VERSION));
       }
     } catch (IOException ex) {
+      logger.error(null, ex);
     }
   }
   
@@ -105,18 +111,23 @@ public class DatabaseConnection {
     }
   }
   
-  private boolean checkProperties() {
-    final int CURRENT_FORMAT_VERSION = 1;
-    final String FORMAT_VERSION = "format.version";
+  private int getVersion() {
     if (!properties.containsKey(FORMAT_VERSION)) {
-      properties.put(FORMAT_VERSION, String.format("%d", CURRENT_FORMAT_VERSION));
-      return true;
+      return 0;
     }
-    int formatVersion = Integer.parseInt((String) properties.get(FORMAT_VERSION));
-    switch (formatVersion) {
+    return Integer.parseInt((String) properties.get(FORMAT_VERSION));
+  }
+  
+  private boolean checkProperties() {
+    int currentFormatVersion = getVersion();
+    switch (currentFormatVersion) {
       case CURRENT_FORMAT_VERSION:
         return true;
       // Earlier versions can be handled here.
+      case 0:
+      case 1:
+        // Need to add status column.
+        return false;
       default:
         return false;
     }
