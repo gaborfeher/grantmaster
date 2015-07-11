@@ -331,10 +331,10 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
             " AND (e.paymentDate <= :endDate OR :endDate IS NULL) " +
             " AND (e.budgetCategory.id = :budgetCategory OR :budgetCategory IS NULL) " +
             " AND (e.budgetCategory.groupName = :budgetCategoryGroup OR :budgetCategoryGroup IS NULL) " +
-            " AND (e.accountNo = :accountNo OR :accountNo IS NULL) " +
-            " AND (e.partnerName = :partnerName OR :partnerName IS NULL) " +
-            " AND (e.comment1 = :comment1 OR :comment1 IS NULL) " +
-            " AND (e.comment2 = :comment2 OR :comment2 IS NULL) " +
+            " AND (LOCATE(LOWER(:accountNo), LOWER(e.accountNo)) > 0 OR :accountNo IS NULL) " +
+            " AND (LOCATE(LOWER(:partnerName), LOWER(e.partnerName)) > 0 OR :partnerName IS NULL) " +
+            " AND (LOCATE(LOWER(:comment1), LOWER(e.comment1)) > 0 OR :comment1 IS NULL) " +
+            " AND (LOCATE(LOWER(:comment2), LOWER(e.comment2)) > 0  OR :comment2 IS NULL) " +
             "GROUP BY e " +
             "ORDER BY e.paymentDate, e.id",
         ProjectExpenseWrapper.class);
