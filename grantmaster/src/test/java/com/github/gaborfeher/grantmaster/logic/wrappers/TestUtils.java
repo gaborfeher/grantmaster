@@ -6,7 +6,6 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
-import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
@@ -75,8 +74,11 @@ public class TestUtils {
         "accountingCurrencyAmount",
         new BigDecimal(accountingCurrencyAmount, Utils.MC), BigDecimal.class);
     newWrapper.setProperty("report", report, ProjectReport.class);
-    newWrapper.save(em);
-    return newWrapper;
+    if (newWrapper.save(em)) {
+      return newWrapper;
+    } else {
+      return null;
+    }
   }
 
   static void createProjectNote(

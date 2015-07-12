@@ -1,24 +1,21 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
-import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
 
-public class ProjectBudgetCategoryWrapperTest {
+public class ProjectBudgetCategoryWrapperTest extends TestBase {
   Currency HUF;
   Currency USD;
   Currency EUR;

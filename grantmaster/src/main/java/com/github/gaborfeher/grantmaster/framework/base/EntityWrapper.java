@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javafx.application.Platform;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -55,6 +56,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     isSummary = false;
   }
 
+  @Override
   public boolean commitEdit(String property, Object val, Class<?> valueType) {
     logger.info("commitEdit({}, {}, {})", property, val, valueType);
     if (Objects.equals(val, getProperty(property))) {
@@ -75,50 +77,33 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       requestTableRefresh();
       return true;
     }
-    if (!validate(false)) {
-      // Validate but don't show error dialog. This is a hack to avoid showing
-      // the dialog twich with TextFieldTableCell. The table cell needs to clean
-      // up it's state before the dialog is shown.
-      return false;
-    }
-    if (DatabaseSingleton.INSTANCE.transaction(
-        (EntityManager em) -> save(em))) {
-      requestTableRefresh();
-      return true;
-    } else {
-      parent.showFailureDialog(
-          "Dialog.Edit.FailureTitle", "Dialog.Edit.FailureContent");
-      return false;
-    }
+    return DatabaseSingleton.INSTANCE.transaction(this::save);
+  }
+    
+  protected boolean saveInternal(EntityManager em) {
+    entity = em.merge(entity);
+    setState(RowEditState.SAVED);
+    return true;
   }
   
-  public boolean saveNewInstance() {
-    if (state != RowEditState.EDITING_NEW) {
-      // TODO(gaborfeher): Log.
-      return false;
-    }
-    if (!validate(true)) {
-      requestTableRefresh();
-      return false;
-    }
-    boolean success = DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> save(em));
+  public final boolean save(EntityManager em) {
+    boolean success = DatabaseSingleton.INSTANCE.runOrRollback(
+        (EntityManager em0) -> validate() && saveInternal(em0), em);
     requestTableRefresh();
-    if (success == true) {
-      return true;
-    } else {
-      parent.showBackendFailureDialog("EntityWrapper.saveNew(): merge");
-      return false;
-    }
+    return success;
   }
   
+  @Override
   public RowEditState getState() {
     return state;
   }
   
+  @Override
   public void setState(RowEditState state) {
     this.state = state;
   }
   
+  @Override
   public boolean canEdit() {
     return !isSummary;
   }
@@ -153,12 +138,6 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       parent.onRefresh();
     }
   }
-
-  public boolean save(EntityManager em) {
-    entity = em.merge(entity);
-    setState(RowEditState.SAVED);
-    return true;
-  }
   
   private Set<ConstraintViolation> checkValidationConstraints() {
     Validator validator = ValidatorFactorySingleton.SINGLE_INSTANCE.getValidator();
@@ -169,13 +148,19 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
   }
   
   @Override
-  public boolean validate(boolean showDialog) {
+  public boolean validate() {
     Set<ConstraintViolation> constraintViolations = checkValidationConstraints();
     if (constraintViolations.isEmpty()) {
       return true;
     } else {
-      if (showDialog) {
-        parent.showValidationFailureDialog(constraintViolations);
+      if (parent == null) {
+        // Running in a test.
+        logger.error("Validation failure and no parent: {}", constraintViolations.toString());
+      } else {
+        // Show error message to the user. Using runLater to avoid messing
+        // with the table-edit GUI.
+        Platform.runLater(() -> 
+          parent.showValidationFailureDialog(constraintViolations));
       }
       return false;
     }

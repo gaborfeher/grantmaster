@@ -53,7 +53,6 @@ public class MainApp extends Application {
     Parent root = loader.load();
     controller = loader.getController();
     controller.setStage(stage);
-    System.out.println("getHostServices() " + getHostServices());
     controller.setHostServices(getHostServices());
     Scene scene = new Scene(root);
     scene.getStylesheets().add("/styles/Styles.css");

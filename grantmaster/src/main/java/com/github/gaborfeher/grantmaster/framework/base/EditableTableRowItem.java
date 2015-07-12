@@ -57,11 +57,10 @@ public interface EditableTableRowItem {
    */
   boolean getIsSummary();
   /**
-   * 
-   * @param showErrorDialog
-   * @return 
+   * @return true if pre-persist validations were successful. Some entities
+   * may want to do post-persist validations in addition to this.
    */
-  boolean validate(boolean showErrorDialog);
+  boolean validate();
   /**
    * @return The encapsulated entity in this row. TODO(gaborfeher): Eliminate the need for this.
    */

@@ -19,7 +19,7 @@ import org.junit.Test;
 import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
 
 
-public class GlobalBudgetCategoryWrapperTest {
+public class GlobalBudgetCategoryWrapperTest extends TestBase {
   Currency HUF;
   Currency USD;
   Currency EUR;

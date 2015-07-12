@@ -116,7 +116,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           </cellValueFactory>
         </TableColumn>
       </columns>
-    </TableColumn> 
+    </TableColumn>
+    <!-- set editable="true" here to experiment with manual exchange rate setting -->
     <TableColumn text="%ExpensesExchangeRate" editable="false" styleClass="numColumn" sortable="false">
       <cellFactory>
         <BigDecimalTableCellFactory property="exchangeRate" /> 

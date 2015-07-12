@@ -18,7 +18,6 @@
 package com.github.gaborfeher.grantmaster.framework.utils;
 
 import java.io.File;
-import java.io.IOException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -46,6 +45,15 @@ public enum DatabaseSingleton {
     this.connection = connection;
   }
   
+  public boolean runOrRollback(TransactionRunner runner, EntityManager em) {
+    if (runner.run(em)) {
+      return true;
+    } else {
+      em.getTransaction().rollback();
+      return false;
+    }
+  }
+  
   public boolean transaction(TransactionRunner runner) {
     EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
     if (entityManagerFactory == null) {
@@ -58,7 +66,9 @@ public enum DatabaseSingleton {
       if (runner.run(entityManager)) {
         transaction.commit();
       } else {
-        transaction.rollback();
+        if (transaction.isActive()) {  // It may already be rolled back.
+            transaction.rollback();
+        }
         return false;
       }
     } catch (Throwable t) {

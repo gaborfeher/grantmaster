@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ProjectWrapperTest {
+public class ProjectWrapperTest extends TestBase {
   Currency HUF;
   Currency USD;
   Currency EUR;
@@ -66,9 +66,8 @@ public class ProjectWrapperTest {
     newWrapper.setProperty("grantCurrency", USD, Currency.class);
     newWrapper.setProperty("accountCurrency", HUF, Currency.class);
     newWrapper.setProperty("incomeType", SOME_GRANT, BudgetCategory.class);
-    
-    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) ->
-        newWrapper.save(em)));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(newWrapper::save));
+
     assertEquals(RowEditState.SAVED, newWrapper.getState());
     
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {

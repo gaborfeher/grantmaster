@@ -103,8 +103,6 @@ public class TextFieldTableCell<S extends EditableTableRowItem, T>
     } else {
       userCancelled = true;
       cancelEdit();
-      getEntityWrapper().validate(true);  // Show validation error dialog.
-      getEntityWrapper().requestTableRefresh();
     }
   }
 

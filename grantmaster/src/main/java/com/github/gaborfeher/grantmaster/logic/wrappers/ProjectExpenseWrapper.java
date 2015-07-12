@@ -50,12 +50,39 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   
   private BigDecimal exchangeRate;
   
+  /*
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     super(expense);
     this.accountingCurrencyAmount = accountingCurrencyAmount;
     this.accountingCurrencyAmountNotEdited = accountingCurrencyAmount;
     this.grantCurrencyAmount = grantCurrencyAmount;
     this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
+  }
+  */
+  
+   public ProjectExpenseWrapper(ProjectExpense expense) {
+    super(expense);
+    
+    this.exchangeRate = BigDecimal.ZERO;
+    this.accountingCurrencyAmount = BigDecimal.ZERO;
+    this.grantCurrencyAmount = BigDecimal.ZERO;
+    
+    if (expense.getExchangeRateOverride() != null) {
+      this.exchangeRate = expense.getExchangeRateOverride();
+      this.accountingCurrencyAmount = expense.getAccountingCurrencyAmountOverride();
+      this.grantCurrencyAmount = expense.getAccountingCurrencyAmountOverride().divide(exchangeRate, Utils.MC);
+    } else if (expense.getSourceAllocations() != null) {
+      this.accountingCurrencyAmount = BigDecimal.ZERO;
+      this.grantCurrencyAmount = BigDecimal.ZERO;
+      for (ExpenseSourceAllocation allocation : expense.getSourceAllocations()) {
+        this.accountingCurrencyAmount = this.accountingCurrencyAmount.add(
+            allocation.getAccountingCurrencyAmount(), Utils.MC);
+        this.grantCurrencyAmount = this.grantCurrencyAmount.add(
+            allocation.getAccountingCurrencyAmount().divide(allocation.getSource().getExchangeRate(), Utils.MC), Utils.MC);
+      }
+      this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
+    }
+    this.accountingCurrencyAmountNotEdited = accountingCurrencyAmount;
   }
   
   @AssertTrue(message="%ValidationErrorExpenseConsistency")
@@ -67,7 +94,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         expense.getOriginalAmount() == null ||
         accountingCurrencyAmount == null) {
       return false;
-    }
+    }    
     Project project = expense.getProject();
     if (!expense.getOriginalCurrency().equals(project.getAccountCurrency())) {
       // Nothing to check if they are not equal.
@@ -149,17 +176,10 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
   }
   
-  @Override
-  public boolean save(EntityManager em) {
-    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
-      return false;
-    }
-    super.save(em);
-    BigDecimal editedAccountingCurrencyAmount = null;
-    if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
-      editedAccountingCurrencyAmount = getAccountingCurrencyAmount();
-    }
-    if (editedAccountingCurrencyAmount != null) {
+  private boolean propagateAccountingCurrencyAmountChange(
+      EntityManager em, BigDecimal editedAccountingCurrencyAmount) {
+    if (entity.getExchangeRateOverride() == null) {
+      // Exchange rate is computed here. (Classic way of expenses.)
       // Set the allocation size to be right for this entity and flush.
       // This is just an initial fake setting which will be removed while normalizing.
 
@@ -187,11 +207,41 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       }
       em.flush();
       updateExpenseAllocations(em, entity.getProject(), entity.getPaymentDate());
+    } else {
+      entity.setAccountingCurrencyAmountOverride(editedAccountingCurrencyAmount);
+      grantCurrencyAmount = editedAccountingCurrencyAmount.divide(exchangeRate, Utils.MC);
+    }
+    return true;
+  }
+  
+  @Override
+  protected boolean saveInternal(EntityManager em) {
+    if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
+      return false;
+    }
+    if (!super.saveInternal(em)) {
+      return false;
+    }
+    BigDecimal editedAccountingCurrencyAmount = null;
+    if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
+      editedAccountingCurrencyAmount = getAccountingCurrencyAmount();
+    }
+    if (editedAccountingCurrencyAmount != null) {
+      if (!propagateAccountingCurrencyAmountChange(em, editedAccountingCurrencyAmount)) {
+        return false;
+      }
     }
 
-    if (entity.getSourceAllocations() == null || entity.getSourceAllocations().isEmpty()) {
-      logger.error("saving expense failed with empty alloc list");
-      return false;
+    if (entity.getExchangeRateOverride() == null) {
+      if (entity.getSourceAllocations() == null || entity.getSourceAllocations().isEmpty()) {
+        logger.error("saving expense failed with empty alloc list");
+        return false;
+      }
+    } else {
+      if (entity.getAccountingCurrencyAmountOverride() == null) {
+        logger.error("saving expense failed with missing accounting currency amount override");
+        return false;
+      }
     }
     return true;
   }
@@ -233,6 +283,9 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       } else {
         return false;
       }
+    } else if ("exchangeRate".equals(name)) {
+      setExchangeRate((BigDecimal) value);
+      return true;
     } else {
       return super.setProperty(name, value, paramType);
     }
@@ -243,7 +296,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     expense.setProject(project);
     expense.setOriginalCurrency(project.getAccountCurrency());
     expense.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
-    ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense, BigDecimal.ZERO, BigDecimal.ZERO);
+    ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense);
     return wrapper;
   }
   
@@ -287,8 +340,8 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   private static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
     String sortString = descending ? " DESC" : "";
     String queryString =
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
-        "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectReport r ON e.report = r " +
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e) " +
+        "FROM ProjectExpense e LEFT OUTER JOIN ProjectReport r ON e.report = r " + //LEFT OUTER JOIN e.sourceAllocations AS a " +
         "WHERE e.project = :project " + extraWhere + " " +
         "GROUP BY e, r " +
         "ORDER BY r.reportDate " + sortString + ", e.paymentDate " + sortString + ", e.id " + sortString;
@@ -324,8 +377,8 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
 
     TypedQuery<ProjectExpenseWrapper> query = em.createQuery(
-        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / a.source.exchangeRate)) " +
-            "FROM ProjectExpense e LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e " +
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e) " +
+            "FROM ProjectExpense e " +
             "WHERE (e.project.id = :project OR :project IS NULL) " +
             " AND (e.paymentDate >= :startDate OR :startDate IS NULL) " +
             " AND (e.paymentDate <= :endDate OR :endDate IS NULL) " +
@@ -370,5 +423,13 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
 
   public BigDecimal getExchangeRate() {
     return exchangeRate;
+  }
+  
+  public void setExchangeRate(BigDecimal exchangeRate) {
+    this.exchangeRate = exchangeRate;
+    entity.setExchangeRateOverride(exchangeRate);
+    if (entity.getSourceAllocations() != null) {
+      entity.getSourceAllocations().clear();
+    }
   }
 }

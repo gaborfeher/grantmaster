@@ -70,8 +70,6 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
       updateItem(val, false);
     } else {
       cancelEdit();
-      getEntityWrapper().validate(true);  // Show validation error dialog if needed.
-      getEntityWrapper().requestTableRefresh();
     }
   }
   

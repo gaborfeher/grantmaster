@@ -18,7 +18,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
 
-public class ProjectExpenseWrapperTest {
+public class ProjectExpenseWrapperTest extends TestBase {
   Currency HUF;
   Currency USD;
   Currency EUR;
@@ -30,6 +30,7 @@ public class ProjectExpenseWrapperTest {
 
   public ProjectExpenseWrapperTest() {
   }
+
   
   @Before
   public void setUp() {
@@ -68,6 +69,7 @@ public class ProjectExpenseWrapperTest {
   
   @Test
   public void testCreateExpense() {
+    System.out.println("TEST testCreateExpense");
     final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
@@ -85,10 +87,7 @@ public class ProjectExpenseWrapperTest {
     newExpense.get().setProperty(
         "report", PROJECT1_REPORT1, ProjectReport.class);
     
-    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
-      newExpense.get().save(em);
-      return true;
-    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
     assertEquals(RowEditState.SAVED, newExpense.get().getState());
     
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
@@ -323,10 +322,7 @@ public class ProjectExpenseWrapperTest {
     newExpense.get().setProperty(
         "report", PROJECT1_REPORT1, ProjectReport.class);
 
-    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
-      newExpense.get().save(em);
-      return true;
-    }));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
     assertEquals(RowEditState.SAVED, newExpense.get().getState());
 
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
@@ -397,6 +393,34 @@ public class ProjectExpenseWrapperTest {
     }));
     assertBigDecimalEquals("15", expense.get().getProperty("originalAmount"));
     assertBigDecimalEquals("4600", expense.get().getProperty("accountingCurrencyAmount"));
-  }  
-  
+  }
+
+  @Test
+  public void testCreateExpenseInOverriddenMode() {
+    final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
+      return true;
+    })); 
+    newExpense.get().setState(RowEditState.EDITING_NEW);
+    newExpense.get().setProperty(
+        "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
+    newExpense.get().setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    newExpense.get().setProperty(
+        "originalAmount", new BigDecimal("100000.5", Utils.MC),BigDecimal.class);
+    newExpense.get().setProperty(
+        "accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC), BigDecimal.class);
+    newExpense.get().setProperty("exchangeRate", new BigDecimal("1000"), BigDecimal.class);
+    newExpense.get().setProperty(
+        "report", PROJECT1_REPORT1, ProjectReport.class);
+    
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
+    assertEquals(RowEditState.SAVED, newExpense.get().getState());
+    
+    assertBigDecimalEquals("1000", newExpense.get().getExchangeRate());
+    assertBigDecimalEquals("100000.5", newExpense.get().getAccountingCurrencyAmount());
+    assertBigDecimalEquals("100.0005", newExpense.get().getGrantCurrencyAmount());
+  }
+
 }

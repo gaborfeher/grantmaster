@@ -32,7 +32,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
@@ -78,10 +77,26 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   
   /**
    * This list describes the money used for paying this expense: income
-   * sources and income amounts.
+   * sources and income amounts. In normal mode, exchange rate, accounting
+   * currency amount and grant currency amount can be computed from this date.
+   * In override mode this should be empty.
    */
   @OneToMany(mappedBy="expense", cascade=CascadeType.ALL, orphanRemoval = true)
   private List<ExpenseSourceAllocation> sourceAllocations;
+  
+  /**
+   * There are two modes of specifying an expense: normal and override.
+   * If this field is null, then the mode is normal.
+   * If this field is not null, then the mode is override, and this field
+   * specifies the exchange rate, and accountingCurrencyAmountOverride specifies
+   * the accounting currency amount.
+   */
+  private BigDecimal exchangeRateOverride;  // optional
+
+  /**
+   * See exchangeRateOverride.
+   */
+  private BigDecimal accountingCurrencyAmountOverride;  // optional
 
   private String comment1;
   
@@ -185,5 +200,21 @@ public class ProjectExpense extends EntityBase implements  Serializable {
 
   public void setReport(ProjectReport report) {
     this.report = report;
+  }
+
+  public BigDecimal getExchangeRateOverride() {
+    return exchangeRateOverride;
+  }
+
+  public void setExchangeRateOverride(BigDecimal exchangeRateOverride) {
+    this.exchangeRateOverride = exchangeRateOverride;
+  }
+
+  public BigDecimal getAccountingCurrencyAmountOverride() {
+    return accountingCurrencyAmountOverride;
+  }
+
+  public void setAccountingCurrencyAmountOverride(BigDecimal accountingCurrencyAmountOverride) {
+    this.accountingCurrencyAmountOverride = accountingCurrencyAmountOverride;
   }
 }

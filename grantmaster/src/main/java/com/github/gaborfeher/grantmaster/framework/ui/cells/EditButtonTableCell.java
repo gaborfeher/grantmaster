@@ -103,9 +103,9 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
     }
   }
   
-  void handleSaveButtonClick() {
+  void handleSaveButtonClick() {  // create
     final EntityWrapper entityWrapper = getEntityWrapper();
-    if (entityWrapper.saveNewInstance()) {
+    if (DatabaseSingleton.INSTANCE.transaction(entityWrapper::save)) {
       updateItem(entityWrapper.getState(), false);
     }
   }
