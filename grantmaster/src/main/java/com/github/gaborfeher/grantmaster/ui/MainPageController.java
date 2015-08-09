@@ -55,15 +55,15 @@ import org.slf4j.LoggerFactory;
 
 public class MainPageController implements Initializable {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MainPageController.class);
-  
+
   /**
    * Number of static tabs shown. (The ones that are not open/close-able
    * project tabs.
    */
   private static final int NUM_SYSTEM_TABS = 5;
-  
+
   private static final int ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT = 0;
-  
+
   @FXML private TextField pathLabel;
   @FXML Parent root;
   @FXML TabPane mainTabs;
@@ -71,10 +71,10 @@ public class MainPageController implements Initializable {
   List<Project> projects;
 
   Stage stage;
-  
+
   @FXML ProjectListTabController projectListTabController;
   @FXML AboutTabController aboutTabController;
-    
+
   private boolean allowCloseDatabase() {
     if (DatabaseSingleton.INSTANCE.getUnsavedChange()) {
       Alert alert = new Alert(AlertType.NONE);
@@ -102,7 +102,7 @@ public class MainPageController implements Initializable {
     }
     return true;
   }
-  
+
   public boolean shutdown() {
     if (!allowCloseDatabase()) {
       return false;
@@ -110,18 +110,18 @@ public class MainPageController implements Initializable {
     DatabaseSingleton.INSTANCE.close();
     return true;
   }
-  
+
   private void closeProjectTabs() {
     mainTabs.getSelectionModel().selectFirst();
     mainTabs.getTabs().remove(NUM_SYSTEM_TABS, mainTabs.getTabs().size());
   }
-  
+
   private void resetAndRefreshTabs() {
     closeProjectTabs();
     mainTabs.getSelectionModel().select(ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT);
     TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT));
   }
- 
+
   public void addProjectTab(final Project project) throws IOException {
     for (int i = NUM_SYSTEM_TABS; i < mainTabs.getTabs().size(); ++i) {
       Tab alreadyOpenTab = mainTabs.getTabs().get(i);
@@ -143,7 +143,7 @@ public class MainPageController implements Initializable {
     newTab.setContent(projectPage);
     mainTabs.getSelectionModel().select(newTab);
   }
-  
+
   private TabPane findTabPaneChild(Parent page) {
     for (Node child : page.getChildrenUnmodifiable()) {
       if (child instanceof TabPane) {
@@ -152,7 +152,7 @@ public class MainPageController implements Initializable {
     }
     return null;
   }
-  
+
   private FileChooser getFileChooserForHdbFiles(String title) {
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("zip-compressed hsqldb files", "*.hdb"));
@@ -160,7 +160,7 @@ public class MainPageController implements Initializable {
     fileChooser.setTitle(title);
     return fileChooser;
   }
-  
+
   private void tryOpenFile(File path) {
     List<String> errors = new ArrayList<>();
     DatabaseConnection connection = DatabaseConnection.openDatabase(path, errors);
@@ -178,9 +178,9 @@ public class MainPageController implements Initializable {
       }
       alert.setContentText(content);
       alert.showAndWait();
-    }    
+    }
   }
-  
+
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {
     if (!allowCloseDatabase()) {
@@ -193,7 +193,7 @@ public class MainPageController implements Initializable {
     }
     tryOpenFile(path);
   }
-  
+
   @FXML
   private void handleNewButtonAction(ActionEvent event) {
     if (!allowCloseDatabase()) {
@@ -216,7 +216,7 @@ public class MainPageController implements Initializable {
       pathLabel.setText(Utils.getString("MainPage.StatusNewDatabase"));
     }
   }
-  
+
   private File selectFileForSaving() {
     FileChooser fileChooser = getFileChooserForHdbFiles(Utils.getString("MainPage.SaveDatabase"));
     File selectedFile = fileChooser.showSaveDialog(stage);
@@ -233,12 +233,12 @@ public class MainPageController implements Initializable {
         alert.setHeaderText(Utils.getString("SaveOverrideQuestion") + "\n" + selectedFile.getAbsolutePath());
         if (alert.showAndWait().get() != ButtonType.OK) {
           return null;
-        } 
+        }
       }
     }
     return selectedFile;
   }
-  
+
   @FXML
   private void handleSaveButtonAction(ActionEvent event) {
     if (!DatabaseSingleton.INSTANCE.isConnected()) {
@@ -255,7 +255,7 @@ public class MainPageController implements Initializable {
     }
     pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
-  
+
   @FXML
   private void handleSaveAsButtonAction(ActionEvent event) {
     if (!DatabaseSingleton.INSTANCE.isConnected()) {
@@ -268,7 +268,7 @@ public class MainPageController implements Initializable {
     DatabaseSingleton.INSTANCE.saveAsDatabase(selectedFile);
     pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
-  
+
   @FXML
   private void handleExportSheetButtonAction(ActionEvent event) {
     FileChooser fileChooser = new FileChooser();
@@ -286,14 +286,14 @@ public class MainPageController implements Initializable {
         alert.setTitle(Utils.getString("MainPage.ExportToExcel"));
         alert.setHeaderText(
             Utils.getString("SaveOverrideQuestion") +
-            "\n" + 
+            "\n" +
             exportFile.getAbsolutePath());
         if (alert.showAndWait().get() != ButtonType.OK) {
           exportFile = null;
-        } 
+        }
       }
     }
-    
+
     TablePageControllerBase.exportActiveTabToXls(exportFile);
   }
 
@@ -326,7 +326,7 @@ public class MainPageController implements Initializable {
     projectListTabController.init(this);
     mainTabs.getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
     mainTabs.getSelectionModel().select(4);
-  }    
+  }
 
   void setStage(Stage stage) {
     this.stage = stage;

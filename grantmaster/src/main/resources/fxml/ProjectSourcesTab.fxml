@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <EditButtonTableCellFactory />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="state" /> 
+            <PropertyValueFactory property="state" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
@@ -48,36 +48,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </TableColumn>
         <TableColumn text="%ProjectTab.SourcesTab.AvailabilityDate" prefWidth="100" sortable="false" styleClass="textColumn">
           <cellFactory>
-            <DateTableCellFactory property="availabilityDate" /> 
+            <DateTableCellFactory property="availabilityDate" />
           </cellFactory>
           <cellValueFactory>
-            <EntityPropertyValueFactory property="availabilityDate" /> 
+            <EntityPropertyValueFactory property="availabilityDate" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectTab.SourcesTab.ExchangeRate" styleClass="numColumn" prefWidth="100" sortable="false">
           <cellFactory>
-            <BigDecimalTableCellFactory property="exchangeRate" /> 
+            <BigDecimalTableCellFactory property="exchangeRate" />
           </cellFactory>
           <cellValueFactory>
-            <EntityPropertyValueFactory property="exchangeRate" /> 
+            <EntityPropertyValueFactory property="exchangeRate" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectTab.SourcesTab.Amount">
           <columns>
             <TableColumn fx:id="accountingCurrencyAmountColumn" styleClass="numColumn" prefWidth="120" editable="false" sortable="false">
               <cellFactory>
-                <BigDecimalTableCellFactory property="accountingCurrencyAmount" /> 
+                <BigDecimalTableCellFactory property="accountingCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="accountingCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="accountingCurrencyAmount" />
               </cellValueFactory>
             </TableColumn>
             <TableColumn fx:id="grantCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" sortable="false">
               <cellFactory>
-                <BigDecimalTableCellFactory property="grantCurrencyAmount" /> 
+                <BigDecimalTableCellFactory property="grantCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="grantCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="grantCurrencyAmount" />
               </cellValueFactory>
             </TableColumn>
           </columns>
@@ -86,18 +86,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <columns>
             <TableColumn fx:id="usedAccountingCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
-                <BigDecimalTableCellFactory property="usedAccountingCurrencyAmount" /> 
+                <BigDecimalTableCellFactory property="usedAccountingCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="usedAccountingCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="usedAccountingCurrencyAmount" />
               </cellValueFactory>
-            </TableColumn>               
+            </TableColumn>
             <TableColumn fx:id="usedGrantCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
                 <BigDecimalTableCellFactory property="usedGrantCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="usedGrantCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="usedGrantCurrencyAmount" />
               </cellValueFactory>
             </TableColumn>
           </columns>
@@ -106,21 +106,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <columns>
             <TableColumn fx:id="remainingAccountingCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
-                <BigDecimalTableCellFactory property="remainingAccountingCurrencyAmount" /> 
+                <BigDecimalTableCellFactory property="remainingAccountingCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="remainingAccountingCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="remainingAccountingCurrencyAmount" />
               </cellValueFactory>
-            </TableColumn>               
+            </TableColumn>
             <TableColumn fx:id="remainingGrantCurrencyAmountColumn" prefWidth="120" styleClass="numColumn" editable="false" sortable="false">
               <cellFactory>
-                <BigDecimalTableCellFactory property="remainingGrantCurrencyAmount" /> 
+                <BigDecimalTableCellFactory property="remainingGrantCurrencyAmount" />
               </cellFactory>
               <cellValueFactory>
-                <EntityPropertyValueFactory property="remainingGrantCurrencyAmount" /> 
+                <EntityPropertyValueFactory property="remainingGrantCurrencyAmount" />
               </cellValueFactory>
             </TableColumn>
           </columns>
+        </TableColumn>
+        <TableColumn text="%ProjectTab.SourcesTab.Comment" styleClass="textColumn" editable="true" sortable="false" prefWidth="120" >
+          <cellFactory>
+            <StringTableCellFactory property="comment" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="comment" />
+          </cellValueFactory>
         </TableColumn>
       </columns>
     </TableView>

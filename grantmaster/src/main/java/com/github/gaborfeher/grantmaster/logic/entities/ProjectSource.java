@@ -39,7 +39,7 @@ public class ProjectSource extends EntityBase implements  Serializable {
   @Id
   @GeneratedValue
   private Long id;
-  
+
   @ManyToOne
   @JoinColumn(nullable = false)
   @CascadeOnDelete
@@ -51,8 +51,8 @@ public class ProjectSource extends EntityBase implements  Serializable {
   @NotNull(message="%ValidationErrorReportEmpty")
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
-  private ProjectReport report;  
-  
+  private ProjectReport report;
+
   @NotNull(message="%ValidationErrorSourceGrantCurrencyAmount")
   @DecimalMin(value="0.01", message="%ValidationErrorSourceGrantCurrencyAmount")
   @Column(nullable = false, scale = 10, precision = 25)
@@ -67,22 +67,24 @@ public class ProjectSource extends EntityBase implements  Serializable {
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private LocalDate availabilityDate;
-  
+
+  private String comment;
+
   @Transient
   private BigDecimal usedAccountingCurrencyAmount;
-  
+
   @Transient
   private BigDecimal accountingCurrencyAmount;
-  
+
   @Transient
   private BigDecimal remainingAccountingCurrencyAmount;
-  
+
   @Transient
   private BigDecimal usedGrantCurrencyAmount;
-  
+
   @Transient
   private BigDecimal remainingGrantCurrencyAmount;
-  
+
   public ProjectSource() {
   }
 
@@ -173,5 +175,13 @@ public class ProjectSource extends EntityBase implements  Serializable {
   public void setReport(ProjectReport report) {
     this.report = report;
   }
-  
+
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
+
 }
