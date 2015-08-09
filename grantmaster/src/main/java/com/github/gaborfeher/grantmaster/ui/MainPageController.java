@@ -181,6 +181,20 @@ public class MainPageController implements Initializable {
     }
   }
 
+  private void showError(String title, String header, String content) {
+    Alert alert = new Alert(AlertType.ERROR);
+    if (title != null) {
+      alert.setTitle(Utils.getString(title));
+    }
+    if (header != null) {
+      alert.setHeaderText(Utils.getString(header));
+    }
+    if (content != null) {
+      alert.setContentText(Utils.getString(content));
+    }
+    alert.showAndWait();
+  }
+
   @FXML
   private void handleOpenButtonAction(ActionEvent event) {
     if (!allowCloseDatabase()) {
@@ -244,14 +258,19 @@ public class MainPageController implements Initializable {
     if (!DatabaseSingleton.INSTANCE.isConnected()) {
       return;
     }
+    boolean success = false;
     if (DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile() == null) {
       File pathToSave = selectFileForSaving();
       if (pathToSave == null) {
         return;
       }
-      DatabaseSingleton.INSTANCE.saveAsDatabase(pathToSave);
+      success = DatabaseSingleton.INSTANCE.saveAsDatabase(pathToSave);
     } else {
-      DatabaseSingleton.INSTANCE.saveDatabase();
+      success = DatabaseSingleton.INSTANCE.saveDatabase();
+    }
+    if (!success) {
+      showError("MainPage.SaveDatabase", "MainPage.SaveDatabaseError", null);
+      return;
     }
     pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
@@ -265,7 +284,10 @@ public class MainPageController implements Initializable {
     if (selectedFile == null) {
       return;
     }
-    DatabaseSingleton.INSTANCE.saveAsDatabase(selectedFile);
+    if (!DatabaseSingleton.INSTANCE.saveAsDatabase(selectedFile)) {
+      showError("MainPage.SaveDatabase", "MainPage.SaveDatabaseError", null);
+      return;
+    }
     pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
   }
 
