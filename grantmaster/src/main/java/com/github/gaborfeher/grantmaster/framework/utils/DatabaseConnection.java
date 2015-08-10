@@ -21,6 +21,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DatabaseConnection {
   private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
-  
+
   private final String PROPERTIES_FILE = "grantmaster.properties";
 
   /**
@@ -46,12 +50,12 @@ public class DatabaseConnection {
    * created and unsaved databases.
    */
   private File originalArchiveFile;
-  
+
   /**
    * Lock on the opened archive file (originalArchiveFile).
    */
   private MyFileLock lock;
-  
+
   /**
    * The unpacked database files used by the database engine.
    */
@@ -62,7 +66,7 @@ public class DatabaseConnection {
   private boolean unsavedChanges;
   private EntityManagerFactory entityManagerFactory;
   private Properties properties;
-  
+
   public void close() {
     disconnect();
     if (archive != null) {
@@ -75,7 +79,7 @@ public class DatabaseConnection {
       lock = null;
     }
   }
-    
+
   private void disconnect() {
     unsavedChanges = false;
     if (getEntityManagerFactory() != null) {
@@ -83,24 +87,29 @@ public class DatabaseConnection {
       entityManagerFactory = null;
     }
   }
-  
+
   final static String FORMAT_VERSION = "format.version";
-  final int CURRENT_FORMAT_VERSION = 2;
- 
-  private void loadProperties() {
-    File propertiesFile = new File(archive.getDirectory(), PROPERTIES_FILE);
+  final static int CURRENT_FORMAT_VERSION = 3;
+
+  private File getPropertiesFile() {
+    return new File(archive.getDirectory(), PROPERTIES_FILE);
+  }
+
+  private void loadOrCreateProperties() {
+    File propertiesFile = getPropertiesFile();
     properties = new Properties();
     try {
       if (propertiesFile.exists()) {
         properties.load(new FileReader(propertiesFile));
       } else {
-        properties.put(FORMAT_VERSION, String.format("%d", CURRENT_FORMAT_VERSION));
+        // In case of empty file,
+        properties.put(FORMAT_VERSION, String.format("%d", 0));
       }
     } catch (IOException ex) {
       logger.error(null, ex);
     }
   }
-  
+
   private void storeProperties() {
     try {
       File propertiesFile = new File(archive.getDirectory(), PROPERTIES_FILE);
@@ -110,49 +119,67 @@ public class DatabaseConnection {
           "Cannot write properties file", ex);
     }
   }
-  
+
   private int getVersion() {
     if (!properties.containsKey(FORMAT_VERSION)) {
       return 0;
     }
     return Integer.parseInt((String) properties.get(FORMAT_VERSION));
   }
-  
-  private boolean checkProperties() {
-    int currentFormatVersion = getVersion();
+
+  private boolean checkVersionAndConvert(int currentFormatVersion, String jdbcUrl) {
     switch (currentFormatVersion) {
       case CURRENT_FORMAT_VERSION:
         return true;
       // Earlier versions can be handled here.
       case 0:
       case 1:
-        // Need to add status column.
-        return false;
+        return upgradeVersionFrom01to3(jdbcUrl);
+      case 2:
+        return false;  // Not supported development version.
       default:
         return false;
     }
   }
-  
+
+  private boolean upgradeVersionFrom01to3(String jdbcUrl) {
+    LoggerFactory.getLogger(DatabaseSingleton.class).info("upgradeVersionFrom01to3()");
+    Properties connectionProps = new Properties();
+    try (
+        Connection conn = DriverManager.getConnection(jdbcUrl, connectionProps);
+        Statement statement = conn.createStatement()) {
+      statement.execute("ALTER TABLE PUBLIC.ProjectReport ADD COLUMN status INTEGER DEFAULT 0 NOT NULL;");
+      statement.execute("ALTER TABLE ProjectSource ADD COLUMN comment VARCHAR(255) DEFAULT NULL;");
+      statement.execute("ALTER TABLE ProjectExpense ADD COLUMN exchangeRateOverride NUMERIC(25, 10) DEFAULT NULL;");
+      statement.execute("ALTER TABLE ProjectExpense ADD COLUMN accountingCurrencyAmountOverride NUMERIC(25, 10) DEFAULT NULL;");
+      properties.setProperty(FORMAT_VERSION, "3");
+      return true;
+    } catch (SQLException ex) {
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
+      return false;
+    }
+  }
+
   private boolean connectToJdbcUrl(String jdbcUrl) {
     if (getEntityManagerFactory() != null) {
       throw new RuntimeException("Cannot connect while previous connection is active.");
     }
     entityManagerFactory = null;
-    Map<String, String> properties = new HashMap<>();
-    properties.put("javax.persistence.jdbc.url", jdbcUrl);
+    Map<String, String> connectionProperties = new HashMap<>();
+    connectionProperties.put("javax.persistence.jdbc.url", jdbcUrl);
     try {
       entityManagerFactory = Persistence.createEntityManagerFactory(
-          "LocalH2ConnectionTemplate", properties);
+          "LocalH2ConnectionTemplate", connectionProperties);
     } catch (PersistenceException ex) {
       LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
     }
     return getEntityManagerFactory() != null;
   }
-  
+
   private boolean connectToMemoryFileForTesting() {
     return connectToJdbcUrl("jdbc:hsqldb:mem:test;shutdown=true");
   }
-  
+
   /**
    * Given an unpacked database archive, build up a database connection
    * to the database files.
@@ -160,13 +187,16 @@ public class DatabaseConnection {
    */
   private boolean connectToFile() {
     File databaseFile = new File(archive.getDirectory(), "database");
-    if (!connectToJdbcUrl("jdbc:hsqldb:file:" + databaseFile +";shutdown=true")) {
+    String jdbcUrl = "jdbc:hsqldb:file:" + databaseFile +";shutdown=true";
+    if (!checkVersionAndConvert(getVersion(), jdbcUrl)) {
       return false;
     }
-    loadProperties();
-    return checkProperties();
+    if (!connectToJdbcUrl(jdbcUrl)) {
+      return false;
+    }
+    return true;
   }
-  
+
   private boolean saveDatabaseInternal(File path) {
     try {
       disconnect();
@@ -180,12 +210,12 @@ public class DatabaseConnection {
       return false;
     }
   }
-  
+
   public boolean saveDatabase() {
     logger.info("saveDatabase()");
     return saveDatabaseInternal(originalArchiveFile);
   }
-  
+
   public boolean saveAsDatabase(File path) {
     MyFileLock newLock = MyFileLock.lockFile(path);
     if (newLock == null) {
@@ -211,6 +241,9 @@ public class DatabaseConnection {
     newConnection.archive = DatabaseArchive.createNew();
     newConnection.originalArchiveFile = null;
     newConnection.lock = null;
+    newConnection.properties = new Properties();
+    newConnection.properties.put(FORMAT_VERSION, String.format("%d", CURRENT_FORMAT_VERSION));
+
     if (newConnection.archive == null) {
       return null;
     }
@@ -220,7 +253,7 @@ public class DatabaseConnection {
     }
     return newConnection;
   }
-  
+
   static DatabaseConnection createNewMemoryDatabaseForTesting() {
     DatabaseConnection newConnection = new DatabaseConnection();
     newConnection.archive = DatabaseArchive.createNew();
@@ -241,7 +274,8 @@ public class DatabaseConnection {
     }
     newConnection.archive = DatabaseArchive.open(path);
     newConnection.originalArchiveFile = path;
-    
+    newConnection.loadOrCreateProperties();
+
     if (newConnection.archive == null) {
       errors.add("DatabaseConnection.UnpackError");
       newConnection.close();
@@ -254,7 +288,7 @@ public class DatabaseConnection {
     }
     return newConnection;
   }
-  
+
   EntityManagerFactory getEntityManagerFactory() {
     return entityManagerFactory;
   }
@@ -266,7 +300,7 @@ public class DatabaseConnection {
   void setUnsavedChanges(boolean unsavedChanges) {
     this.unsavedChanges = unsavedChanges;
   }
-  
+
   public File getOriginalArchiveFile() {
     return originalArchiveFile;
   }
