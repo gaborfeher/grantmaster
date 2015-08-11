@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   </padding>
   <children>
     <TextFlow>
-      <Text>GrantMaster v0.9 (2015-07-05)</Text>
+      <Text>GrantMaster v0.11-beta (2015-08-11)</Text>
     </TextFlow>
     <TextFlow>
       <Hyperlink onAction="#onLinkClick" >https://github.com/gaborfeher/grantmaster</Hyperlink>
