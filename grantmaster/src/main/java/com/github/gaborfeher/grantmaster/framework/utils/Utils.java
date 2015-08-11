@@ -21,21 +21,26 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextArea;
 import javax.persistence.TypedQuery;
+import javax.validation.ConstraintViolation;
 import org.slf4j.LoggerFactory;
 
 public class Utils {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Utils.class);
-  
+
   // Note: the database has a different scale/precision setting for bigdecimals,
   // and possible different rounding rules.
   public static MathContext MC = MathContext.DECIMAL128;
-  
+
   public static String getString(String key) {
     return getResourceBundle().getString(key);
   }
-  
+
   public static ResourceBundle getResourceBundle() {
     return ResourceBundle.getBundle("bundles.Strings", new Locale("hu"));
   }
@@ -48,9 +53,9 @@ public class Utils {
     if (list.size() > 1) {
       logger.error("getSingleResultWithDefault(): too many results in list");
     }
-    return list.get(0);    
+    return list.get(0);
   }
-  
+
   public static BigDecimal addMult(BigDecimal base, BigDecimal add, BigDecimal mult) {
     if (add == null) {
       return base;
@@ -60,4 +65,31 @@ public class Utils {
     }
     return base.add(add.multiply(mult, MC), MC);
   }
+
+  public static Optional<ButtonType> showListDialog(
+      String title,
+      String mainMessage,
+      List<String> messages,
+      List<ButtonType> extraButtons) {
+    String fullMessage = Utils.getString(mainMessage) + ":\n";
+    for (String message : messages) {
+      if (message.length() > 0 && message.charAt(0) == '%') {
+        message = Utils.getString(message.substring(1));
+      }
+      fullMessage += " * " + message + "\n";
+    }
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(Utils.getString(title));
+    alert.setResizable(true);
+    TextArea text = new TextArea(fullMessage);
+    text.setWrapText(true);
+    text.setEditable(false);
+    alert.setGraphic(text);
+    if (extraButtons != null) {
+      alert.getButtonTypes().addAll(extraButtons);
+    }
+    return alert.showAndWait();
+
+  }
+
 }

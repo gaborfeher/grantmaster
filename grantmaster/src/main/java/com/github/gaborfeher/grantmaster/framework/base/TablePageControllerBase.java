@@ -48,7 +48,7 @@ import javax.validation.ConstraintViolation;
  * objects implementing EditableTableRowItems. In current implementation, they
  * are all JPA Entities wrapped in their corresponding EntityWrapper
  * subclasses.)
- * @param <T> 
+ * @param <T>
  */
 public abstract class TablePageControllerBase<T extends EditableTableRowItem>
     implements Initializable {
@@ -56,7 +56,7 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
    * The main table displaying the data in this tab.
    */
   @FXML private TableView<T> table;
-  
+
   /**
    * The root node of this tab. The only reason we need access to it here
    * is to store a pointer to this controller inside it as user payload. That
@@ -64,16 +64,14 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
    */
   @FXML private Node mainNode;
 
-  private ResourceBundle resourceBundle;
- 
   protected abstract T createNewEntity(EntityManager em);
   protected abstract void getItemListForRefresh(EntityManager em, List<T> items);
-  
+
   public void discardNew() {
     table.getItems().clear();
     onRefresh();
   }
-  
+
   /**
    * Refreshes the content of the table of this controller. The refresh
    * task is posted to the end of the the Java FX event queue to avoid
@@ -86,17 +84,17 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
       refreshTableContentAndMaintainFocus();
     });
   }
-  
+
   public void onMyTabIsSelected() {
     refreshOtherContent();
     refreshTableContentAndMaintainFocus();
   }
-  
+
   // TODO(gaborfeher): Some subclasses are using detached entitites in this,
   // so they don't pick up subsequent changes after the first resresh.
   protected void refreshOtherContent() {
   }
-  
+
   /**
    * Refreshes the content of the table immediately.
    */
@@ -114,7 +112,7 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
       table.requestFocus();
     }
   }
-  
+
   /**
    * Refreshes the content of the table immediately, using queried data
    * from the underlying database. The data is retrieved using
@@ -154,18 +152,17 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
       return true;
     });
   }
-  
+
   protected ObservableList<TableColumn<T, ?>> getTableColumns() {
     return table.getColumns();
   }
-  
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    this.resourceBundle = resourceBundle;
     // Store a pointer to this controller in the main node of the JFX GUI node
     // strucutre.
     mainNode.getProperties().put("controller", this);
-    
+
     if (table != null) {
       table.getSelectionModel().setCellSelectionEnabled(true);
       // Start editing the selected cell if a key is pressed.
@@ -185,7 +182,7 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
       });
     }
   }
-  
+
   private void addMyselfAsParent(List<T> items) {
     for (T entity : items) {
       entity.setParent(this);
@@ -198,35 +195,23 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
     alert.setContentText(Utils.getString("BackendErrorText") + "\n(" + message + ")");
     alert.showAndWait();
   }
-  
+
   public void showFailureDialog(String title, String content) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle(Utils.getString(title));
     alert.getDialogPane().setContent(new Label(Utils.getString(content)));
     alert.showAndWait();
   }
-  
+
   public void showValidationFailureDialog(
       Set<ConstraintViolation<T>> constraintViolations) {
-    String message = Utils.getString("ValidationProblems") + ":\n";
+    List<String> messages = new ArrayList<>();
     for (ConstraintViolation<T> violation : constraintViolations) {
-      String violationMessage = violation.getMessage();
-      if (violationMessage.length() > 0 && violationMessage.charAt(0) == '%') {
-        violationMessage =
-            resourceBundle.getString(violationMessage.substring(1));
-      }
-      message += "*" + violationMessage+ "\n";
+      messages.add(violation.getMessage());
     }
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle(Utils.getString("ValidationTitle"));
-    alert.setResizable(true);
-    TextArea text = new TextArea(message);
-    text.setWrapText(true);
-    text.setEditable(false);
-    alert.setGraphic(text);
-    alert.showAndWait();
+    Utils.showListDialog("ValidationTitle", "ValidationProblems", messages, null);
   }
-  
+
   public static void exportActiveTabToXls(File file) {
     TablePageControllerBase activeController = TabSelectionChangeListener.getActiveTabController();
     if (activeController != null) {
@@ -234,7 +219,7 @@ public abstract class TablePageControllerBase<T extends EditableTableRowItem>
     }
   }
 
-  private void exportToXls(File file) {  
+  private void exportToXls(File file) {
     ExcelExporter exporter = new ExcelExporter(table);
     exporter.export(file);
   }

@@ -21,6 +21,7 @@ import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.framework.base.TabSelectionChangeListener;
 import com.github.gaborfeher.grantmaster.framework.utils.DatabaseConnection;
 import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.MyFileLock;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyWrapper;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
@@ -162,22 +164,30 @@ public class MainPageController implements Initializable {
   }
 
   private void tryOpenFile(File path) {
-    List<String> errors = new ArrayList<>();
+    DatabaseConnection.Errors errors = new DatabaseConnection.Errors();
     DatabaseConnection connection = DatabaseConnection.openDatabase(path, errors);
     if (connection != null) {
       DatabaseSingleton.INSTANCE.setConnection(connection);
       resetAndRefreshTabs();
       pathLabel.setText(DatabaseSingleton.INSTANCE.getCurrentlyOpenArchiveFile().getAbsolutePath());
     } else {
-      Alert alert = new Alert(AlertType.ERROR);
-      alert.setTitle(Utils.getString("MainPage.OpenDatabase"));
-      alert.setHeaderText(Utils.getString("MainPage.OpenDatabaseError"));
-      String content = "";
-      for (String error : errors) {
-        content += Utils.getString(error) + "\n";
+      List<ButtonType> extraButtons = new ArrayList<>();
+      ButtonType forceBreakLock = new ButtonType(
+          Utils.getString("DatabaseConnection.ForceBreakLock"));
+      if (errors.lockingError) {
+        logger.warn("tryOpenFile({}): locking error", path);
+        extraButtons.add(forceBreakLock);
       }
-      alert.setContentText(content);
-      alert.showAndWait();
+      Optional<ButtonType> result = Utils.showListDialog(
+          "MainPage.OpenDatabase",
+          "MainPage.OpenDatabaseError",
+          errors.errorKeys,
+          extraButtons);
+      if (errors.lockingError && result.isPresent() && result.get() == forceBreakLock) {
+        logger.info("tryOpenFile({}): breaking lock", path);
+        MyFileLock.breakLock(path);
+        tryOpenFile(path);  // retry
+      }
     }
   }
 

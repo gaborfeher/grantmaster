@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MyFileLock {
   private static final Logger logger = LoggerFactory.getLogger(MyFileLock.class);
-  
+
   /**
    * Unique identifier of this lock. We write it into the lock file so that it
    * can be verified that noone else has changed it.
@@ -44,21 +44,29 @@ public class MyFileLock {
    * The file that represents the lock. Normally this is originalFile_.lck
    */
   private File lockFile;
-  
+
   private MyFileLock() {
   }
-  
+
+  private static File getLockFile(File original) {
+    String fname = original.getName();
+    fname = fname.replaceAll("\\.[^.]*$", "_.lck");
+    return new File(original.getParentFile(), fname);
+  }
+
+  public static void breakLock(File file) {
+    File lockFile = getLockFile(file);
+    lockFile.delete();
+  }
+
   public static MyFileLock lockFile(File file) {
     MyFileLock lock = new MyFileLock();
-
-    String fname = file.getName();
-    fname = fname.replaceAll("\\.[^.]*$", "_.lck");
-    lock.lockFile = new File(file.getParentFile(), fname);
+    lock.lockFile = getLockFile(file);
     if (lock.lockFile.exists()) {
       return null;
     }
     try (FileChannel fileChannel = FileChannel.open(
-        lock.lockFile.toPath(), 
+        lock.lockFile.toPath(),
         StandardOpenOption.CREATE_NEW,
         StandardOpenOption.WRITE)) {
       // Note: checking the existence and creating the file is claimed to be
@@ -70,9 +78,9 @@ public class MyFileLock {
     } catch (IOException ex) {
       logger.error(null, ex);
       return null;
-    }    
+    }
   }
-  
+
   public boolean verify() {
     try (FileChannel fileChannel = FileChannel.open(lockFile.toPath(), StandardOpenOption.READ)) {
       ByteBuffer lockFileContent = ByteBuffer.allocate(100);
@@ -86,7 +94,7 @@ public class MyFileLock {
       return false;
     }
   }
-  
+
   public boolean release() {
     if (!verify()) {
       // The lock is not ours.
@@ -97,5 +105,5 @@ public class MyFileLock {
     id = null;
     return true;
   }
-  
+
 }

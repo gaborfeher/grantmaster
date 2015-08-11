@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,12 +265,22 @@ public class DatabaseConnection {
     return newConnection;
   }
 
-  public static DatabaseConnection openDatabase(File path, List<String> errors) {
+  public static class Errors {
+    public List<String> errorKeys = new ArrayList<>();
+    public boolean lockingError = false;
+
+    public void add(String key) {
+      errorKeys.add(key);
+    }
+  }
+
+  public static DatabaseConnection openDatabase(File path, Errors errors) {
     logger.info("openDatabase({})", path);
     DatabaseConnection newConnection = new DatabaseConnection();
     newConnection.lock = MyFileLock.lockFile(path);
     if (newConnection.lock == null) {
-      errors.add("DatabaseConnection.LockingError");
+      errors.lockingError = true;
+      errors.add("%DatabaseConnection.LockingError");
       return null;
     }
     newConnection.archive = DatabaseArchive.open(path);
@@ -277,12 +288,12 @@ public class DatabaseConnection {
     newConnection.loadOrCreateProperties();
 
     if (newConnection.archive == null) {
-      errors.add("DatabaseConnection.UnpackError");
+      errors.add("%DatabaseConnection.UnpackError");
       newConnection.close();
       return null;
     }
     if (!newConnection.connectToFile()) {
-      errors.add("DatabaseConnection.ConnectionError");
+      errors.add("%DatabaseConnection.ConnectionError");
       newConnection.close();
       return null;
     }
