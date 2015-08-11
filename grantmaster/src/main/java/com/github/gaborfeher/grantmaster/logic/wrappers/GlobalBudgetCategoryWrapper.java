@@ -19,6 +19,7 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
+import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -35,13 +36,13 @@ import javax.persistence.EntityManager;
 public class GlobalBudgetCategoryWrapper
     extends BudgetCategoryWrapperBase<BudgetCategory> {
   // Column Name to summary value, e.g. "2015 (HUF)" -> 1,000,000
-  protected final Map<String, BigDecimal> computedValues;
-  
+  private final Map<String, BigDecimal> computedValues;
+
   public GlobalBudgetCategoryWrapper(BudgetCategory budgetCategory) {
     super(budgetCategory, null);
     computedValues = new HashMap<>();
   }
-  
+
   protected GlobalBudgetCategoryWrapper(String fakeName) {
     super(null, fakeName);
     computedValues = new HashMap<>();
@@ -54,11 +55,11 @@ public class GlobalBudgetCategoryWrapper
     }
     return result;
   }
-  
+
   public void setComputedValue(String key, BigDecimal value) {
     computedValues.put(key, value);
   }
-  
+
   public GlobalBudgetCategoryWrapper createFakeCopy(String fakeName) {
     GlobalBudgetCategoryWrapper copy = new GlobalBudgetCategoryWrapper(fakeName);
     copy.addSummaryValues(this, BigDecimal.ONE);
@@ -66,7 +67,7 @@ public class GlobalBudgetCategoryWrapper
     copy.setState(null);
     return copy;
   }
-  
+
   @Override
   public Object getProperty(String name) {
     if (computedValues.containsKey(name)) {
@@ -81,13 +82,13 @@ public class GlobalBudgetCategoryWrapper
   public boolean canEdit() {
     return getBudgetCategory() != null;
   }
-      
+
   protected void addSummaryValue(BudgetCategoryWrapperBase other0, String key, BigDecimal multiplier) {
     GlobalBudgetCategoryWrapper other = (GlobalBudgetCategoryWrapper) other0;
     BigDecimal value = multiplier.multiply(other.getComputedValue(key), Utils.MC);
     setComputedValue(key, value.add(getComputedValue(key), Utils.MC));
   }
-  
+
   @Override
   public void addSummaryValues(BudgetCategoryWrapperBase other0, BigDecimal multiplier) {
     GlobalBudgetCategoryWrapper other = (GlobalBudgetCategoryWrapper) other0;
@@ -101,8 +102,44 @@ public class GlobalBudgetCategoryWrapper
   }
 
   @Override
+  protected void removeColumns(Set<String> columns) {
+    for (String column : columns) {
+      computedValues.remove(column);
+    }
+  }
+
+  @Override
   public BudgetCategory getBudgetCategory() {
     return entity;
+  }
+
+  /**
+   * Sums up all the project budget limits and inserts them into the list of
+   * budget category lines. The limits are always counted in the grant currency
+   * of projects. Therefore, there will be a sum computed for each
+   * grant currency / budget category pair.
+   * @param em
+   * @param paymentCategories The limits will be added as columns into each item.
+   * @param columnNames Newly created column names will be added in this set.
+   */
+  public static void addCurrentBudgetLimitSums(
+      EntityManager em,
+      List<GlobalBudgetCategoryWrapper> paymentCategories,
+      Set<String> columnNames) {
+    Map<BudgetCategory, Map<Currency, BigDecimal>> limits = new HashMap<>();
+    ProjectBudgetCategoryWrapper.getAggregateLimits(em, limits);
+    for (GlobalBudgetCategoryWrapper category : paymentCategories) {
+      Map<Currency, BigDecimal> categoryLimits = limits.get(category.getBudgetCategory());
+      if (categoryLimits == null) {
+        continue;
+      }
+      for (Map.Entry<Currency, BigDecimal> categoryLimit : categoryLimits.entrySet()) {
+        String key = categoryLimit.getKey().getCode();
+        BigDecimal value = categoryLimit.getValue();
+        columnNames.add(key);
+        category.setComputedValue(key, value);
+      }
+    }
   }
 
   public static List<GlobalBudgetCategoryWrapper> getBudgetCategoryWrappers(EntityManager em, BudgetCategory.Direction direction) {
@@ -114,7 +151,7 @@ public class GlobalBudgetCategoryWrapper
             setParameter("direction", direction).
             getResultList();
   }
-  
+
   public static List<BudgetCategory> getBudgetCategories(EntityManager em, BudgetCategory.Direction direction) {
     return em.createQuery("SELECT c " +
             "FROM BudgetCategory c " +
@@ -124,7 +161,7 @@ public class GlobalBudgetCategoryWrapper
             setParameter("direction", direction).
             getResultList();
   }
-  
+
   private static void getYearlyBudgetCategorySummaryMap(
       EntityManager em,
       String query,
@@ -139,7 +176,7 @@ public class GlobalBudgetCategoryWrapper
       budgetCategoryWrapper.setComputedValue(header, (BigDecimal)line[3]);
     }
   }
-  
+
   /**
    * Retrieves all the budget categories. Each one is populated with yearly
    * summaries of its corresponding expense or income.
@@ -155,7 +192,7 @@ public class GlobalBudgetCategoryWrapper
     incomeCategories.clear();
     incomeCategories.addAll(getBudgetCategoryWrappers(
         em, BudgetCategory.Direction.INCOME));
-    
+
     Map<Long, GlobalBudgetCategoryWrapper> budgetCategoryMap = new HashMap<>();
     for (GlobalBudgetCategoryWrapper budgetCategoryWrapper : paymentCategories) {
       budgetCategoryMap.put(budgetCategoryWrapper.getId(), budgetCategoryWrapper);
@@ -163,7 +200,7 @@ public class GlobalBudgetCategoryWrapper
     for (GlobalBudgetCategoryWrapper budgetCategoryWrapper : incomeCategories) {
       budgetCategoryMap.put(budgetCategoryWrapper.getId(), budgetCategoryWrapper);
     }
-    
+
     // Collect expense summaries.
     getYearlyBudgetCategorySummaryMap(
         em,
@@ -192,14 +229,14 @@ public class GlobalBudgetCategoryWrapper
             "Alkalmazottak bruttó bérköltsége",
             "Alkalmazottak járulékköltsége",
             "Bruttó megbízási díjak",
-            "Megbízási díjak járulékköltsége", 
+            "Megbízási díjak járulékköltsége",
             "Béren kívüli juttatások összege",
             "Béren kívüli juttatások adóterhe",
             "Reprezentációs költség",
             "Személyi jellegű egyéb kifizetések"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
-    
+
     groupName = "Iroda működtetésének költségei (bérek nélkül)";
     direction = BudgetCategory.Direction.PAYMENT;
     for (String name :
@@ -215,7 +252,7 @@ public class GlobalBudgetCategoryWrapper
             "Egyéb kiadások, ráfordítások"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
-    
+
     groupName = "Egyéb szolgáltatások költsége";
     direction = BudgetCategory.Direction.PAYMENT;
     for (String name :
@@ -228,14 +265,14 @@ public class GlobalBudgetCategoryWrapper
             "Minden egyéb szolgáltatás díja"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
-    
+
     groupName = "Tárgyi eszköz beszerzés";
     direction = BudgetCategory.Direction.PAYMENT;
     for (String name :
         new String[]{"100eFt egyedi érték feletti eszközök beszerzése"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
-    
+
     groupName = null;
     direction = BudgetCategory.Direction.INCOME;
     for (String name : new String[]{
@@ -249,5 +286,10 @@ public class GlobalBudgetCategoryWrapper
             "Egyéb bevételek"}) {
       em.persist(new BudgetCategory(direction, groupName, name));
     }
+  }
+
+  @Override
+  public String toString() {
+    return getBudgetCategory().toString() + " " + computedValues.toString();
   }
 }

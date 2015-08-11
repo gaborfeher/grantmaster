@@ -23,6 +23,7 @@ import com.github.gaborfeher.grantmaster.logic.wrappers.BudgetCategoryWrapperBas
 import com.github.gaborfeher.grantmaster.logic.wrappers.GlobalBudgetCategoryWrapper;
 import com.github.gaborfeher.grantmaster.framework.ui.cells.BigDecimalTableCellFactory;
 import com.github.gaborfeher.grantmaster.framework.ui.cells.EntityPropertyValueFactory;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,35 +33,55 @@ import javafx.scene.control.TableColumn;
 import javax.persistence.EntityManager;
 
 public class BudgetCategoriesTabController extends TablePageControllerBase<GlobalBudgetCategoryWrapper> {
+  static final int NUM_FIXED_COLUMNS = 3;
 
   public BudgetCategoriesTabController() {
   }
-  
+
+  private void addTableColumn(List columns, String columnName) {
+    TableColumn column = new TableColumn<GlobalBudgetCategoryWrapper, BigDecimal>(columnName);
+    column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
+    column.setCellFactory(new BigDecimalTableCellFactory());
+    column.getStyleClass().add("numColumn");
+    column.setSortable(false);
+    column.setEditable(false);
+    column.setPrefWidth(130.0);
+    columns.add(column);
+  }
+
+  private void addTableColumns(String mainColumnName, Set<String> columnNames) {
+    TableColumn mainColumn = new TableColumn(mainColumnName);
+    getTableColumns().add(mainColumn);
+    for (final String columnName : columnNames) {
+      addTableColumn(mainColumn.getColumns(), columnName);
+    }
+  }
+
   @Override
   protected void getItemListForRefresh(EntityManager em, List items) {
     List paymentCategories = new ArrayList();
     List incomeCategories = new ArrayList();
-    Set<String> columnNames = new TreeSet<>();
-        GlobalBudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
-            em, paymentCategories, incomeCategories, columnNames);
-    
+    Set<String> expenseColumnNames = new TreeSet<>();
+    GlobalBudgetCategoryWrapper.getYearlyBudgetCategorySummaries(
+        em, paymentCategories, incomeCategories, expenseColumnNames);
+    Set<String> limitColumnNames = new TreeSet<>();
+    GlobalBudgetCategoryWrapper.addCurrentBudgetLimitSums(
+        em, paymentCategories, limitColumnNames);
+
     // Initialize table columns.
-    getTableColumns().remove(4, getTableColumns().size());
-    for (final String columnName : columnNames) {
-      TableColumn column = new TableColumn<GlobalBudgetCategoryWrapper, BigDecimal>(columnName);
-      column.setCellValueFactory(new EntityPropertyValueFactory(columnName));
-      column.setCellFactory(new BigDecimalTableCellFactory());
-      column.getStyleClass().add("numColumn");
-      column.setSortable(false);
-      column.setEditable(false);
-      column.setPrefWidth(130.0);
-      getTableColumns().add(column);
-    }
-    
+    getTableColumns().remove(NUM_FIXED_COLUMNS + 1, getTableColumns().size());
+    addTableColumns(
+        Utils.getString("BudgetCategoriesTab.LimitColumnGroup"),
+        limitColumnNames);
+    addTableColumns(
+        Utils.getString("BudgetCategoriesTab.TransferColumnGroup"),
+        expenseColumnNames);
+
     BudgetCategoryWrapperBase.createBudgetSummaryList(
         em,
         paymentCategories,
         incomeCategories,
+        limitColumnNames,
         items);
   }
 

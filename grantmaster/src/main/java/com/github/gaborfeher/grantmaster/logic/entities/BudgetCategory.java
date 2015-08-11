@@ -32,16 +32,16 @@ import javax.validation.constraints.Size;
 @Table(
     uniqueConstraints=
         @UniqueConstraint(columnNames={"name"}))
-public class BudgetCategory extends EntityBase implements   Serializable {
+public class BudgetCategory extends EntityBase implements Serializable {
   @Id
   @GeneratedValue
   private Long id;
-  
+
   @NotNull(message="%ValidationErrorNameEmpty")
   @Size(min=1, message="%ValidationErrorNameEmpty")
   @Column(nullable = false)
   private String name;
-  
+
   public static enum Direction {
     PAYMENT,
     INCOME;
@@ -49,19 +49,19 @@ public class BudgetCategory extends EntityBase implements   Serializable {
   @NotNull(message="%ValidationErrorDirectionEmpty")
   @Column(nullable = false)
   private Direction direction;
-  
+
   @Column(nullable = true)
   private String groupName;
 
   public BudgetCategory() {
   }
-  
+
   public BudgetCategory(Direction direction, String groupName, String name) {
     this.direction = direction;
     this.groupName = groupName;
     this.name = name;
   }
-  
+
   public Direction getDirection() {
     return direction;
   }

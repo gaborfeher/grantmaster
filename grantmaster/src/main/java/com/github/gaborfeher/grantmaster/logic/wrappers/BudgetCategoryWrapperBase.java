@@ -23,11 +23,12 @@ import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.framework.base.EntityBase;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 
 public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends EntityWrapper<T> {
   private final String fakeName;
-  
+
   public BudgetCategoryWrapperBase(T entity, String fakeName) {
     super(entity);
     this.fakeName = fakeName;
@@ -87,6 +88,7 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
       EntityManager em,
       List<BudgetCategoryWrapperBase> paymentCategories,
       List<BudgetCategoryWrapperBase> incomeCategories,
+      Set<String> excludeColumnsFromFinal,
       List<BudgetCategoryWrapperBase> output) {
     BudgetCategoryWrapperBase expenseSum = createBudgetSummaryList(
         em, paymentCategories, Utils.getString("Summary.ExpenseSummary"), output);
@@ -97,6 +99,7 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
     if (expenseSum != null) {
       finalSum.addSummaryValues(expenseSum, new BigDecimal(-1));
     }
+    finalSum.removeColumns(excludeColumnsFromFinal);
     output.add(finalSum);
   }
 
@@ -106,7 +109,7 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
     }
     return getBudgetCategory().getGroupName();
   }
-   
+
   public abstract BudgetCategory getBudgetCategory();
 
   @Override
@@ -120,5 +123,7 @@ public abstract class BudgetCategoryWrapperBase<T extends EntityBase> extends En
 
   protected abstract void addSummaryValues(BudgetCategoryWrapperBase current, BigDecimal multiplier);
   protected abstract BudgetCategoryWrapperBase createFakeCopy(String summaryTitle);
-  
+
+  protected abstract void removeColumns(Set<String> columns);
+
 }

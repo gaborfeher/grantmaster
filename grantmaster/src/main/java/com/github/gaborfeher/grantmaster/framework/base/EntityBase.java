@@ -21,7 +21,7 @@ public abstract class EntityBase {
   public abstract Long getId();
 
   @Override
-  public boolean equals(Object other) {
+  public final boolean equals(Object other) {
     if (other == null) {
       return false;
     }
@@ -36,7 +36,7 @@ public abstract class EntityBase {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return getId() == null ? 0 : getId().hashCode();
   }
 }

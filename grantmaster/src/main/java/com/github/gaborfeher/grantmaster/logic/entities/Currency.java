@@ -30,11 +30,11 @@ public class Currency extends EntityBase implements Serializable {
   @Id
   @GeneratedValue
   private Long id;
-  
+
   @NotNull(message="%ValidationErrorCurrencyCodeEmpty")
   @Column(nullable = false, unique = true)
   private String code;
-  
+
   public Currency() {
   }
 
@@ -45,7 +45,7 @@ public class Currency extends EntityBase implements Serializable {
   public void setCode(String code) {
     this.code = code;
   }
-  
+
   @Override
   public String toString() {
     return code;
