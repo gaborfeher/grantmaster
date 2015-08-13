@@ -33,14 +33,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <EditButtonTableCellFactory />
       </cellFactory>
       <cellValueFactory>
-        <PropertyValueFactory property="state" /> 
+        <PropertyValueFactory property="state" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%Project" editable="false" sortable="false" styleClass="textColumn">
       <cellValueFactory>
         <EntityPropertyValueFactory property="project" />
       </cellValueFactory>
-    </TableColumn> 
+    </TableColumn>
     <TableColumn text="%ProjectReportColumn" prefWidth="100" sortable="false" styleClass="textColumn">
       <cellFactory>
         <ProjectReportTableCellFactory property="report" />
@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </TableColumn>
     <TableColumn text="%ProjectExpensesDate" prefWidth="100" sortable="false" styleClass="textColumn">
       <cellFactory>
-        <DateTableCellFactory property="paymentDate" /> 
+        <DateTableCellFactory property="paymentDate" />
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="paymentDate" />
@@ -62,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <StringTableCellFactory property="accountNo" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="accountNo" /> 
+        <EntityPropertyValueFactory property="accountNo" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpensePartnerName" sortable="false" styleClass="textColumn" >
@@ -70,7 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <StringTableCellFactory property="partnerName" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="partnerName" /> 
+        <EntityPropertyValueFactory property="partnerName" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%BudgetCategory" sortable="false" prefWidth="150" styleClass="textColumn" >
@@ -78,7 +78,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="budgetCategory" /> 
+        <EntityPropertyValueFactory property="budgetCategory" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalAmount" styleClass="numColumn" sortable="false" prefWidth="130">
@@ -86,7 +86,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <BigDecimalTableCellFactory property="originalAmount" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="originalAmount" /> 
+        <EntityPropertyValueFactory property="originalAmount" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesOriginalCurrency" sortable="false" styleClass="textColumn" >
@@ -94,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <CurrencyTableCellFactory property="originalCurrency" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="originalCurrency" /> 
+        <EntityPropertyValueFactory property="originalCurrency" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ProjectExpensesAmount">
@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <BigDecimalTableCellFactory property="accountingCurrencyAmount" />
           </cellFactory>
           <cellValueFactory>
-            <EntityPropertyValueFactory property="accountingCurrencyAmount" /> 
+            <EntityPropertyValueFactory property="accountingCurrencyAmount" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn fx:id="grantCurrencyAmountColumn" editable="false" styleClass="numColumn" sortable="false" prefWidth="130">
@@ -112,7 +112,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <BigDecimalTableCellFactory property="grantCurrencyAmount"  />
           </cellFactory>
           <cellValueFactory>
-            <EntityPropertyValueFactory property="grantCurrencyAmount" /> 
+            <EntityPropertyValueFactory property="grantCurrencyAmount" />
           </cellValueFactory>
         </TableColumn>
       </columns>
@@ -120,26 +120,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <!-- set editable="true" here to experiment with manual exchange rate setting -->
     <TableColumn text="%ExpensesExchangeRate" editable="false" styleClass="numColumn" sortable="false">
       <cellFactory>
-        <BigDecimalTableCellFactory property="exchangeRate" /> 
+        <BigDecimalTableCellFactory property="exchangeRate" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="exchangeRate" /> 
+        <EntityPropertyValueFactory property="exchangeRate" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseComment1" editable="true" sortable="false" prefWidth="120" styleClass="textColumn" >
       <cellFactory>
-        <StringTableCellFactory property="comment1" /> 
+        <StringTableCellFactory property="comment1" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="comment1" /> 
+        <EntityPropertyValueFactory property="comment1" />
       </cellValueFactory>
     </TableColumn>
     <TableColumn text="%ExpenseComment2" editable="true" sortable="false" prefWidth="120" styleClass="textColumn" >
       <cellFactory>
-        <StringTableCellFactory property="comment2" /> 
+        <StringTableCellFactory property="comment2" />
       </cellFactory>
       <cellValueFactory>
-        <EntityPropertyValueFactory property="comment2" /> 
+        <EntityPropertyValueFactory property="comment2" />
       </cellValueFactory>
     </TableColumn>
   </columns>

@@ -162,7 +162,7 @@ public class GlobalBudgetCategoryWrapper
             getResultList();
   }
 
-  private static void getYearlyBudgetCategorySummaryMap(
+  private static void addYearlySumsToBudgetCategoryMap(
       EntityManager em,
       String query,
       Map<Long, GlobalBudgetCategoryWrapper> map,
@@ -173,7 +173,9 @@ public class GlobalBudgetCategoryWrapper
       int year = (Integer)line[2];
       String header = String.format("%d (%s)", year, (String)line[1]);
       columnNames.add(header);
-      budgetCategoryWrapper.setComputedValue(header, (BigDecimal)line[3]);
+      BigDecimal addValue = (BigDecimal)line[3];
+      BigDecimal newValue = budgetCategoryWrapper.getComputedValue(header).add(addValue, Utils.MC);
+      budgetCategoryWrapper.setComputedValue(header, newValue);
     }
   }
 
@@ -202,17 +204,24 @@ public class GlobalBudgetCategoryWrapper
     }
 
     // Collect expense summaries.
-    getYearlyBudgetCategorySummaryMap(
+    addYearlySumsToBudgetCategoryMap(
         em,
         "SELECT e.budgetCategory, e.project.accountCurrency.code AS currency, FUNCTION('YEAR', e.paymentDate) AS year, SUM(a.accountingCurrencyAmount) " +
-        "FROM ProjectExpense e, ExpenseSourceAllocation a " +
-        "WHERE a.expense = e " +
-        "GROUP BY e.budgetCategory, year, currency",
+            "FROM ProjectExpense e, ExpenseSourceAllocation a " +
+            "WHERE a.expense = e " +
+            "GROUP BY e.budgetCategory, year, currency",
         budgetCategoryMap,
         columnNames);
+    addYearlySumsToBudgetCategoryMap(
+        em,
+        "SELECT e.budgetCategory, e.project.accountCurrency.code AS currency, FUNCTION('YEAR', e.paymentDate) AS year, SUM(e.accountingCurrencyAmountOverride) " +
+            "FROM ProjectExpense e " +
+            "WHERE e.accountingCurrencyAmountOverride IS NOT NULL " +
+            "GROUP BY e.budgetCategory, year, currency",
+        budgetCategoryMap, columnNames);
 
     // Collect income summaries.
-    getYearlyBudgetCategorySummaryMap(
+    addYearlySumsToBudgetCategoryMap(
         em,
         "SELECT s.project.incomeType AS incomeType, s.project.accountCurrency.code AS currency, FUNCTION('YEAR', s.availabilityDate) AS year, SUM(s.grantCurrencyAmount * s.exchangeRate) " +
         "FROM ProjectSource s " +

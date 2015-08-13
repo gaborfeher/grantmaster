@@ -24,12 +24,14 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<ProjectBudgetLimit> {
   private BigDecimal spentGrantCurrency;
@@ -177,15 +179,17 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Proj
     throw new UnsupportedOperationException("Not supported.");
   }
 
-  public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
+  /**
+   * Gets all budget categories. Populates expense summaries from expenses
+   * of the given project. Only expenses specified in "normal" more are
+   * considered.
+   * @return true if at least one expense was populated
+   */
+  private static boolean getProjectBudgetCategoriesNormalMode(
       EntityManager em,
       Project project,
-      ProjectReport filterReport) {
-    BigDecimal total =
-        Utils.getSingleResultWithDefault(BigDecimal.ZERO,
-            em.createQuery("SELECT SUM(s.grantCurrencyAmount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", BigDecimal.class).
-                setParameter("project", project));
-
+      ProjectReport filterReport,
+      List<ProjectBudgetCategoryWrapper> categories) {
     List<ProjectBudgetCategoryWrapper> list = em.createQuery(
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(a.accountingCurrencyAmount), SUM(a.accountingCurrencyAmount / s.exchangeRate)) " +
         "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project LEFT OUTER JOIN ExpenseSourceAllocation a ON a.expense = e LEFT OUTER JOIN ProjectSource s ON a.source = s AND s.project = :project " +
@@ -198,30 +202,126 @@ public class ProjectBudgetCategoryWrapper extends BudgetCategoryWrapperBase<Proj
             setParameter("direction", BudgetCategory.Direction.PAYMENT).
             setParameter("filterReportId", filterReport == null ? null : filterReport.getId()).
             getResultList();
+    categories.addAll(list);
+    for (ProjectBudgetCategoryWrapper categoryWrapper : list) {
+      if (categoryWrapper.spentGrantCurrency != null) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-    Iterator<ProjectBudgetCategoryWrapper> iterator = list.iterator();
+  /**
+   * Gets all budget categories. Populates expense summaries from expenses
+   * of the given project. Only expenses specified in "override" more are
+   * considered.
+   * @return true if at least one expense was populated
+   */
+  private static boolean getProjectBudgetCategoriesOverrideMode(
+      EntityManager em,
+      Project project,
+      ProjectReport filterReport,
+      List<ProjectBudgetCategoryWrapper> categories) {
+    List<ProjectBudgetCategoryWrapper> list = em.createQuery(
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, SUM(e.accountingCurrencyAmountOverride), SUM(e.accountingCurrencyAmountOverride / e.exchangeRateOverride)) " +
+        "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project " +
+            "WHERE c.direction = :direction " +
+            " AND (:filterReportId IS NULL OR e.report.id = :filterReportId) " +
+            "GROUP BY c " +
+            "ORDER BY c.groupName NULLS LAST, c.name",
+        ProjectBudgetCategoryWrapper.class).
+            setParameter("project", project).
+            setParameter("direction", BudgetCategory.Direction.PAYMENT).
+            setParameter("filterReportId", filterReport == null ? null : filterReport.getId()).
+            getResultList();
+    categories.addAll(list);
+    for (ProjectBudgetCategoryWrapper categoryWrapper : list) {
+      if (categoryWrapper.spentGrantCurrency != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Gets total expense sum per budget categories for a project. Only considers
+   * expenses where the exchange rate was manually specified, that is
+   * "override mode".
+   */
+  private static void getProjectBudgetCategories(
+      EntityManager em,
+      Project project,
+      ProjectReport filterReport,
+      List<ProjectBudgetCategoryWrapper> categories) {
+    List<ProjectBudgetCategoryWrapper> list = em.createQuery(
+        "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectBudgetCategoryWrapper(c, 0.0, 0.0) " +
+        "FROM BudgetCategory c LEFT OUTER JOIN ProjectExpense e ON e.budgetCategory = c AND e.project = :project " +
+            "WHERE c.direction = :direction " +
+            " AND (:filterReportId IS NULL OR e.report.id = :filterReportId) " +
+            "GROUP BY c " +
+            "ORDER BY c.groupName NULLS LAST, c.name",
+        ProjectBudgetCategoryWrapper.class).
+            setParameter("project", project).
+            setParameter("direction", BudgetCategory.Direction.PAYMENT).
+            setParameter("filterReportId", filterReport == null ? null : filterReport.getId()).
+            getResultList();
+    categories.addAll(list);
+  }
+
+  private static BigDecimal getTotalProjectIncome(
+      EntityManager em,
+      Project project) {
+    TypedQuery<BigDecimal> query =
+        em.createQuery("SELECT SUM(s.grantCurrencyAmount) FROM ProjectSource s WHERE s.project = :project GROUP BY s.project", BigDecimal.class).
+            setParameter("project", project);
+    return Utils.getSingleResultWithDefault(BigDecimal.ZERO, query);
+  }
+
+  private static ProjectBudgetLimit getLimitForProjectAndCategory(
+      EntityManager em,
+      Project project,
+      BudgetCategory budgetCategory) {
+    return Utils.getSingleResultWithDefault(
+        null,
+        em.createQuery(
+            "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.budgetCategory = :budgetCategory",
+            ProjectBudgetLimit.class).
+            setParameter("project", project).
+            setParameter("budgetCategory", budgetCategory));
+  }
+
+  public static List<ProjectBudgetCategoryWrapper> getProjectBudgetLimits(
+      EntityManager em,
+      Project project,
+      ProjectReport filterReport) {
+    BigDecimal totalIncome = getTotalProjectIncome(em, project);
+    List<ProjectBudgetCategoryWrapper> categories = new ArrayList<>();
+    // Get list of all budget categories with cumulative expenses of this project.
+    if (!getProjectBudgetCategoriesNormalMode(em, project, filterReport, categories)) {
+      // We don't know whether this project had "normal" or "override" mode
+      // expenses. If normal did not yield any results, we try again with
+      // override.
+      categories.clear();
+      getProjectBudgetCategoriesOverrideMode(em, project, filterReport, categories);
+    }
+
+    // Go over list of categories, populate limit values where present.
+    // Drop categories which have neither limit nor expense values.
+    Iterator<ProjectBudgetCategoryWrapper> iterator = categories.iterator();
     while (iterator.hasNext()) {
-      ProjectBudgetCategoryWrapper limitWrapper = iterator.next();
-      ProjectBudgetLimit limit =
-          Utils.getSingleResultWithDefault(
-              null,
-              em.createQuery(
-                  "SELECT l FROM ProjectBudgetLimit l WHERE l.project = :project AND l.budgetCategory = :budgetCategory",
-                  ProjectBudgetLimit.class).
-                  setParameter("project", project).
-                  setParameter("budgetCategory", limitWrapper.getBudgetCategory()));
-
-      if (limit == null && limitWrapper.spentGrantCurrency == null) {
+      ProjectBudgetCategoryWrapper categoryWrapper = iterator.next();
+      ProjectBudgetLimit limit = getLimitForProjectAndCategory(em, project, categoryWrapper.getBudgetCategory());
+      if (limit == null && categoryWrapper.spentGrantCurrency == null) {
         iterator.remove();
       }
       if (limit != null) {
-        limitWrapper.setLimit(total, limit);
+        categoryWrapper.setLimit(totalIncome, limit);
       } else {
-        limitWrapper.setProject(project);
+        categoryWrapper.setProject(project);
       }
     }
 
-    return list;
+    return categories;
   }
 
   static void removeProjectBudgetLimits(EntityManager em, Project project) {
