@@ -38,7 +38,7 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
    * The class of object being edited here, needed by the EntityWrapper.
    */
   private final Class valueClass;
-  
+
   private class FocusChangeListener implements ChangeListener<Boolean> {
     @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -55,15 +55,15 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
     super(stringConverter);
     this.property = property;
     this.valueClass = valueClass;
-    
+
     focusedProperty().addListener(new FocusChangeListener());
   }
-  
+
   protected EditableTableRowItem getEntityWrapper() {
     return (EditableTableRowItem) getTableRow().getItem();
   }
-  
-  @Override  
+
+  @Override
   public void commitEdit(T val) {
     if (getEntityWrapper() != null &&  // TODO(gaborfeher): Investigate why these are needed.
         getEntityWrapper().commitEdit(property, val, valueClass)) {
@@ -72,7 +72,7 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
       cancelEdit();
     }
   }
-  
+
   @Override
   public void startEdit() {
     if (getEntityWrapper() != null &&
@@ -81,7 +81,7 @@ public abstract class BetterChoiceBoxTableCell<S extends EditableTableRowItem, T
       super.startEdit();
     }
   }
-  
+
   /**
    * Retrieves and updates the list of choice items in the choice box.
    */

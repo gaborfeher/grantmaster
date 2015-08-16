@@ -43,13 +43,13 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   @NotNull(message="%ValidationErrorExpenseAmount")
   @DecimalMin(value="0.01", message="%ValidationErrorExpenseAmount")
   private BigDecimal accountingCurrencyAmount;
-  
+
   private final BigDecimal accountingCurrencyAmountNotEdited;
-  
+
   private BigDecimal grantCurrencyAmount;
-  
+
   private BigDecimal exchangeRate;
-  
+
   /*
   public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
     super(expense);
@@ -59,14 +59,14 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
   }
   */
-  
+
    public ProjectExpenseWrapper(ProjectExpense expense) {
     super(expense);
-    
+
     this.exchangeRate = BigDecimal.ZERO;
     this.accountingCurrencyAmount = BigDecimal.ZERO;
     this.grantCurrencyAmount = BigDecimal.ZERO;
-    
+
     if (expense.getExchangeRateOverride() != null) {
       this.exchangeRate = expense.getExchangeRateOverride();
       this.accountingCurrencyAmount = expense.getAccountingCurrencyAmountOverride();
@@ -84,7 +84,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
     this.accountingCurrencyAmountNotEdited = accountingCurrencyAmount;
   }
-  
+
   @AssertTrue(message="%ValidationErrorExpenseConsistency")
   private boolean isValid() {
     ProjectExpense expense = getEntity();
@@ -94,7 +94,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         expense.getOriginalAmount() == null ||
         accountingCurrencyAmount == null) {
       return false;
-    }    
+    }
     Project project = expense.getProject();
     if (!expense.getOriginalCurrency().equals(project.getAccountCurrency())) {
       // Nothing to check if they are not equal.
@@ -102,8 +102,21 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
     return 0 == expense.getOriginalAmount().compareTo(accountingCurrencyAmount);
   }
-      
-      
+
+  @AssertTrue(message="%ValidationErrorLockedReport")
+  private boolean isEditingAllowed() {
+    return ProjectReport.Status.OPEN.equals(getEntity().getReport().getStatus());
+  }
+
+  @Override
+  protected boolean checkIsLocked() {
+    if (getEntity().getReport().getStatus() != ProjectReport.Status.CLOSED) {
+      return false;
+    }
+    validate();  // trigger error message
+    return true;
+  }
+
   /**
    * Adds an expense source allocation to this expense. In other words,
    * spent money is added. Not that grantCurrencyAmount is updated but
@@ -121,7 +134,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     allocation.setAccountingCurrencyAmount(accountingCurrencyAmountToTake);
     entity.getSourceAllocations().add(allocation);
   }
-  
+
   /**
    * Recalculate the sourceAllocations array. So that this expense uses the
    * earliest free sources for its cost. Preconditions: the
@@ -135,7 +148,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     List<ProjectSourceWrapper> sources =
         ProjectSourceWrapper.getProjectSourceListForAllocation(em, entity.getProject());
     entity.setSourceAllocations(new ArrayList<>());
-    
+
     for (int i = 0; i < sources.size(); ++i) {
       ProjectSource source = sources.get(i).getEntity();
       if (remainingAccountingCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -157,7 +170,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       em.persist(allocation);
     }
   }
-  
+
   public static void updateExpenseAllocations(EntityManager em, Project project, LocalDate startingFrom) {
     // Get list of expenses to update.
     List<ProjectExpenseWrapper> expensesToUpdate =
@@ -175,7 +188,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       e.recalculateAllocations(em);
     }
   }
-  
+
   private boolean propagateAccountingCurrencyAmountChange(
       EntityManager em, BigDecimal editedAccountingCurrencyAmount) {
     if (entity.getExchangeRateOverride() == null) {
@@ -213,7 +226,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
     return true;
   }
-  
+
   @Override
   protected boolean saveInternal(EntityManager em) {
     if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
@@ -290,7 +303,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       return super.setProperty(name, value, paramType);
     }
   }
-  
+
   public static ProjectExpenseWrapper createNew(EntityManager em, Project project) {
     ProjectExpense expense = new ProjectExpense();
     expense.setProject(project);
@@ -299,7 +312,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     ProjectExpenseWrapper wrapper = new ProjectExpenseWrapper(expense);
     return wrapper;
   }
-  
+
   @Override
   public boolean delete(EntityManager em) {
     if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
@@ -313,11 +326,11 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     requestTableRefresh();
     return true;
   }
-  
+
   public static List<ProjectExpenseWrapper> getProjectExpenseList(EntityManager em, Project project) {
     return getProjectExpenseListQuery(em, project, true, "").getResultList();
   }
-  
+
   /**
    * @return List of expenses in the order they should be taken when allocating
    * sources.( Note that filtering is only based on report date, therefore
@@ -336,7 +349,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       return getProjectExpenseListQuery(em, project, false, "").getResultList();
     }
   }
-  
+
   private static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {
     String sortString = descending ? " DESC" : "";
     String queryString =
@@ -400,10 +413,10 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
      query.setParameter("accountNo", accountNo);
      query.setParameter("comment1", comment1);
      query.setParameter("comment2", comment2);
-     
+
      return query.getResultList();
   }
-  
+
   public static void removeProjectExpenses(EntityManager em, Project project) {
     em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a IN (SELECT a FROM ExpenseSourceAllocation a, ProjectExpense e WHERE a.expense = e AND e.project = :project)").
         setParameter("project", project).
@@ -424,7 +437,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   public BigDecimal getExchangeRate() {
     return exchangeRate;
   }
-  
+
   public void setExchangeRate(BigDecimal exchangeRate) {
     this.exchangeRate = exchangeRate;
     entity.setExchangeRateOverride(exchangeRate);

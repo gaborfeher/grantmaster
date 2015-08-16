@@ -33,5 +33,5 @@ class ProjectReportStatusTableCell<S extends EditableTableRowItem>
   @Override
   protected void refreshChoiceItems() {
   }
-  
+
 }

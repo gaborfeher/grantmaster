@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.validation.constraints.AssertTrue;
 
 public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
   public ProjectSourceWrapper(ProjectSource source, BigDecimal usedAccountingCurrencyAmount) {
@@ -41,16 +42,30 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
       source.setRemainingGrantCurrencyAmount(source.getGrantCurrencyAmount().subtract(source.getUsedGrantCurrencyAmount(), Utils.MC));
     }
   }
+
+  @AssertTrue(message="%ValidationErrorLockedReport")
+  private boolean isEditingAllowed() {
+    return ProjectReport.Status.OPEN.equals(getEntity().getReport().getStatus());
+  }
   
+  @Override
+  protected boolean checkIsLocked() {
+    if (getEntity().getReport().getStatus() != ProjectReport.Status.CLOSED) {
+      return false;
+    }
+    validate();  // trigger error message
+    return true;
+  }
+
   public BigDecimal getGrantCurrencyAmount() {
     return entity.getGrantCurrencyAmount();
   }
-  
+
   public static List<ProjectSourceWrapper> getProjectSources(
       EntityManager em, Project project, ProjectReport filterReport) {
     return getProjectSources(em, project, filterReport, true);
   }
-  
+
   public static List<ProjectSourceWrapper> getProjectSourceListForAllocation(EntityManager em, Project project) {
     return getProjectSources(em, project, null, false);
   }
@@ -69,7 +84,7 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     query.setParameter("filterReportId", filterReport == null ? null : filterReport.getId());
     return query.getResultList();
   }
-  
+
   static void removeProjectSources(EntityManager em, Project project) {
     em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a IN (SELECT a FROM ExpenseSourceAllocation a, ProjectSource s WHERE a.source = s AND s.project = :project)").
         setParameter("project", project).
@@ -90,7 +105,7 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getAvailabilityDate());
     return true;
   }
-  
+
   @Override
   public boolean delete(EntityManager em) {
     if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
@@ -98,12 +113,12 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     }
     return super.delete(em);
   }
-  
+
   public static ProjectSourceWrapper createNew(EntityManager em, Project project) {
     ProjectSource source = new ProjectSource();
     source.setProject(project);
     source.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
     return new ProjectSourceWrapper(source, BigDecimal.ZERO);
   }
-  
+
 }

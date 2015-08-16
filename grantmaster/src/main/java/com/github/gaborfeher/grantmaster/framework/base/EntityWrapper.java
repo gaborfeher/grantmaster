@@ -38,18 +38,18 @@ import org.slf4j.LoggerFactory;
  * The GUI controls talking to EditableTableRowItem objects are the Java FX tab
  * controllers derived from ControllerBase, and the Java FX table cell
  * implementations in the ui.cells subpackage.
- * 
+ *
  * @param <T> Type of entity to wrap.
  */
 public abstract class EntityWrapper<T extends EntityBase> implements EditableTableRowItem {
   private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EntityWrapper.class);
-  
+
   protected T entity;
-  
+
   private RowEditState state;
   private boolean isSummary;
   private TablePageControllerBase parent;
-  
+
   public EntityWrapper(T entity) {
     this.entity = entity;
     state = RowEditState.SAVED;
@@ -62,7 +62,9 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     if (Objects.equals(val, getProperty(property))) {
       return true;
     }
-    
+    if (state != RowEditState.EDITING_NEW && checkIsLocked()) {
+      return false;
+    }
     if (!setProperty(property, val, valueType)) {
       return false;
     }
@@ -79,30 +81,30 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     }
     return DatabaseSingleton.INSTANCE.transaction(this::save);
   }
-    
+
   protected boolean saveInternal(EntityManager em) {
     entity = em.merge(entity);
     setState(RowEditState.SAVED);
     return true;
   }
-  
+
   public final boolean save(EntityManager em) {
     boolean success = DatabaseSingleton.INSTANCE.runOrRollback(
         (EntityManager em0) -> validate() && saveInternal(em0), em);
     requestTableRefresh();
     return success;
   }
-  
+
   @Override
   public RowEditState getState() {
     return state;
   }
-  
+
   @Override
   public void setState(RowEditState state) {
     this.state = state;
   }
-  
+
   @Override
   public boolean canEdit() {
     return !isSummary;
@@ -118,7 +120,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       return false;
     }
   }
-  
+
   @Override
   public Object getProperty(String name) {
     try {
@@ -131,14 +133,14 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       return null;
     }
   }
-  
+
   @Override
   public void requestTableRefresh() {
     if (parent != null) {
       parent.onRefresh();
     }
   }
-  
+
   private Set<ConstraintViolation> checkValidationConstraints() {
     Validator validator = ValidatorFactorySingleton.SINGLE_INSTANCE.getValidator();
     Set<ConstraintViolation> constraintViolations = new HashSet<>();
@@ -146,7 +148,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     constraintViolations.addAll(validator.validate(this));
     return constraintViolations;
   }
-  
+
   @Override
   public boolean validate() {
     Set<ConstraintViolation> constraintViolations = checkValidationConstraints();
@@ -159,13 +161,13 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       } else {
         // Show error message to the user. Using runLater to avoid messing
         // with the table-edit GUI.
-        Platform.runLater(() -> 
-          parent.showValidationFailureDialog(constraintViolations));
+        Platform.runLater(() ->
+            parent.showValidationFailureDialog(constraintViolations));
       }
       return false;
     }
   }
-  
+
   public boolean delete(EntityManager em) {
     if (entity != null) {
       entity = (T) em.find(entity.getClass(), entity.getId());
@@ -173,7 +175,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     }
     return true;
   }
-  
+
   public void discardEdits() {
     if (state == RowEditState.EDITING_NEW) {
       parent.discardNew();
@@ -181,12 +183,16 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       parent.onRefresh();
     }
   }
-  
+
+  protected boolean checkIsLocked() {
+    return false;
+  }
+
   @Override
   public boolean getIsSummary() {
     return isSummary;
   }
-  
+
   public void setIsSummary(boolean isSummary) {
     this.isSummary = isSummary;
   }
@@ -199,7 +205,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
   public TablePageControllerBase getParent() {
     return parent;
   }
-  
+
   public Long getId() {
     if (entity == null) {
       return null;
@@ -207,7 +213,7 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       return entity.getId();
     }
   }
-  
+
   @Override
   public T getEntity() {
     return entity;
