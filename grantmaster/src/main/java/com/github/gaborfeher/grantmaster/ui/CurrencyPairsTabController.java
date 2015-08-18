@@ -1,6 +1,8 @@
-/**
+package com.github.gaborfeher.grantmaster.ui;
+
+/*
  * This file is a part of GrantMaster.
- * Copyright (C) 2015  Gábor Fehér <feherga@gmail.com>
+ * Copyright (C) 2015 Gabor Feher <feherga@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.gaborfeher.grantmaster.ui;
 
-import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
-import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
+import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.framework.ui.cells.EditButtonTableCell;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
-import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.entities.CurrencyPair;
+import com.github.gaborfeher.grantmaster.logic.wrappers.CurrencyPairWrapper;
 import java.io.IOException;
 import java.util.List;
 import javafx.event.ActionEvent;
@@ -32,42 +33,48 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javax.persistence.EntityManager;
 
-public class ProjectListTabController extends TablePageControllerBase<ProjectWrapper> {
+/**
+ * FXML Controller class
+ *
+ * @author gabor
+ */
+public class CurrencyPairsTabController extends TablePageControllerBase<CurrencyPairWrapper> {
   MainPageController parent;
-
-  @Override
-  public void getItemListForRefresh(EntityManager em, List<ProjectWrapper> items) {
-    items.addAll(ProjectWrapper.getProjects(em));
-  }
 
   public void handleOpenButtonAction(ActionEvent event) throws IOException {
     Node sourceButton = (Node) event.getSource();
     EditButtonTableCell sourceCell = (EditButtonTableCell) sourceButton.getProperties().get("tableCell");
-    ProjectWrapper sourceProjectWrapper = (ProjectWrapper) sourceCell.getEntityWrapper();
-    if (sourceProjectWrapper.getState() != RowEditState.SAVED) {
+    CurrencyPairWrapper currenciesWrapper = (CurrencyPairWrapper) sourceCell.getEntityWrapper();
+    if (currenciesWrapper.getState() != RowEditState.SAVED) {
       return;
     }
-    parent.addTab(createProjectTab(sourceProjectWrapper.getEntity()));
+    parent.addTab(createExchageRateTab(currenciesWrapper.getEntity()));
   }
 
-  private Tab createProjectTab(Project project) throws IOException {
-    Tab newTab = new Tab(project.getName());
-    final ProjectTabController controller;
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
+  private Tab createExchageRateTab(CurrencyPair currencyPair) throws IOException {
+    Tab newTab = new Tab(currencyPair.toString());
+    final ExchangeRateItemsTabController controller;
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ExchangeRateItems.fxml"));
     loader.setResources(Utils.getResourceBundle());
     Parent projectPage = loader.load();
     controller = loader.getController();
-    controller.init(project);
+    controller.init(currencyPair);
     newTab.setContent(projectPage);
     return newTab;
   }
 
-  void init(MainPageController parent) {
-    this.parent = parent;
+  @Override
+  protected CurrencyPairWrapper createNewEntity(EntityManager em) {
+    return new CurrencyPairWrapper(new CurrencyPair());
   }
 
   @Override
-  protected ProjectWrapper createNewEntity(EntityManager em) {
-    return ProjectWrapper.createNew();
+  protected void getItemListForRefresh(EntityManager em, List<CurrencyPairWrapper> items) {
+    items.addAll(CurrencyPairWrapper.getAllExhangeRatePairs(em));
   }
+
+  public void init(MainPageController parent) {
+    this.parent = parent;
+  }
+
 }

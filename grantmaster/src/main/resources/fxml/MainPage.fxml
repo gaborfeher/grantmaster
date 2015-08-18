@@ -47,6 +47,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <Tab text="%CurrenciesTab.Name" userData="%CurrenciesTab.Help" closable="false">
           <fx:include source="CurrenciesTab.fxml" />
         </Tab>
+        <Tab text="%CurrencyPairsTab.Name" userData="%CurrencyPairsTab.Help" closable="false">
+          <fx:include source="CurrencyPairsTab.fxml" fx:id="currencyPairsTab" />
+        </Tab>
         <Tab text="%SearchTab.Name" closable="false">
           <fx:include source="SearchTab.fxml" />
         </Tab>
@@ -54,6 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
           <fx:include source="AboutTab.fxml" fx:id="aboutTab" />
         </Tab>
       </tabs>
-    </TabPane>      
+    </TabPane>
   </children>
 </VBox>

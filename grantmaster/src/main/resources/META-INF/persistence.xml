@@ -12,6 +12,8 @@
     <class>com.github.gaborfeher.grantmaster.logic.entities.ProjectSource</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.Currency</class>
     <class>com.github.gaborfeher.grantmaster.logic.entities.LocalDatePersistenceConverter</class>
+    <class>com.github.gaborfeher.grantmaster.logic.entities.CurrencyPair</class>
+    <class>com.github.gaborfeher.grantmaster.logic.entities.ExchangeRateItem</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <!-- to make sure rounding in database shows up in UI after refresh -->
     <properties>

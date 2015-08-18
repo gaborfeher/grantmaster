@@ -36,7 +36,6 @@ import java.util.ResourceBundle;
 import javafx.application.HostServices;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -62,7 +61,9 @@ public class MainPageController implements Initializable {
    * Number of static tabs shown. (The ones that are not open/close-able
    * project tabs.
    */
-  private static final int NUM_SYSTEM_TABS = 5;
+  private static final int NUM_SYSTEM_TABS = 6;
+
+  private static final int ACTIVATE_TAB_AT_STARTUP = 5;
 
   private static final int ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT = 0;
 
@@ -75,6 +76,7 @@ public class MainPageController implements Initializable {
   Stage stage;
 
   @FXML ProjectListTabController projectListTabController;
+  @FXML CurrencyPairsTabController currencyPairsTabController;
   @FXML AboutTabController aboutTabController;
 
   private boolean allowCloseDatabase() {
@@ -124,25 +126,16 @@ public class MainPageController implements Initializable {
     TabSelectionChangeListener.activateTab(mainTabs.getTabs().get(ACTIVATE_TAB_AT_THIS_POS_AFTER_OPEN_PROJECT));
   }
 
-  public void addProjectTab(final Project project) throws IOException {
+  public void addTab(Tab newTab) throws IOException {
     for (int i = NUM_SYSTEM_TABS; i < mainTabs.getTabs().size(); ++i) {
       Tab alreadyOpenTab = mainTabs.getTabs().get(i);
-      if (project.getName().equals(alreadyOpenTab.getText())) {
+      if (newTab.getText().equals(alreadyOpenTab.getText())) {
         // The requested project is already open.
         mainTabs.getSelectionModel().select(alreadyOpenTab);
         return;
       }
     }
-    // Do the Java FX magic of opening the tab.
-    Tab newTab = new Tab(project.getName());
     mainTabs.getTabs().add(newTab);
-    final ProjectTabController controller;
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
-    loader.setResources(Utils.getResourceBundle());
-    Parent projectPage = loader.load();
-    controller = loader.getController();
-    controller.init(project);
-    newTab.setContent(projectPage);
     mainTabs.getSelectionModel().select(newTab);
   }
 
@@ -356,8 +349,9 @@ public class MainPageController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle rb) {
     projectListTabController.init(this);
+    currencyPairsTabController.init(this);
     mainTabs.getSelectionModel().selectedItemProperty().addListener(new TabSelectionChangeListener());
-    mainTabs.getSelectionModel().select(4);
+    mainTabs.getSelectionModel().select(ACTIVATE_TAB_AT_STARTUP);
   }
 
   void setStage(Stage stage) {
