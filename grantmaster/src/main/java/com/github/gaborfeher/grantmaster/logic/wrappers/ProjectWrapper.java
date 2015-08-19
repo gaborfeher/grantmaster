@@ -18,6 +18,7 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
@@ -30,7 +31,7 @@ public class ProjectWrapper extends EntityWrapper<Project> {
   public ProjectWrapper(Project project) {
     super(project);
   }
-  
+
   @Override
   public boolean delete(EntityManager em) {
     entity = em.find(Project.class, entity.getId());
@@ -51,11 +52,11 @@ public class ProjectWrapper extends EntityWrapper<Project> {
         ProjectWrapper.class).
             getResultList();
   }
-  
+
   public static List<Project> getProjectsWithoutWrapping(EntityManager em) {
     return em.createQuery("SELECT p FROM Project p ORDER BY p.name", Project.class).getResultList();
   }
-  
+
   public static ProjectWrapper createNew() {
     Project newProject = new Project();
     ProjectReport projectReport = new ProjectReport();
@@ -65,4 +66,14 @@ public class ProjectWrapper extends EntityWrapper<Project> {
     newProject.setReports(Arrays.asList(projectReport));
     return new ProjectWrapper(newProject);
   }
+
+  @Override
+  public boolean setProperty(String name, Object value, Class<?> paramType) {
+    if ("expenseMode".equals(name) && getState() != RowEditState.EDITING_NEW) {
+      // This value cannot be changed once the project is created.
+      return false;  // Refuse changing it.
+    }
+    return super.setProperty(name, value, paramType);
+  }
+
 }

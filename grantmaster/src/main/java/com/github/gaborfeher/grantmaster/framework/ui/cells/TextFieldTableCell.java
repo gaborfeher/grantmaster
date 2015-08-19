@@ -33,11 +33,11 @@ public class TextFieldTableCell<S extends EditableTableRowItem, T>
   final TextField editTextField;
   final MultiStringConverter<T> stringConverter;
   final Class<T> valueType;
-  
+
   // true if the last editing session was cancelled by user (currently esc key)
   // This disables later spurious commit messages.
   boolean userCancelled;
-  
+
   public TextFieldTableCell(
       String property,
       MultiStringConverter<T> stringConverter0,
@@ -91,8 +91,8 @@ public class TextFieldTableCell<S extends EditableTableRowItem, T>
       alert.showAndWait();
     }
   }
-  
-  @Override  
+
+  @Override
   public void commitEdit(T val) {
     if (userCancelled) {
       return;  // User cancel was before this commit message, ignore this.
@@ -121,7 +121,7 @@ public class TextFieldTableCell<S extends EditableTableRowItem, T>
     super.cancelEdit();
     updateItem(getItem(), false);
   }
-  
+
   @Override
   public void updateItem(final T item, final boolean empty) {
     super.updateItem(item, empty);

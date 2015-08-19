@@ -35,12 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <EditButtonTableCellFactory extraButtonText="%ProjectListTab.OpenProject" onAction="#handleOpenButtonAction" />
           </cellFactory>
           <cellValueFactory>
-            <PropertyValueFactory property="state" /> 
+            <PropertyValueFactory property="state" />
           </cellValueFactory>
         </TableColumn>
         <TableColumn text="%ProjectListTab.ProjectName" prefWidth="150" styleClass="textColumn" sortable="false">
             <cellFactory>
-            <StringTableCellFactory property="name" /> 
+            <StringTableCellFactory property="name" />
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="name" />
@@ -56,7 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </TableColumn>
         <TableColumn text="%ProjectListTab.GrantCurrency" prefWidth="150" styleClass="textColumn" sortable="false">
           <cellFactory>
-            <CurrencyTableCellFactory property="grantCurrency" /> 
+            <CurrencyTableCellFactory property="grantCurrency" />
           </cellFactory>
           <cellValueFactory>
             <EntityPropertyValueFactory property="grantCurrency" />
@@ -70,8 +70,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <EntityPropertyValueFactory property="incomeType" />
           </cellValueFactory>
         </TableColumn>
-        
+        <TableColumn text="%ProjectListTab.ExpenseMode" prefWidth="300" styleClass="textColumn" sortable="false">
+          <cellFactory>
+            <ExpenseModeTableCellFactory property="expenseMode" />
+          </cellFactory>
+          <cellValueFactory>
+            <EntityPropertyValueFactory property="expenseMode" />
+          </cellValueFactory>
+        </TableColumn>
       </columns>
-    </TableView>                
+    </TableView>
   </children>
 </VBox>

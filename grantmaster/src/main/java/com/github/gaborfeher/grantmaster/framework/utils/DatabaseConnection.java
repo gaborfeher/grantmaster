@@ -90,7 +90,7 @@ public class DatabaseConnection {
   }
 
   final static String FORMAT_VERSION = "format.version";
-  final static int CURRENT_FORMAT_VERSION = 3;
+  final static int CURRENT_FORMAT_VERSION = 4;
 
   private File getPropertiesFile() {
     return new File(archive.getDirectory(), PROPERTIES_FILE);
@@ -130,14 +130,15 @@ public class DatabaseConnection {
 
   private boolean checkVersionAndConvert(int currentFormatVersion, String jdbcUrl) {
     switch (currentFormatVersion) {
-      case CURRENT_FORMAT_VERSION:
-        return true;
-      // Earlier versions can be handled here.
       case 0:
       case 1:
-        return upgradeVersionFrom01to3(jdbcUrl);
+        return upgradeVersionFrom01to3(jdbcUrl) && checkVersionAndConvert(3, jdbcUrl);
       case 2:
         return false;  // Not supported development version.
+      case 3:
+        return upgradeVersionFrom3to4(jdbcUrl);
+      case CURRENT_FORMAT_VERSION:
+        return true;
       default:
         return false;
     }
@@ -154,6 +155,21 @@ public class DatabaseConnection {
       statement.execute("ALTER TABLE ProjectExpense ADD COLUMN exchangeRateOverride NUMERIC(25, 10) DEFAULT NULL;");
       statement.execute("ALTER TABLE ProjectExpense ADD COLUMN accountingCurrencyAmountOverride NUMERIC(25, 10) DEFAULT NULL;");
       properties.setProperty(FORMAT_VERSION, "3");
+      return true;
+    } catch (SQLException ex) {
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
+      return false;
+    }
+  }
+
+  private boolean upgradeVersionFrom3to4(String jdbcUrl) {
+    LoggerFactory.getLogger(DatabaseSingleton.class).info("upgradeVersionFrom3to4()");
+    Properties connectionProps = new Properties();
+    try (
+        Connection conn = DriverManager.getConnection(jdbcUrl, connectionProps);
+        Statement statement = conn.createStatement()) {
+      statement.execute("ALTER TABLE Project ADD COLUMN expenseMode INTEGER DEFAULT 0 NOT NULL;");
+      properties.setProperty(FORMAT_VERSION, "4");
       return true;
     } catch (SQLException ex) {
       LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);

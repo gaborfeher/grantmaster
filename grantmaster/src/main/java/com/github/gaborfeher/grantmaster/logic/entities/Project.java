@@ -50,7 +50,7 @@ public class Project extends EntityBase implements  Serializable {
   @ManyToOne
   @JoinColumn(nullable = false)
   private Currency accountCurrency;
-  
+
   @NotNull(message = "%ValidationErrorIncomeCategoryEmpty")
   @ManyToOne
   @JoinColumn(nullable = false)
@@ -58,7 +58,14 @@ public class Project extends EntityBase implements  Serializable {
 
   @OneToMany(mappedBy = "project")
   private List<ProjectReport> reports;
-  
+
+  public static enum ExpenseMode {
+    NORMAL_AUTO_BY_SOURCE,
+    OVERRIDE_AUTO_BY_RATE_TABLE;
+  }
+  @Column(nullable = false)
+  private ExpenseMode expenseMode = ExpenseMode.NORMAL_AUTO_BY_SOURCE;
+
   public Project() {
   }
 
@@ -74,7 +81,7 @@ public class Project extends EntityBase implements  Serializable {
   public Long getId() {
     return id;
   }
-  
+
   @Override
   public String toString() {
     return getName();
@@ -111,4 +118,13 @@ public class Project extends EntityBase implements  Serializable {
   public void setReports(List<ProjectReport> reports) {
     this.reports = reports;
   }
+
+  public ExpenseMode getExpenseMode() {
+    return expenseMode;
+  }
+
+  public void setExpenseMode(ExpenseMode expenseMode) {
+    this.expenseMode = expenseMode;
+  }
+
 }
