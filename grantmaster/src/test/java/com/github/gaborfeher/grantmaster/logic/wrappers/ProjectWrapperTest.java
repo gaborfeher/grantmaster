@@ -25,18 +25,18 @@ public class ProjectWrapperTest extends TestBase {
   Currency EUR;
   BudgetCategory SOME_GRANT;
   BudgetCategory SOME_EXPENSE;
-  
+
   public ProjectWrapperTest() {
   }
-  
+
   @BeforeClass
   public static void setUpClass() {
   }
-  
+
   @AfterClass
   public static void tearDownClass() {
   }
-  
+
   @Before
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
@@ -52,7 +52,7 @@ public class ProjectWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @After
   public void tearDown() {
     DatabaseSingleton.INSTANCE.close();
@@ -69,7 +69,7 @@ public class ProjectWrapperTest extends TestBase {
     assertTrue(DatabaseSingleton.INSTANCE.transaction(newWrapper::save));
 
     assertEquals(RowEditState.SAVED, newWrapper.getState());
-    
+
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       Project project = em.find(Project.class, newWrapper.getId());
       assertEquals("testProject", project.getName());
@@ -79,23 +79,25 @@ public class ProjectWrapperTest extends TestBase {
       return true;
     });
   }
-  
+
   @Test
   public void testDeleteProject() {
     // Create projects for testing.
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
-      Project project1 = TestUtils.createProject(em, "P1", USD, HUF, SOME_GRANT);
+      Project project1 = TestUtils.createProject(
+          em, "P1", USD, HUF, SOME_GRANT, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       ProjectReport report1 = TestUtils.createProjectReport(em, project1, LocalDate.of(2015, 5, 18));
       TestUtils.createProjectSource(em, project1, LocalDate.of(2014, 1, 1), report1, "100", "1000");
       TestUtils.createProjectExpense(em, project1, SOME_EXPENSE, LocalDate.of(2014, 6, 4), report1, "1000", HUF, "1000");
       TestUtils.createProjectNote(em, project1, new Timestamp(1234), "hello, world");
       TestUtils.createProjectBudgetLimit(em, project1, SOME_EXPENSE, null, "1000");
-      TestUtils.createProject(em, "P2", USD, HUF, SOME_GRANT);
+      TestUtils.createProject(
+          em, "P2", USD, HUF, SOME_GRANT, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       return true;
     }));
     // Query projects into a list, to simulate real use case, when the wrappers
     // have detached objects.
-    final List<ProjectWrapper> projects = new ArrayList<>();    
+    final List<ProjectWrapper> projects = new ArrayList<>();
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
       projects.addAll(ProjectWrapper.getProjects(em));
       return true;
@@ -113,9 +115,9 @@ public class ProjectWrapperTest extends TestBase {
       assertEquals("P2", list.get(0).getEntity().getName());
       return true;
     }));
-    
-    
+
+
   }
 
- 
+
 }

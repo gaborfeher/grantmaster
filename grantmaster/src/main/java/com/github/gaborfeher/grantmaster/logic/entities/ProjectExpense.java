@@ -40,16 +40,16 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   @Id
   @GeneratedValue
   private long id;
-  
+
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private Project project;
-  
+
   @NotNull(message="%ValidationErrorPaymentDateEmpty")
   @Column(nullable = false)
   @Temporal(TemporalType.DATE)
   private LocalDate paymentDate;
-  
+
   /**
    * The report in which this expense will be included.
    */
@@ -57,24 +57,24 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private ProjectReport report;
-  
+
   private String accountNo;
   private String partnerName;
-  
+
   @NotNull(message="%ValidationErrorBudgetCategoryEmpty")
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private BudgetCategory budgetCategory;
-  
+
   @NotNull(message="%ValidationErrorExpenseOriginalAmount")
   @DecimalMin(value="0.00", message="%ValidationErrorExpenseOriginalAmount")
   @Column(nullable = false, scale = 10, precision = 25)
   private BigDecimal originalAmount;
-  
+
   @ManyToOne(optional = false)
   @JoinColumn(nullable = false)
   private Currency originalCurrency;
-  
+
   /**
    * This list describes the money used for paying this expense: income
    * sources and income amounts. In normal mode, exchange rate, accounting
@@ -83,7 +83,7 @@ public class ProjectExpense extends EntityBase implements  Serializable {
    */
   @OneToMany(mappedBy="expense", cascade=CascadeType.ALL, orphanRemoval = true)
   private List<ExpenseSourceAllocation> sourceAllocations;
-  
+
   /**
    * There are two modes of specifying an expense: normal and override.
    * If this field is null, then the mode is normal.
@@ -99,12 +99,12 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   private BigDecimal accountingCurrencyAmountOverride;  // optional
 
   private String comment1;
-  
+
   private String comment2;
-  
+
   public ProjectExpense() {
   }
-  
+
   @Override
   public Long getId() {
     return id;
@@ -199,6 +199,9 @@ public class ProjectExpense extends EntityBase implements  Serializable {
   }
 
   public void setReport(ProjectReport report) {
+    if (report == null || !report.getProject().equals(getProject())) {
+      throw new RuntimeException("assertion failed");
+    }
     this.report = report;
   }
 

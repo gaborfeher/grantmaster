@@ -33,7 +33,8 @@ public class ProjectSourceWrapperTest extends TestBase {
       SOME_GRANT = new BudgetCategory(
           BudgetCategory.Direction.INCOME, "i.stuff", "Some kind of project grant");
       em.persist(SOME_GRANT);
-      PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
+      PROJECT1 = TestUtils.createProject(
+          em, "project1", USD, HUF, SOME_GRANT, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       PROJECT1_REPORT1 = TestUtils.createProjectReport(
           em, PROJECT1, LocalDate.of(2015, 4, 1));
       PROJECT1_REPORT2 = TestUtils.createProjectReport(
@@ -41,12 +42,12 @@ public class ProjectSourceWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @After
   public void tearDown() {
     DatabaseSingleton.INSTANCE.close();
   }
-  
+
     @Test
   public void testSortingForAllocation() {
     final ObjectHolder<Long> sourceId1 = new ObjectHolder<>();
@@ -63,7 +64,7 @@ public class ProjectSourceWrapperTest extends TestBase {
               PROJECT1_REPORT2,
               "21.1",
               "300000.1"
-          ).getId());  
+          ).getId());
       sourceId2.set(
           TestUtils.createProjectSource(
               em,

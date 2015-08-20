@@ -5,6 +5,7 @@ import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
+import com.github.gaborfeher.grantmaster.logic.entities.CurrencyPair;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
@@ -27,11 +28,13 @@ public class ProjectExpenseWrapperTest extends TestBase {
   Project PROJECT1;
   ProjectReport PROJECT1_REPORT1;
   ProjectReport PROJECT1_REPORT2;
+  Project PROJECT2_OVERRIDE;
+  ProjectReport PROJECT2_OVERRIDE_REPORT1;
 
   public ProjectExpenseWrapperTest() {
   }
 
-  
+
   @Before
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
@@ -45,7 +48,8 @@ public class ProjectExpenseWrapperTest extends TestBase {
       SOME_EXPENSE = new BudgetCategory(
           BudgetCategory.Direction.PAYMENT, "p.stuff", "Some kind of payment");
       em.persist(SOME_EXPENSE);
-      PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
+      PROJECT1 = TestUtils.createProject(
+          em, "project1", USD, HUF, SOME_GRANT, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       PROJECT1_REPORT1 = TestUtils.createProjectReport(
           em, PROJECT1, LocalDate.of(2015, 4, 1));
       PROJECT1_REPORT2 = TestUtils.createProjectReport(
@@ -58,23 +62,30 @@ public class ProjectExpenseWrapperTest extends TestBase {
           em, PROJECT1, LocalDate.of(2015, 4, 1), PROJECT1_REPORT1, "200", "1000");
       TestUtils.createProjectSource(
           em, PROJECT1, LocalDate.of(2015, 3, 1), PROJECT1_REPORT2, "300", "1000");
+      PROJECT2_OVERRIDE = TestUtils.createProject(
+          em, "project2", USD, HUF, SOME_GRANT, Project.ExpenseMode.OVERRIDE_AUTO_BY_RATE_TABLE);
+      PROJECT2_OVERRIDE_REPORT1 = TestUtils.createProjectReport(
+          em, PROJECT2_OVERRIDE, LocalDate.of(2015, 7, 1));
+
+      CurrencyPair currencyPair = TestUtils.createCurrencyPair(em, HUF, USD);
+      TestUtils.createExchangeRate(em, currencyPair, LocalDate.of(2015, 8, 20), "1000");
+      TestUtils.createExchangeRate(em, currencyPair, LocalDate.of(2015, 8, 21), "2000");
       return true;
     }));
   }
-  
+
   @After
   public void tearDown() {
     DatabaseSingleton.INSTANCE.close();
   }
-  
+
   @Test
   public void testCreateExpense() {
-    System.out.println("TEST testCreateExpense");
     final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
       return true;
-    })); 
+    }));
     newExpense.get().setState(RowEditState.EDITING_NEW);
     newExpense.get().setProperty(
         "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
@@ -86,10 +97,10 @@ public class ProjectExpenseWrapperTest extends TestBase {
         "accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC), BigDecimal.class);
     newExpense.get().setProperty(
         "report", PROJECT1_REPORT1, ProjectReport.class);
-    
+
     assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
     assertEquals(RowEditState.SAVED, newExpense.get().getState());
-    
+
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
       assertEquals(1, expenses.size());
@@ -130,7 +141,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
               "200421",
               HUF,
               "200000.1"
-          ).getId());  
+          ).getId());
       expenseId2.set(
           TestUtils.createProjectExpense(
               em,
@@ -183,7 +194,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
   public void testShiftExpenseForward() {
     final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
     final ObjectHolder<Long> expenseId2 = new ObjectHolder<>();
-    
+
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
       expenseId1.set(
           TestUtils.createProjectExpense(
@@ -195,10 +206,10 @@ public class ProjectExpenseWrapperTest extends TestBase {
               "100000",
               HUF,
               "100000"
-          ).getId());  
+          ).getId());
       return true;
     }));
-    
+
     assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
       expenseId2.set(
           TestUtils.createProjectExpense(
@@ -213,11 +224,11 @@ public class ProjectExpenseWrapperTest extends TestBase {
           ).getId());
       return true;
     }));
-    
+
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       ProjectExpenseWrapper expense1 = TestUtils.findExpenseById(em, PROJECT1, expenseId1.get());
       ProjectExpenseWrapper expense2 = TestUtils.findExpenseById(em, PROJECT1, expenseId2.get());
-      
+
       assertBigDecimalEquals("100000", expense1.getAccountingCurrencyAmount());
       assertBigDecimalEquals("200", expense1.getExchangeRate());
       assertBigDecimalEquals("500", expense1.getGrantCurrencyAmount());
@@ -228,7 +239,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @Test
   public void testShiftExpenseBackward() {
     final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
@@ -246,7 +257,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
               "200042",
               HUF,
               "200000.1"
-          ).getId());  
+          ).getId());
       expenseId2.set(
           TestUtils.createProjectExpense(
               em,
@@ -301,14 +312,14 @@ public class ProjectExpenseWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @Test
   public void testCreateOvershootExpense() {
     final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
       return true;
-    })); 
+    }));
     newExpense.get().setState(RowEditState.EDITING_NEW);
     newExpense.get().setProperty(
         "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
@@ -333,7 +344,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
       return true;
     });
   }
-  
+
   @Test
   public void testSetOriginalAmountWhenTied() {
     final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
@@ -348,7 +359,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
     assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
     assertBigDecimalEquals("16", expense.get().getProperty("accountingCurrencyAmount"));
   }
-  
+
   @Test
   public void testSetOriginalAmountWhenNotTied() {
     final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
@@ -363,8 +374,8 @@ public class ProjectExpenseWrapperTest extends TestBase {
     assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
     assertBigDecimalEquals("4500", expense.get().getProperty("accountingCurrencyAmount"));
   }
-  
-  
+
+
   @Test
   public void testSetAccountingCurrencyAmountWhenTied() {
     final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
@@ -379,7 +390,7 @@ public class ProjectExpenseWrapperTest extends TestBase {
     assertBigDecimalEquals("16", expense.get().getProperty("originalAmount"));
     assertBigDecimalEquals("16", expense.get().getProperty("accountingCurrencyAmount"));
   }
-  
+
   @Test
   public void testSetAccountingCurrencyAmountWhenNotTied() {
     final ObjectHolder<ProjectExpenseWrapper> expense = new ObjectHolder<>();
@@ -396,12 +407,12 @@ public class ProjectExpenseWrapperTest extends TestBase {
   }
 
   @Test
-  public void testCreateExpenseInOverriddenMode() {
+  public void testCreateExpenseInOverriddenModeManual() {
     final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
-      newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
+      newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT2_OVERRIDE));
       return true;
-    })); 
+    }));
     newExpense.get().setState(RowEditState.EDITING_NEW);
     newExpense.get().setProperty(
         "paymentDate", LocalDate.of(2015, 3, 4), LocalDate.class);
@@ -413,14 +424,62 @@ public class ProjectExpenseWrapperTest extends TestBase {
         "accountingCurrencyAmount", new BigDecimal("100000.5", Utils.MC), BigDecimal.class);
     newExpense.get().setProperty("exchangeRate", new BigDecimal("1000"), BigDecimal.class);
     newExpense.get().setProperty(
-        "report", PROJECT1_REPORT1, ProjectReport.class);
-    
+        "report", PROJECT2_OVERRIDE_REPORT1, ProjectReport.class);
+
     assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
     assertEquals(RowEditState.SAVED, newExpense.get().getState());
-    
+
     assertBigDecimalEquals("1000", newExpense.get().getExchangeRate());
     assertBigDecimalEquals("100000.5", newExpense.get().getAccountingCurrencyAmount());
     assertBigDecimalEquals("100.0005", newExpense.get().getGrantCurrencyAmount());
+  }
+
+  @Test
+  public void testCreateExpenseInOverrideModeAuto() {
+    final ObjectHolder<ProjectExpenseWrapper> expense0820 = new ObjectHolder<>();
+    final ObjectHolder<ProjectExpenseWrapper> expense0821 = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      expense0820.set(ProjectExpenseWrapper.createNew(em, PROJECT2_OVERRIDE));
+      expense0821.set(ProjectExpenseWrapper.createNew(em, PROJECT2_OVERRIDE));
+      return true;
+    }));
+    expense0820.get().setState(RowEditState.EDITING_NEW);
+    expense0820.get().setProperty(
+        "paymentDate", LocalDate.of(2015, 8, 20), LocalDate.class);
+    expense0820.get().setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    expense0820.get().setProperty(
+        "originalAmount", new BigDecimal("100000", Utils.MC),BigDecimal.class);
+    expense0820.get().setProperty(
+        "accountingCurrencyAmount", new BigDecimal("100000", Utils.MC), BigDecimal.class);
+    expense0820.get().setProperty(
+        "report", PROJECT2_OVERRIDE_REPORT1, ProjectReport.class);
+
+    expense0821.get().setState(RowEditState.EDITING_NEW);
+    expense0821.get().setProperty(
+        "paymentDate", LocalDate.of(2015, 8, 21), LocalDate.class);
+    expense0821.get().setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    expense0821.get().setProperty(
+        "originalAmount", new BigDecimal("100000", Utils.MC),BigDecimal.class);
+    expense0821.get().setProperty(
+        "accountingCurrencyAmount", new BigDecimal("100000", Utils.MC), BigDecimal.class);
+    expense0821.get().setProperty(
+        "report", PROJECT2_OVERRIDE_REPORT1, ProjectReport.class);
+
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(expense0820.get()::save));
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(expense0821.get()::save));
+    assertEquals(RowEditState.SAVED, expense0820.get().getState());
+    assertEquals(RowEditState.SAVED, expense0821.get().getState());
+
+    // 1000 is the exchange rate for 2015-08-20
+    assertBigDecimalEquals("1000", expense0820.get().getExchangeRate());
+    // 2000 is the exchange rate for 2015-08-21
+    assertBigDecimalEquals("2000", expense0821.get().getExchangeRate());
+    assertBigDecimalEquals("100000", expense0820.get().getAccountingCurrencyAmount());
+    assertBigDecimalEquals("100000", expense0821.get().getAccountingCurrencyAmount());
+    assertBigDecimalEquals("100", expense0820.get().getGrantCurrencyAmount());
+    assertBigDecimalEquals("50", expense0821.get().getGrantCurrencyAmount());
   }
 
 }

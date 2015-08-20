@@ -29,7 +29,7 @@ public class ProjectBudgetCategoryWrapperTest extends TestBase {
 
   public ProjectBudgetCategoryWrapperTest() {
   }
-  
+
   @Before
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
@@ -49,7 +49,8 @@ public class ProjectBudgetCategoryWrapperTest extends TestBase {
       em.persist(PAYMENT_CAT1);
       em.persist(PAYMENT_CAT2);
       em.persist(PAYMENT_CAT3);
-      PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, SOME_GRANT);
+      PROJECT1 = TestUtils.createProject(
+          em, "project1", USD, HUF, SOME_GRANT, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       PROJECT1_REPORT1 = TestUtils.createProjectReport(
           em, PROJECT1, LocalDate.of(2015, 4, 1));
       PROJECT1_REPORT2 = TestUtils.createProjectReport(
@@ -65,12 +66,12 @@ public class ProjectBudgetCategoryWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @After
   public void tearDown() {
     DatabaseSingleton.INSTANCE.close();
   }
-  
+
   @Test
   public void testProjectExpenseSummariesNoFilter() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
@@ -90,7 +91,7 @@ public class ProjectBudgetCategoryWrapperTest extends TestBase {
       return true;
     });
   }
-    
+
   @Test
   public void testProjectExpenseSummariesWithFilter() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {

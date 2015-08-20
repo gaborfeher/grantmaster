@@ -4,6 +4,8 @@ import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Currency;
+import com.github.gaborfeher.grantmaster.logic.entities.CurrencyPair;
+import com.github.gaborfeher.grantmaster.logic.entities.ExchangeRateItem;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectBudgetLimit;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectNote;
@@ -23,16 +25,18 @@ public class TestUtils {
       String name,
       Currency income,
       Currency expense,
-      BudgetCategory incomeCategory) {
+      BudgetCategory incomeCategory,
+      Project.ExpenseMode expenseMode) {
     Project project = new Project();
     project.setName(name);
     project.setAccountCurrency(expense);
     project.setGrantCurrency(income);
     project.setIncomeType(incomeCategory);
+    project.setExpenseMode(expenseMode);
     em.persist(project);
     return project;
   }
-  
+
   public static ProjectSource createProjectSource(
       EntityManager em,
       Project project,
@@ -92,7 +96,7 @@ public class TestUtils {
     projectNote.setProject(project);
     em.persist(projectNote);
   }
-  
+
   static ProjectReport createProjectReport(
       EntityManager em,
       Project project,
@@ -120,14 +124,37 @@ public class TestUtils {
       limit.setBudgetGrantCurrency(new BigDecimal(budget, Utils.MC));
     }
   }
-  
+
   static Currency createCurrency(EntityManager em, String code) {
     Currency currency = new Currency();
     currency.setCode(code);
     em.persist(currency);
     return currency;
   }
-  
+
+  static CurrencyPair createCurrencyPair(
+      EntityManager em,
+      Currency fromCurrency,
+      Currency toCurrency) {
+    CurrencyPair currencyPair = new CurrencyPair();
+    currencyPair.setFromCurrency(fromCurrency);
+    currencyPair.setToCurrency(toCurrency);
+    em.persist(currencyPair);
+    return currencyPair;
+  }
+
+  static void createExchangeRate(
+      EntityManager em,
+      CurrencyPair currencyPair,
+      LocalDate rateDate,
+      String rate) {
+    ExchangeRateItem exchangeRateItem = new ExchangeRateItem();
+    exchangeRateItem.setCurrencies(currencyPair);
+    exchangeRateItem.setRateDate(rateDate);
+    exchangeRateItem.setRate(new BigDecimal(rate, Utils.MC));
+    em.persist(exchangeRateItem);
+  }
+
   static ProjectWrapper findProjectByName(
       EntityManager em, String name) {
     for (ProjectWrapper project : ProjectWrapper.getProjects(em)) {
@@ -167,7 +194,7 @@ public class TestUtils {
   static void assertBigDecimalEquals(BigDecimal expected, Object tested) {
     assertEquals(0, expected.compareTo((BigDecimal)tested));
   }
-  
+
   static void assertBigDecimalEquals(String expected, Object tested) {
     assertBigDecimalEquals(new BigDecimal(expected, Utils.MC), tested);
   }

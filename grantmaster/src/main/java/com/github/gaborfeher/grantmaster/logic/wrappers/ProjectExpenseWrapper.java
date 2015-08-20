@@ -18,6 +18,7 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
 import com.github.gaborfeher.grantmaster.logic.entities.ExpenseSourceAllocation;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
@@ -50,16 +51,6 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
 
   private BigDecimal exchangeRate;
 
-  /*
-  public ProjectExpenseWrapper(ProjectExpense expense, BigDecimal accountingCurrencyAmount, BigDecimal grantCurrencyAmount) {
-    super(expense);
-    this.accountingCurrencyAmount = accountingCurrencyAmount;
-    this.accountingCurrencyAmountNotEdited = accountingCurrencyAmount;
-    this.grantCurrencyAmount = grantCurrencyAmount;
-    this.exchangeRate = grantCurrencyAmount.compareTo(BigDecimal.ZERO) <= 0 ? null : accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
-  }
-  */
-
    public ProjectExpenseWrapper(ProjectExpense expense) {
     super(expense);
 
@@ -86,7 +77,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   }
 
   @AssertTrue(message="%ValidationErrorExpenseConsistency")
-  private boolean isValid() {
+  private boolean isExpenseConsistencyHeld() {
     ProjectExpense expense = getEntity();
     if (expense.getProject() == null ||
         expense.getProject().getAccountCurrency() == null ||
@@ -101,6 +92,15 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       return true;
     }
     return 0 == expense.getOriginalAmount().compareTo(accountingCurrencyAmount);
+  }
+
+  @AssertTrue(message="%ValidationErrorExpenseExchangeRateMissing")
+  private boolean isExchangeRateSpecified() {
+    ProjectExpense expense = getEntity();
+    if (expense.getProject().getExpenseMode() != Project.ExpenseMode.OVERRIDE_AUTO_BY_RATE_TABLE) {
+      return true;  // Nothing to check in this case.
+    }
+    return expense.getExchangeRateOverride() != null;
   }
 
   @AssertTrue(message="%ValidationErrorLockedReport")
@@ -191,40 +191,65 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
 
   private boolean propagateAccountingCurrencyAmountChange(
       EntityManager em, BigDecimal editedAccountingCurrencyAmount) {
-    if (entity.getExchangeRateOverride() == null) {
-      // Exchange rate is computed here. (Classic way of expenses.)
-      // Set the allocation size to be right for this entity and flush.
-      // This is just an initial fake setting which will be removed while normalizing.
+    switch (entity.getProject().getExpenseMode()) {
+      case NORMAL_AUTO_BY_SOURCE:
+        // Exchange rate is computed here. (Classic way of expenses.)
+        // Set the allocation size to be right for this entity and flush.
+        // This is just an initial fake setting which will be removed while normalizing.
 
-      ExpenseSourceAllocation allocation;
-      if (entity.getSourceAllocations().size() > 0) {
-        allocation = entity.getSourceAllocations().get(0);
-        allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
-        while (entity.getSourceAllocations().size() > 1) {
-          entity.getSourceAllocations().remove(1);
+        ExpenseSourceAllocation allocation;
+        if (entity.getSourceAllocations().size() > 0) {
+          allocation = entity.getSourceAllocations().get(0);
+          allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+          while (entity.getSourceAllocations().size() > 1) {
+            entity.getSourceAllocations().remove(1);
+          }
+        } else {
+          ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
+              setParameter("project", entity.getProject()).
+              setMaxResults(1).
+              getSingleResult();
+          if (source0 == null) {
+            return false;
+          }
+          allocation = new ExpenseSourceAllocation();
+          em.persist(allocation);
+          allocation.setExpense(entity);
+          allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+          allocation.setSource(source0);
+          entity.getSourceAllocations().add(allocation);
         }
-      } else {
-        ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
-            setParameter("project", entity.getProject()).
-            setMaxResults(1).
-            getSingleResult();
-        if (source0 == null) {
+        em.flush();
+        updateExpenseAllocations(em, entity.getProject(), entity.getPaymentDate());
+        return true;
+      case OVERRIDE_AUTO_BY_RATE_TABLE:
+        entity.setAccountingCurrencyAmountOverride(editedAccountingCurrencyAmount);
+        grantCurrencyAmount = editedAccountingCurrencyAmount.divide(exchangeRate, Utils.MC);
+        return true;
+      default:
+        logger.error("unknown expenseMode");
+        return false;
+    }
+  }
+
+  protected boolean checkConsistencyBeforeSave() {
+    switch (entity.getProject().getExpenseMode()) {
+      case OVERRIDE_AUTO_BY_RATE_TABLE:
+        if (entity.getExchangeRateOverride() == null || entity.getAccountingCurrencyAmountOverride() == null) {
+          logger.error("saving expense failed with missing accounting currency amount or exchange rate override");
           return false;
         }
-        allocation = new ExpenseSourceAllocation();
-        em.persist(allocation);
-        allocation.setExpense(entity);
-        allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
-        allocation.setSource(source0);
-        entity.getSourceAllocations().add(allocation);
-      }
-      em.flush();
-      updateExpenseAllocations(em, entity.getProject(), entity.getPaymentDate());
-    } else {
-      entity.setAccountingCurrencyAmountOverride(editedAccountingCurrencyAmount);
-      grantCurrencyAmount = editedAccountingCurrencyAmount.divide(exchangeRate, Utils.MC);
+        return true;
+      case NORMAL_AUTO_BY_SOURCE:
+        if (entity.getSourceAllocations() == null || entity.getSourceAllocations().isEmpty()) {
+          logger.error("saving expense failed with empty alloc list");
+          return false;
+        }
+        return true;
+      default:
+        logger.error("unknown expenseMode");
+        return false;
     }
-    return true;
   }
 
   @Override
@@ -235,6 +260,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     if (!super.saveInternal(em)) {
       return false;
     }
+
     BigDecimal editedAccountingCurrencyAmount = null;
     if (getAccountingCurrencyAmount().compareTo(accountingCurrencyAmountNotEdited) != 0) {
       editedAccountingCurrencyAmount = getAccountingCurrencyAmount();
@@ -244,19 +270,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         return false;
       }
     }
-
-    if (entity.getExchangeRateOverride() == null) {
-      if (entity.getSourceAllocations() == null || entity.getSourceAllocations().isEmpty()) {
-        logger.error("saving expense failed with empty alloc list");
-        return false;
-      }
-    } else {
-      if (entity.getAccountingCurrencyAmountOverride() == null) {
-        logger.error("saving expense failed with missing accounting currency amount override");
-        return false;
-      }
-    }
-    return true;
+    return checkConsistencyBeforeSave();
   }
 
   @Override
@@ -297,11 +311,36 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         return false;
       }
     } else if ("exchangeRate".equals(name)) {
-      setExchangeRate((BigDecimal) value);
-      return true;
+      // Manual setting of exchange rate is only allowed in "override" mode
+      // projects.
+      if (getEntity().getProject().getExpenseMode() == Project.ExpenseMode.OVERRIDE_AUTO_BY_RATE_TABLE) {
+        setExchangeRate((BigDecimal) value);
+        return true;
+      } else {
+        return false;
+      }
+    } else if ("paymentDate".equals(name)) {
+      return setPaymentDate((LocalDate) value);
     } else {
       return super.setProperty(name, value, paramType);
     }
+  }
+
+  private boolean setPaymentDate(LocalDate paymentDate) {
+    if (!super.setProperty("paymentDate", paymentDate, LocalDate.class)) {
+      return false;
+    }
+    if (getEntity().getProject().getExpenseMode() == Project.ExpenseMode.OVERRIDE_AUTO_BY_RATE_TABLE) {
+      DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+        setExchangeRate(
+            ExchangeRateItemWrapper.getExchangeRate(
+                em,
+                getEntity().getProject(),
+                (LocalDate) paymentDate));
+        return true;
+      });
+    }
+    return true;
   }
 
   public static ProjectExpenseWrapper createNew(EntityManager em, Project project) {

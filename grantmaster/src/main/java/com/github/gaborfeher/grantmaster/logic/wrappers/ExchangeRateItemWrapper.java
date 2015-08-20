@@ -18,8 +18,12 @@
 package com.github.gaborfeher.grantmaster.logic.wrappers;
 
 import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.CurrencyPair;
 import com.github.gaborfeher.grantmaster.logic.entities.ExchangeRateItem;
+import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -43,5 +47,28 @@ public class ExchangeRateItemWrapper extends EntityWrapper<ExchangeRateItem> {
         ExchangeRateItemWrapper.class).
             setParameter("currencies", currencyPair).
            getResultList();
+  }
+
+  public static BigDecimal getExchangeRate(
+      EntityManager em,
+      Project project,
+      LocalDate date) {
+    ExchangeRateItem exchangeRateItem = Utils.getSingleResultWithDefault(
+        null,
+        em.createQuery(
+            "SELECT e " +
+            "FROM ExchangeRateItem e " +
+            "WHERE e.currencies.fromCurrency = :fromCurrency " +
+            "AND e.currencies.toCurrency = :toCurrency " +
+            "AND e.rateDate = :date",
+            ExchangeRateItem.class).
+            setParameter("fromCurrency", project.getAccountCurrency()).
+            setParameter("toCurrency", project.getGrantCurrency()).
+            setParameter("date", date));
+    if (exchangeRateItem == null) {
+      return null;
+    } else {
+      return exchangeRateItem.getRate();
+    }
   }
 }

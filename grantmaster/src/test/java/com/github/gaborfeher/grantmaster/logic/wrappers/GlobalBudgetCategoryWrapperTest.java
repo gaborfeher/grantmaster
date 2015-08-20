@@ -36,7 +36,7 @@ public class GlobalBudgetCategoryWrapperTest extends TestBase {
 
   public GlobalBudgetCategoryWrapperTest() {
   }
-  
+
   @Before
   public void setUp() {
     assertTrue(DatabaseSingleton.INSTANCE.connectToMemoryFileForTesting());
@@ -59,8 +59,10 @@ public class GlobalBudgetCategoryWrapperTest extends TestBase {
       em.persist(PAYMENT_CAT1);
       em.persist(PAYMENT_CAT2);
       em.persist(PAYMENT_CAT3);
-      PROJECT1 = TestUtils.createProject(em, "project1", USD, HUF, INCOME_CAT1);
-      PROJECT2 = TestUtils.createProject(em, "project2", USD, HUF, INCOME_CAT2);
+      PROJECT1 = TestUtils.createProject(
+          em, "project1", USD, HUF, INCOME_CAT1, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
+      PROJECT2 = TestUtils.createProject(
+          em, "project2", USD, HUF, INCOME_CAT2, Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
       PROJECT1_REPORT1 = TestUtils.createProjectReport(
           em, PROJECT1, LocalDate.of(2011, 4, 1));
       PROJECT1_REPORT2 = TestUtils.createProjectReport(
@@ -82,12 +84,12 @@ public class GlobalBudgetCategoryWrapperTest extends TestBase {
       return true;
     }));
   }
-  
+
   @After
   public void tearDown() {
     DatabaseSingleton.INSTANCE.close();
   }
-  
+
   @Test
   public void testGetYearlyBudgetCategorySummaries() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
@@ -123,5 +125,5 @@ public class GlobalBudgetCategoryWrapperTest extends TestBase {
       return true;
     });
   }
-  
+
 }
