@@ -41,6 +41,10 @@ import org.slf4j.LoggerFactory;
 public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   private static final Logger logger = LoggerFactory.getLogger(ProjectExpenseWrapper.class);
 
+  private static final String EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION =
+      "(e.report.reportDate > :reportDate OR (e.report.reportDate = :reportDate AND (:paymentDate IS NULL OR e.paymentDate >= :paymentDate)))";
+
+
   @NotNull(message="%ValidationErrorExpenseAmount")
   @DecimalMin(value="0.01", message="%ValidationErrorExpenseAmount")
   private BigDecimal accountingCurrencyAmount;
@@ -119,7 +123,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
 
   /**
    * Adds an expense source allocation to this expense. In other words,
-   * spent money is added. Not that grantCurrencyAmount is updated but
+   * spent money is added. Note that grantCurrencyAmount is updated but
    * accountingCurrencyAmount is not, because it is assumed that
    * recalculateAllocations is taking care of it.
    */
@@ -142,11 +146,9 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
    * of this expense. sourceAllocations should be empty, and any previously
    * used allocations should be deleted (and flushed) from the database.
    */
-  private void recalculateAllocations(EntityManager em) {
+  private void recalculateAllocations(EntityManager em, List<ProjectSourceWrapper> sources) {
     BigDecimal remainingAccountingCurrencyAmount = accountingCurrencyAmount;
     grantCurrencyAmount = BigDecimal.ZERO;
-    List<ProjectSourceWrapper> sources =
-        ProjectSourceWrapper.getProjectSourceListForAllocation(em, entity.getProject());
     entity.setSourceAllocations(new ArrayList<>());
 
     for (int i = 0; i < sources.size(); ++i) {
@@ -163,6 +165,11 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       if (take.compareTo(BigDecimal.ZERO) > 0) {
         remainingAccountingCurrencyAmount = remainingAccountingCurrencyAmount.subtract(take, Utils.MC);
         addAllocation(source, take);
+        // Update the transient member remainingAccountingCurrencyAmount of
+        // source so that the subsequent invocations of this method can reuse
+        // the sources list. (Instead of re-querying it.)
+        source.setRemainingAccountingCurrencyAmount(
+            source.getRemainingAccountingCurrencyAmount().subtract(take));
       }
     }
     exchangeRate = accountingCurrencyAmount.divide(grantCurrencyAmount, Utils.MC);
@@ -171,57 +178,82 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     }
   }
 
-  public static void updateExpenseAllocations(EntityManager em, Project project, LocalDate startingFrom) {
-    // Get list of expenses to update.
-    List<ProjectExpenseWrapper> expensesToUpdate =
-        getProjectExpenseListForAllocation(em, project, startingFrom);
+  private static void removeExpenseAllocations(
+      EntityManager em,
+      Project project,
+      LocalDate startingFromReportDate,
+      LocalDate startingFromExpenseDate) {
+    em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a.expense IN (" +
+        "SELECT e FROM ProjectExpense e WHERE e.project = :project AND " +
+        EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION + ")")
+        .setParameter("project", project)
+        .setParameter("reportDate", startingFromReportDate)
+        .setParameter("paymentDate", startingFromExpenseDate)
+        .executeUpdate();
+  }
+
+  public static void updateExpenseAllocations(
+      EntityManager em,
+      Project project,
+      LocalDate startingFromReportDate,
+      LocalDate startingFromExpenseDate) {
+     List<ProjectExpenseWrapper> expensesToUpdate =
+        getProjectExpenseListForAllocation(em, project, startingFromReportDate, startingFromExpenseDate);
     // Delete allocations and flush this to database. (Accounting currency amounts
     // are still kept in the database.)
-    for (ProjectExpenseWrapper e : expensesToUpdate) {
-      em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a.expense = :expense").
-          setParameter("expense", e.getEntity()).
-          executeUpdate();
-    }
+    removeExpenseAllocations(
+        em, project, startingFromReportDate, startingFromExpenseDate);
     em.flush();
     // Recompute expenses.
+    List<ProjectSourceWrapper> sources =
+        ProjectSourceWrapper.getProjectSourceListForAllocation(em, project);
     for (ProjectExpenseWrapper e : expensesToUpdate) {
-      e.recalculateAllocations(em);
+      e.recalculateAllocations(em, sources);
     }
+  }
+
+  private boolean makeSimpleFakeExpenseSourceAllocations(
+      EntityManager em, BigDecimal editedAccountingCurrencyAmount) {
+    // Exchange rate is computed here. (Classic way of expenses.)
+    // Set the allocated amount to be right for this entity and flush to database.
+    // This is just an initial fake setting which will be removed while normalizing.
+
+    ExpenseSourceAllocation allocation;
+    if (entity.getSourceAllocations().size() > 0) {
+      allocation = entity.getSourceAllocations().get(0);
+      allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+      while (entity.getSourceAllocations().size() > 1) {
+        entity.getSourceAllocations().remove(1);
+      }
+    } else {
+      ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
+          setParameter("project", entity.getProject()).
+          setMaxResults(1).
+          getSingleResult();
+      if (source0 == null) {
+        return false;
+      }
+      allocation = new ExpenseSourceAllocation();
+      em.persist(allocation);
+      allocation.setExpense(entity);
+      allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
+      allocation.setSource(source0);
+      entity.getSourceAllocations().add(allocation);
+    }
+    em.flush();
+    return true;
   }
 
   private boolean propagateAccountingCurrencyAmountChange(
       EntityManager em, BigDecimal editedAccountingCurrencyAmount) {
     switch (entity.getProject().getExpenseMode()) {
       case NORMAL_AUTO_BY_SOURCE:
-        // Exchange rate is computed here. (Classic way of expenses.)
-        // Set the allocation size to be right for this entity and flush.
-        // This is just an initial fake setting which will be removed while normalizing.
-
-        ExpenseSourceAllocation allocation;
-        if (entity.getSourceAllocations().size() > 0) {
-          allocation = entity.getSourceAllocations().get(0);
-          allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
-          while (entity.getSourceAllocations().size() > 1) {
-            entity.getSourceAllocations().remove(1);
-          }
+        if (makeSimpleFakeExpenseSourceAllocations(em, editedAccountingCurrencyAmount)) {
+          updateExpenseAllocations(em, entity.getProject(), entity.getReport().getReportDate(), entity.getPaymentDate());
+          return true;
         } else {
-          ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
-              setParameter("project", entity.getProject()).
-              setMaxResults(1).
-              getSingleResult();
-          if (source0 == null) {
-            return false;
-          }
-          allocation = new ExpenseSourceAllocation();
-          em.persist(allocation);
-          allocation.setExpense(entity);
-          allocation.setAccountingCurrencyAmount(editedAccountingCurrencyAmount);
-          allocation.setSource(source0);
-          entity.getSourceAllocations().add(allocation);
+          return false;
         }
-        em.flush();
-        updateExpenseAllocations(em, entity.getProject(), entity.getReport().getReportDate());
-        return true;
       case OVERRIDE_AUTO_BY_RATE_TABLE:
         entity.setAccountingCurrencyAmountOverride(editedAccountingCurrencyAmount);
         grantCurrencyAmount = editedAccountingCurrencyAmount.divide(exchangeRate, Utils.MC);
@@ -360,7 +392,8 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     ProjectExpense mergedExpense = em.find(ProjectExpense.class, entity.getId());
     em.remove(mergedExpense);
     em.flush();
-    updateExpenseAllocations(em, mergedExpense.getProject(), entity.getReport().getReportDate());
+    updateExpenseAllocations(
+        em, mergedExpense.getProject(), entity.getReport().getReportDate(), null);
     requestTableRefresh();
     return true;
   }
@@ -375,14 +408,20 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
    * earlier expenses in a report may be have their allocations recalculated
    * unnecessarily.)
    */
-  public static List<ProjectExpenseWrapper> getProjectExpenseListForAllocation(
+  static List<ProjectExpenseWrapper> getProjectExpenseListForAllocation(
       EntityManager em,
       Project project,
-      LocalDate earliestReportDate) {
+      LocalDate earliestReportDate,
+      LocalDate earliestPaymentDate) {
     if (earliestReportDate != null) {
-      return getProjectExpenseListQuery(em, project, false, " AND e.report.reportDate >= :date").
-          setParameter("date", earliestReportDate).
-          getResultList();
+      TypedQuery<ProjectExpenseWrapper> query = getProjectExpenseListQuery(
+          em,
+          project,
+          false,
+          " AND " + EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION);
+      query.setParameter("reportDate", earliestReportDate);
+      query.setParameter("paymentDate", earliestPaymentDate);
+      return query.getResultList();
     } else {
       return getProjectExpenseListQuery(em, project, false, "").getResultList();
     }
@@ -392,7 +431,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     String sortString = descending ? " DESC" : "";
     String queryString =
         "SELECT new com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper(e) " +
-        "FROM ProjectExpense e LEFT OUTER JOIN ProjectReport r ON e.report = r " + //LEFT OUTER JOIN e.sourceAllocations AS a " +
+        "FROM ProjectExpense e LEFT OUTER JOIN ProjectReport r ON e.report = r " +
         "WHERE e.project = :project " + extraWhere + " " +
         "GROUP BY e, r " +
         "ORDER BY r.reportDate " + sortString + ", e.paymentDate " + sortString + ", e.id " + sortString;

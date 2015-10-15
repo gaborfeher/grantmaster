@@ -102,7 +102,8 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     if (!super.saveInternal(em)) {
       return false;
     }
-    ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getReport().getReportDate());
+    ProjectExpenseWrapper.updateExpenseAllocations(
+        em, entity.getProject(), entity.getReport().getReportDate(), null);
     return true;
   }
 

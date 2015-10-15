@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static com.github.gaborfeher.grantmaster.logic.wrappers.TestUtils.assertBigDecimalEquals;
+import java.time.Month;
 
 public class ProjectExpenseWrapperTest extends TestBase {
   Currency HUF;
@@ -213,12 +214,122 @@ public class ProjectExpenseWrapperTest extends TestBase {
     // Check order.
     assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       List<ProjectExpenseWrapper> expenses =
-          ProjectExpenseWrapper.getProjectExpenseListForAllocation(em, PROJECT1, null);
+          ProjectExpenseWrapper.getProjectExpenseListForAllocation(em, PROJECT1, null, null);
       assertEquals(4, expenses.size());
       assertEquals(expenseId4.get(), expenses.get(0).getId());
       assertEquals(expenseId2.get(), expenses.get(1).getId());
       assertEquals(expenseId3.get(), expenses.get(2).getId());
       assertEquals(expenseId1.get(), expenses.get(3).getId());
+      return true;
+    }));
+  }
+
+  /**
+   * Test the thresholding used to decide which expenses are to be reallocated
+   * when something has changed.
+   */
+  @Test
+  public void testGetProjectExpenseListForAllocation() {
+    final ObjectHolder<Long> expenseId1 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId2 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId3 = new ObjectHolder<>();
+    final ObjectHolder<Long> expenseId4 = new ObjectHolder<>();
+    // Setup.
+    assertTrue(DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      expenseId1.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2016, 2, 1),
+              PROJECT1_REPORT2,
+              "200421",
+              HUF,
+              "200000.1"
+          ).getId());
+      expenseId2.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2016, 4, 2),
+              PROJECT1_REPORT1,
+              "200422",
+              HUF,
+              "200000.2"
+          ).getId());
+      expenseId3.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2016, 1, 1),
+              PROJECT1_REPORT2,
+              "200423",
+              HUF,
+              "200000.3"
+          ).getId());
+      expenseId4.set(
+          TestUtils.createProjectExpense(
+              em,
+              PROJECT1,
+              SOME_GRANT,
+              LocalDate.of(2016, 4, 1),
+              PROJECT1_REPORT1,
+              "200424",
+              HUF,
+              "200000.4"
+          ).getId());
+      return true;
+    }));
+    // Check order.
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses =
+          ProjectExpenseWrapper.getProjectExpenseListForAllocation(
+              em,
+              PROJECT1,
+              LocalDate.of(2015, 3, 30),  // just before PROJECT1_REPORT1
+              null);
+      assertEquals(4, expenses.size());
+      assertEquals(expenseId4.get(), expenses.get(0).getId());
+      assertEquals(expenseId2.get(), expenses.get(1).getId());
+      assertEquals(expenseId3.get(), expenses.get(2).getId());
+      assertEquals(expenseId1.get(), expenses.get(3).getId());
+
+      expenses = ProjectExpenseWrapper.getProjectExpenseListForAllocation(
+          em,
+          PROJECT1,
+          LocalDate.of(2015, 7, 29),  // just before PROJECT1_REPORT2
+          null);
+      assertEquals(2, expenses.size());
+      assertEquals(expenseId3.get(), expenses.get(0).getId());
+      assertEquals(expenseId1.get(), expenses.get(1).getId());
+
+      expenses = ProjectExpenseWrapper.getProjectExpenseListForAllocation(
+          em,
+          PROJECT1,
+          LocalDate.of(2015, 4, 1),  // PROJECT1_REPORT1
+          LocalDate.of(2016, 4, 2)); // expenseId2
+      assertEquals(3, expenses.size());
+      assertEquals(expenseId2.get(), expenses.get(0).getId());
+      assertEquals(expenseId3.get(), expenses.get(1).getId());
+      assertEquals(expenseId1.get(), expenses.get(2).getId());
+
+      expenses = ProjectExpenseWrapper.getProjectExpenseListForAllocation(
+          em,
+          PROJECT1,
+          LocalDate.of(2015, 8, 1),  // PROJECT1_REPORT2
+          LocalDate.of(2016, 1, 1)); // expenseId3
+      assertEquals(2, expenses.size());
+      assertEquals(expenseId3.get(), expenses.get(0).getId());
+      assertEquals(expenseId1.get(), expenses.get(1).getId());
+
+      expenses = ProjectExpenseWrapper.getProjectExpenseListForAllocation(
+          em,
+          PROJECT1,
+          LocalDate.of(2015, 8, 1),  // PROJECT1_REPORT2
+          LocalDate.of(2016, 2, 2)); // one day after expenseId4
+      assertEquals(0, expenses.size());
       return true;
     }));
   }
