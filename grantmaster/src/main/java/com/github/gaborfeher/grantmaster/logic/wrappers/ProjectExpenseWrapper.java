@@ -220,7 +220,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
           entity.getSourceAllocations().add(allocation);
         }
         em.flush();
-        updateExpenseAllocations(em, entity.getProject(), entity.getPaymentDate());
+        updateExpenseAllocations(em, entity.getProject(), entity.getReport().getReportDate());
         return true;
       case OVERRIDE_AUTO_BY_RATE_TABLE:
         entity.setAccountingCurrencyAmountOverride(editedAccountingCurrencyAmount);
@@ -357,11 +357,10 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
     if (ProjectReport.Status.CLOSED.equals(entity.getReport().getStatus())) {
       return false;
     }
-    LocalDate startDate = entity.getPaymentDate();
     ProjectExpense mergedExpense = em.find(ProjectExpense.class, entity.getId());
     em.remove(mergedExpense);
     em.flush();
-    updateExpenseAllocations(em, mergedExpense.getProject(), startDate);
+    updateExpenseAllocations(em, mergedExpense.getProject(), entity.getReport().getReportDate());
     requestTableRefresh();
     return true;
   }

@@ -118,6 +118,39 @@ public class ProjectExpenseWrapperTest extends TestBase {
     });
   }
 
+  @Test
+  public void testCreateMultiSourceExpenseAfterReportTime() {
+    // This covers a bug in which expenses before the report time were never updated.
+    final ObjectHolder<ProjectExpenseWrapper> newExpense = new ObjectHolder<>();
+    assertTrue(DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      newExpense.set(ProjectExpenseWrapper.createNew(em, PROJECT1));
+      return true;
+    }));
+    newExpense.get().setState(RowEditState.EDITING_NEW);
+    newExpense.get().setProperty(
+        "paymentDate", LocalDate.of(2015, 5, 1), LocalDate.class);  // After REPORT1's time.
+    newExpense.get().setProperty(
+        "budgetCategory", SOME_EXPENSE, BudgetCategory.class);
+    newExpense.get().setProperty(
+        "originalAmount", new BigDecimal("300000", Utils.MC),BigDecimal.class);
+    newExpense.get().setProperty(
+        "accountingCurrencyAmount", new BigDecimal("300000", Utils.MC), BigDecimal.class);
+    newExpense.get().setProperty(
+        "report", PROJECT1_REPORT1, ProjectReport.class);
+
+    assertTrue(DatabaseSingleton.INSTANCE.transaction(newExpense.get()::save));
+    assertEquals(RowEditState.SAVED, newExpense.get().getState());
+
+    DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
+      List<ProjectExpenseWrapper> expenses = ProjectExpenseWrapper.getProjectExpenseList(em, PROJECT1);
+      assertEquals(1, expenses.size());
+      ProjectExpenseWrapper expenseWrapper = expenses.get(0);
+      assertBigDecimalEquals("300000", expenseWrapper.getAccountingCurrencyAmount());
+      assertBigDecimalEquals("150", expenseWrapper.getExchangeRate());
+      return true;
+    });
+  }
+
   /**
    * Make sure that the sorting used for recalculating
    * project expense-source allocations

@@ -47,7 +47,7 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
   private boolean isEditingAllowed() {
     return ProjectReport.Status.OPEN.equals(getEntity().getReport().getStatus());
   }
-  
+
   @Override
   protected boolean checkIsLocked() {
     if (getEntity().getReport().getStatus() != ProjectReport.Status.CLOSED) {
@@ -102,7 +102,7 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     if (!super.saveInternal(em)) {
       return false;
     }
-    ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getAvailabilityDate());
+    ProjectExpenseWrapper.updateExpenseAllocations(em, entity.getProject(), entity.getReport().getReportDate());
     return true;
   }
 
