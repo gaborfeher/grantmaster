@@ -42,7 +42,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   private static final Logger logger = LoggerFactory.getLogger(ProjectExpenseWrapper.class);
 
   private static final String EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION =
-      "(e.report.reportDate > :reportDate OR (e.report.reportDate = :reportDate AND (:paymentDate IS NULL OR e.paymentDate >= :paymentDate)))";
+      "(:reportDate IS NULL OR e.report.reportDate > :reportDate OR (e.report.reportDate = :reportDate AND (:paymentDate IS NULL OR e.paymentDate >= :paymentDate)))";
 
 
   @NotNull(message="%ValidationErrorExpenseAmount")
@@ -413,18 +413,14 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       Project project,
       LocalDate earliestReportDate,
       LocalDate earliestPaymentDate) {
-    if (earliestReportDate != null) {
-      TypedQuery<ProjectExpenseWrapper> query = getProjectExpenseListQuery(
-          em,
-          project,
-          false,
-          " AND " + EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION);
-      query.setParameter("reportDate", earliestReportDate);
-      query.setParameter("paymentDate", earliestPaymentDate);
-      return query.getResultList();
-    } else {
-      return getProjectExpenseListQuery(em, project, false, "").getResultList();
-    }
+    TypedQuery<ProjectExpenseWrapper> query = getProjectExpenseListQuery(
+        em,
+        project,
+        false,
+        " AND " + EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION);
+    query.setParameter("reportDate", earliestReportDate);
+    query.setParameter("paymentDate", earliestPaymentDate);
+    return query.getResultList();
   }
 
   private static TypedQuery<ProjectExpenseWrapper> getProjectExpenseListQuery(EntityManager em, Project project, boolean descending, String extraWhere) {

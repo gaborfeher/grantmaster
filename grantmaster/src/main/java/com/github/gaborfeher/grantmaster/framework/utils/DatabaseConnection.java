@@ -17,6 +17,9 @@
  */
 package com.github.gaborfeher.grantmaster.framework.utils;
 
+import com.github.gaborfeher.grantmaster.logic.entities.Project;
+import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectExpenseWrapper;
+import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -25,12 +28,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import org.slf4j.Logger;
@@ -90,7 +96,7 @@ public class DatabaseConnection {
   }
 
   final static String FORMAT_VERSION = "format.version";
-  final static int CURRENT_FORMAT_VERSION = 4;
+  final static int CURRENT_FORMAT_VERSION = 5;
 
   private File getPropertiesFile() {
     return new File(archive.getDirectory(), PROPERTIES_FILE);
@@ -136,7 +142,9 @@ public class DatabaseConnection {
       case 2:
         return false;  // Not supported development version.
       case 3:
-        return upgradeVersionFrom3to4(jdbcUrl);
+        return upgradeVersionFrom3to4(jdbcUrl) && checkVersionAndConvert(4, jdbcUrl);
+      case 4:
+        return upgradeVersionFrom4to5(jdbcUrl) && checkVersionAndConvert(5, jdbcUrl);
       case CURRENT_FORMAT_VERSION:
         return true;
       default:
@@ -175,6 +183,35 @@ public class DatabaseConnection {
       LoggerFactory.getLogger(DatabaseSingleton.class).error(null, ex);
       return false;
     }
+  }
+
+  private boolean upgradeVersionFrom4to5(String jdbcUrl) {
+    LoggerFactory.getLogger(DatabaseSingleton.class).info("upgradeVersionFrom4to5()");
+    if (!connectToJdbcUrl(jdbcUrl)) {
+      return false;
+    }
+    EntityManager em = entityManagerFactory.createEntityManager();
+    EntityTransaction transaction = em.getTransaction();
+    try {
+      transaction.begin();
+      List<Project> projects = ProjectWrapper.getProjectsWithoutWrapping(em);
+      for (Project project : projects) {
+        LoggerFactory.getLogger(DatabaseSingleton.class).info("Updating project {}", project.getName());
+        ProjectExpenseWrapper.updateExpenseAllocations(em, project, null, null);
+        em.flush();  // in case of db-level errors, trigger them now to make this easier to debug
+      }
+      transaction.commit();
+    } catch (Throwable t) {
+      LoggerFactory.getLogger(DatabaseSingleton.class).error(null, t);
+      if (transaction.isActive()) {
+        transaction.rollback();
+      }
+      return false;
+    } finally {
+      em.close();
+      disconnect();
+    }
+    return true;
   }
 
   private boolean connectToJdbcUrl(String jdbcUrl) {
