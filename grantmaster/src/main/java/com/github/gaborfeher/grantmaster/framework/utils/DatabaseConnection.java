@@ -134,17 +134,17 @@ public class DatabaseConnection {
     return Integer.parseInt((String) properties.get(FORMAT_VERSION));
   }
 
-  private boolean checkVersionAndConvert(int currentFormatVersion, String jdbcUrl) {
-    switch (currentFormatVersion) {
+  private boolean checkVersionAndConvert(String jdbcUrl) {
+    switch (getVersion()) {
       case 0:
       case 1:
-        return upgradeVersionFrom01to3(jdbcUrl) && checkVersionAndConvert(3, jdbcUrl);
+        return upgradeVersionFrom01to3(jdbcUrl) && checkVersionAndConvert(jdbcUrl);
       case 2:
         return false;  // Not supported development version.
       case 3:
-        return upgradeVersionFrom3to4(jdbcUrl) && checkVersionAndConvert(4, jdbcUrl);
+        return upgradeVersionFrom3to4(jdbcUrl) && checkVersionAndConvert(jdbcUrl);
       case 4:
-        return upgradeVersionFrom4to5(jdbcUrl) && checkVersionAndConvert(5, jdbcUrl);
+        return upgradeVersionFrom4to5(jdbcUrl) && checkVersionAndConvert(jdbcUrl);
       case CURRENT_FORMAT_VERSION:
         return true;
       default:
@@ -211,6 +211,7 @@ public class DatabaseConnection {
       em.close();
       disconnect();
     }
+    properties.setProperty(FORMAT_VERSION, "5");
     return true;
   }
 
@@ -242,7 +243,7 @@ public class DatabaseConnection {
   private boolean connectToFile() {
     File databaseFile = new File(archive.getDirectory(), "database");
     String jdbcUrl = "jdbc:hsqldb:file:" + databaseFile +";shutdown=true";
-    if (!checkVersionAndConvert(getVersion(), jdbcUrl)) {
+    if (!checkVersionAndConvert(jdbcUrl)) {
       return false;
     }
     if (!connectToJdbcUrl(jdbcUrl)) {
