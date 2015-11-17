@@ -168,7 +168,7 @@ public class MainPageController implements Initializable {
       ButtonType forceBreakLock = new ButtonType(
           Utils.getString("DatabaseConnection.ForceBreakLock"));
       if (errors.lockingError) {
-        logger.warn("tryOpenFile({}): locking error", path);
+        logger.warn("tryOpenFile('{}'): locking error", path);
         extraButtons.add(forceBreakLock);
       }
       Optional<ButtonType> result = Utils.showListDialog(
@@ -177,7 +177,7 @@ public class MainPageController implements Initializable {
           errors.errorKeys,
           extraButtons);
       if (errors.lockingError && result.isPresent() && result.get() == forceBreakLock) {
-        logger.info("tryOpenFile({}): breaking lock", path);
+        logger.info("tryOpenFile('{}'): breaking lock", path);
         MyFileLock.breakLock(path);
         tryOpenFile(path);  // retry
       }

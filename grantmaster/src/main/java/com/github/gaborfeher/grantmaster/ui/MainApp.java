@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class MainApp extends Application {
   private static final Logger logger = LoggerFactory.getLogger(MainApp.class);
-  
+
   private MainPageController controller;
 
   @Override
@@ -43,11 +43,18 @@ public class MainApp extends Application {
     });
     super.init();
   }
-  
+
   @Override
   public void start(Stage stage) throws Exception {
-    logger.info("startup");
-    
+    logger.info("startup - what a wonderful day!");
+    logger.info(
+        "Environment: {} {} {} {}",
+        System.getProperty("java.runtime.name"),
+        System.getProperty("java.runtime.version"),
+        System.getProperty("java.vm.name"),
+        System.getProperty("java.vm.version"));
+    Utils.logMemoryUsage();
+
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPage.fxml"));
     loader.setResources(Utils.getResourceBundle());
     Parent root = loader.load();
@@ -60,12 +67,13 @@ public class MainApp extends Application {
     stage.setMaximized(true);
     stage.setScene(scene);
     stage.show();
-    
+
     scene.getWindow().setOnCloseRequest((WindowEvent ev) -> {
       if (!controller.shutdown()) {
         ev.consume();  // Prevent the closing of this application.
       } else {
-        logger.info("shutdown");
+        logger.info("shutdown - bye!");
+        Utils.logMemoryUsage();
       }
     });
   }

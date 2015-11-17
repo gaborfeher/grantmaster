@@ -4,7 +4,7 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-  
+
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>grantmaster_log.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -16,9 +16,9 @@
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <maxFileSize>20MB</maxFileSize>
     </triggeringPolicy>
-    
+
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
 
@@ -26,6 +26,6 @@
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
   </root>
-  
+
   <logger name="org.eclipse.persistence.logging" level="WARN"/>
 </configuration>

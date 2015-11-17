@@ -92,4 +92,15 @@ public class Utils {
 
   }
 
+  public static void logMemoryUsage() {
+    final int bytesInMegabyte = 1024*1024;
+    Runtime runtime = Runtime.getRuntime();
+    logger.info(
+        "Memory: total: {}, max: {}, free: {}, used: {}",
+        runtime.totalMemory() / bytesInMegabyte,
+        runtime.maxMemory() / bytesInMegabyte,
+        runtime.freeMemory() / bytesInMegabyte,
+        (runtime.totalMemory() - runtime.freeMemory()) / bytesInMegabyte);
+  }
+
 }

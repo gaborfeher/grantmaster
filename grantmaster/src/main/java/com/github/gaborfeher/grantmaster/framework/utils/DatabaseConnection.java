@@ -276,7 +276,7 @@ public class DatabaseConnection {
     if (newLock == null) {
       return false;
     }
-    logger.info("saveAsDatabase({})", path);
+    logger.info("saveAsDatabase('{}')", path);
     if (saveDatabaseInternal(path)) {
       originalArchiveFile = path;
       if (lock != null) {
@@ -329,7 +329,7 @@ public class DatabaseConnection {
   }
 
   public static DatabaseConnection openDatabase(File path, Errors errors) {
-    logger.info("openDatabase({})", path);
+    logger.info("openDatabase('{}')", path);
     DatabaseConnection newConnection = new DatabaseConnection();
     newConnection.lock = MyFileLock.lockFile(path);
     if (newConnection.lock == null) {
@@ -351,6 +351,7 @@ public class DatabaseConnection {
       newConnection.close();
       return null;
     }
+    Utils.logMemoryUsage();
     return newConnection;
   }
 
