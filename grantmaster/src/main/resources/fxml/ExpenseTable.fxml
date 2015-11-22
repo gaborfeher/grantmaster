@@ -36,7 +36,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <PropertyValueFactory property="state" />
       </cellValueFactory>
     </TableColumn>
-    <TableColumn text="%Project" editable="false" sortable="false" styleClass="textColumn">
+    <TableColumn text="%Project" editable="true" sortable="false" styleClass="textColumn">
+      <cellFactory>
+        <ProjectTableCellFactory property="project" />
+      </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="project" />
       </cellValueFactory>

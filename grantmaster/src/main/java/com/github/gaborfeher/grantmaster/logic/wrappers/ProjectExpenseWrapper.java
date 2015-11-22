@@ -44,7 +44,6 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
   private static final String EXPENSE_LIST_DATE_FILTER_QUERY_CONDITION =
       "(:reportDate IS NULL OR e.report.reportDate > :reportDate OR (e.report.reportDate = :reportDate AND (:paymentDate IS NULL OR e.paymentDate >= :paymentDate)))";
 
-
   @NotNull(message="%ValidationErrorExpenseAmount")
   @DecimalMin(value="0.01", message="%ValidationErrorExpenseAmount")
   private BigDecimal accountingCurrencyAmount;
@@ -200,7 +199,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
      List<ProjectExpenseWrapper> expensesToUpdate =
         getProjectExpenseListForAllocation(em, project, startingFromReportDate, startingFromExpenseDate);
     // Delete allocations and flush this to database. (Accounting currency amounts
-    // are still kept in the database.)
+    // are still kept in the expensesToUpdate array.)
     removeExpenseAllocations(
         em, project, startingFromReportDate, startingFromExpenseDate);
     em.flush();
@@ -226,10 +225,7 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
         entity.getSourceAllocations().remove(1);
       }
     } else {
-      ProjectSource source0 = em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
-          setParameter("project", entity.getProject()).
-          setMaxResults(1).
-          getSingleResult();
+      ProjectSource source0 = ProjectSourceWrapper.getOneProjectSource(em, entity.getProject());
       if (source0 == null) {
         return false;
       }
@@ -353,9 +349,50 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       }
     } else if ("paymentDate".equals(name)) {
       return setPaymentDate((LocalDate) value);
+    } else if ("project".equals(name)) {
+      return setProject((Project) value);
     } else {
       return super.setProperty(name, value, paramType);
     }
+  }
+
+  private boolean setProject(Project newProject) {
+    if (entity.getProject().getExpenseMode() != Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE ||
+        newProject.getExpenseMode() != Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE) {
+      Utils.showSimpleErrorDialog(
+          "Expense.setProject.ErrorTitle",
+          "Expense.setProject.BadProjectMode.Description",
+          new ArrayList());
+      return false;
+    }
+    return DatabaseSingleton.INSTANCE.transaction((EntityManager em) -> {
+      if (ProjectSourceWrapper.countProjectSources(em, newProject) == 0) {
+        Utils.showSimpleErrorDialog(
+            "Expense.setProject.ErrorTitle",
+            "Expense.setProject.MissingSource.Description",
+            new ArrayList());
+        return false;
+      }
+      ProjectReport newReport = ProjectReportWrapper.getDefaultProjectReport(em, newProject);
+      Project oldProject = entity.getProject();
+      ProjectReport oldReport = entity.getReport();
+
+      entity.setProject(newProject);
+      entity.setReport(newReport);
+      entity.setSourceAllocations(new ArrayList<>());
+
+      entity = em.merge(entity);
+      em.flush();
+      if (checkIsLocked()) {
+        return false;
+      }
+      updateExpenseAllocations(
+          em, oldProject, oldReport.getReportDate(), null);
+      em.flush();
+
+      propagateAccountingCurrencyAmountChange(em, accountingCurrencyAmount);
+      return true;
+    });
   }
 
   private boolean setPaymentDate(LocalDate paymentDate) {

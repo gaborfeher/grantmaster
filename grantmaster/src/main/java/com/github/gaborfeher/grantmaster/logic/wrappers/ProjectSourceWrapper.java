@@ -85,6 +85,21 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     return query.getResultList();
   }
 
+  public static ProjectSource getOneProjectSource(
+      EntityManager em, Project project) {
+    return em.createQuery("SELECT s FROM ProjectSource s WHERE s.project = :project", ProjectSource.class).
+      setParameter("project", project).
+      setMaxResults(1).
+      getSingleResult();
+  }
+
+  public static long countProjectSources(
+      EntityManager em, Project project) {
+    return em.createQuery("SELECT COUNT(s) FROM ProjectSource s WHERE s.project = :project", Long.class).
+      setParameter("project", project).
+      getSingleResult();
+  }
+
   static void removeProjectSources(EntityManager em, Project project) {
     em.createQuery("DELETE FROM ExpenseSourceAllocation a WHERE a IN (SELECT a FROM ExpenseSourceAllocation a, ProjectSource s WHERE a.source = s AND s.project = :project)").
         setParameter("project", project).

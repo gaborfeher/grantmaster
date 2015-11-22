@@ -19,6 +19,7 @@ package com.github.gaborfeher.grantmaster.ui;
 
 import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.framework.utils.DatabaseSingleton;
+import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectExpense;
@@ -40,7 +41,7 @@ import javax.persistence.EntityManager;
 public class SearchTabController
     extends TablePageControllerBase<ProjectExpenseWrapper> {
   @FXML private ExpenseTableController tableController;
-  
+
   @FXML private ChoiceBox<Project> project;
   @FXML private DatePicker startDate;
   @FXML private DatePicker endDate;
@@ -50,11 +51,16 @@ public class SearchTabController
   @FXML private TextField partnerName;
   @FXML private TextField comment1;
   @FXML private TextField comment2;
-  
+
   private List<ProjectExpenseWrapper> searchResults;
-  
+
   @FXML
   private void search() {
+    fetchSearchResults();
+    onRefresh();
+  }
+
+  private void fetchSearchResults() {
     DatabaseSingleton.INSTANCE.query((EntityManager em) -> {
       searchResults = ProjectExpenseWrapper.getExpenseList(
           em,
@@ -69,9 +75,9 @@ public class SearchTabController
           comment2.getText());
       return true;
     });
-    onRefresh();
+    Utils.logMemoryUsage("fetchSearchResults: ");
   }
-  
+
   @FXML
   private void reset() {
     project.setValue(null);
@@ -90,6 +96,7 @@ public class SearchTabController
   @Override
   public void getItemListForRefresh(EntityManager em, List<ProjectExpenseWrapper> items) {
     items.clear();
+    fetchSearchResults();
     if (searchResults != null) {
       items.addAll(searchResults);
     }
@@ -160,5 +167,5 @@ public class SearchTabController
   protected ProjectExpenseWrapper createNewEntity(EntityManager em) {
     return null;
   }
-  
+
 }

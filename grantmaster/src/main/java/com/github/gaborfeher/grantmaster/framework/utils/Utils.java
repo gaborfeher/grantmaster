@@ -27,7 +27,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javax.persistence.TypedQuery;
-import javax.validation.ConstraintViolation;
 import org.slf4j.LoggerFactory;
 
 public class Utils {
@@ -66,6 +65,23 @@ public class Utils {
     return base.add(add.multiply(mult, MC), MC);
   }
 
+  public static Optional<ButtonType> showSimpleErrorDialog(
+      String title,
+      String message,
+      List<ButtonType> extraButtons) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(Utils.getString(title));
+    alert.setResizable(true);
+    TextArea text = new TextArea(message);
+    text.setWrapText(true);
+    text.setEditable(false);
+    alert.setGraphic(text);
+    if (extraButtons != null) {
+      alert.getButtonTypes().addAll(extraButtons);
+    }
+    return alert.showAndWait();
+  }
+
   public static Optional<ButtonType> showListDialog(
       String title,
       String mainMessage,
@@ -78,25 +94,19 @@ public class Utils {
       }
       fullMessage += " * " + message + "\n";
     }
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle(Utils.getString(title));
-    alert.setResizable(true);
-    TextArea text = new TextArea(fullMessage);
-    text.setWrapText(true);
-    text.setEditable(false);
-    alert.setGraphic(text);
-    if (extraButtons != null) {
-      alert.getButtonTypes().addAll(extraButtons);
-    }
-    return alert.showAndWait();
-
+    return showSimpleErrorDialog(title, fullMessage, extraButtons);
   }
 
   public static void logMemoryUsage() {
+    logMemoryUsage("");
+  }
+
+  public static void logMemoryUsage(String message) {
     final int bytesInMegabyte = 1024*1024;
     Runtime runtime = Runtime.getRuntime();
     logger.info(
-        "Memory: total: {}, max: {}, free: {}, used: {}",
+        "{}Memory: total: {}, max: {}, free: {}, used: {}",
+        message,
         runtime.totalMemory() / bytesInMegabyte,
         runtime.maxMemory() / bytesInMegabyte,
         runtime.freeMemory() / bytesInMegabyte,
