@@ -22,6 +22,7 @@ import java.math.MathContext;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Random;
 import java.util.ResourceBundle;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -35,6 +36,14 @@ public class Utils {
   // Note: the database has a different scale/precision setting for bigdecimals,
   // and possible different rounding rules.
   public static MathContext MC = MathContext.DECIMAL128;
+
+  // Uncomment to enable a button on most of the GUI pages which can add a
+  // random item to the list.
+  public static RandomHelper testRandom = null;  // new RandomHelper(42);
+
+  public static boolean testMode() {
+    return testRandom != null;
+  }
 
   public static String getString(String key) {
     return getResourceBundle().getString(key);
@@ -97,15 +106,11 @@ public class Utils {
     return showSimpleErrorDialog(title, fullMessage, extraButtons);
   }
 
-  public static void logMemoryUsage() {
-    logMemoryUsage("");
-  }
-
   public static void logMemoryUsage(String message) {
     final int bytesInMegabyte = 1024*1024;
     Runtime runtime = Runtime.getRuntime();
     logger.info(
-        "{}Memory: total: {}, max: {}, free: {}, used: {}",
+        "{} - Memory Usage: total: {}, max: {}, free: {}, used: {}",
         message,
         runtime.totalMemory() / bytesInMegabyte,
         runtime.maxMemory() / bytesInMegabyte,

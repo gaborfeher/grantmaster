@@ -34,17 +34,17 @@ public enum DatabaseSingleton {
    * database is open.
    */
   private DatabaseConnection connection;
-  
+
   private DatabaseSingleton() {
   }
-  
+
   public void setConnection(DatabaseConnection connection) {
     if (this.connection != null) {
       this.connection.close();
     }
     this.connection = connection;
   }
-  
+
   public boolean runOrRollback(TransactionRunner runner, EntityManager em) {
     if (runner.run(em)) {
       return true;
@@ -53,7 +53,7 @@ public enum DatabaseSingleton {
       return false;
     }
   }
-  
+
   public boolean transaction(TransactionRunner runner) {
     EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
     if (entityManagerFactory == null) {
@@ -79,11 +79,12 @@ public enum DatabaseSingleton {
       return false;
     } finally {
       entityManager.close();
+      Utils.logMemoryUsage("after transaction");
     }
     connection.setUnsavedChanges(true);
     return true;
   }
-  
+
   public boolean query(TransactionRunner runner) {
     EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
     if (entityManagerFactory == null) {
@@ -95,6 +96,7 @@ public enum DatabaseSingleton {
       result = runner.run(entityManager);
     } finally {
       entityManager.close();
+      Utils.logMemoryUsage("after query");
     }
     return result;
   }
@@ -105,11 +107,11 @@ public enum DatabaseSingleton {
     }
     return connection.getEntityManagerFactory();
   }
-  
+
   public boolean isConnected() {
     return connection != null;
   }
-  
+
   public boolean getUnsavedChange() {
     return connection != null && connection.isUnsavedChanges();
   }
@@ -133,7 +135,7 @@ public enum DatabaseSingleton {
       return false;
     }
   }
-  
+
   public boolean saveAsDatabase(File path) {
     if (connection != null) {
       return connection.saveAsDatabase(path);
@@ -141,7 +143,7 @@ public enum DatabaseSingleton {
       return false;
     }
   }
-  
+
   public File getCurrentlyOpenArchiveFile() {
     return connection.getOriginalArchiveFile();
   }

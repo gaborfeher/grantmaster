@@ -23,6 +23,7 @@ import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectSource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -135,6 +136,14 @@ public class ProjectSourceWrapper extends EntityWrapper<ProjectSource> {
     source.setProject(project);
     source.setReport(ProjectReportWrapper.getDefaultProjectReport(em, project));
     return new ProjectSourceWrapper(source, BigDecimal.ZERO);
+  }
+
+  @Override
+  protected boolean fillRandom(EntityManager em) {
+    entity.setAvailabilityDate(LocalDate.of(2015, 12, Utils.testRandom.nextInt(31) + 1));
+    entity.setExchangeRate(BigDecimal.valueOf(Utils.testRandom.nextDouble() * 10.0 + 0.01));
+        entity.setGrantCurrencyAmount(BigDecimal.valueOf(Utils.testRandom.nextInt(10000000) + 1000));
+    return true;
   }
 
 }

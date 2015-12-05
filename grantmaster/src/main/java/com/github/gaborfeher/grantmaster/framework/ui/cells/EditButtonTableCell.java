@@ -49,10 +49,13 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
       new Button(Utils.getString("EditCell.DiscardEntity"));
   final Button deleteButton =
       new Button(Utils.getString("EditCell.DeleteEntity"));
-  
+  final Button randomButton = new Button("!RND!");
+
   final HBox editDeleteBox = new HBox();
-  final HBox saveDiscardBox = new HBox(saveButton, discardButton);
-  
+  final HBox saveDiscardBox = Utils.testMode() ?
+      new HBox(saveButton, discardButton, randomButton) :
+      new HBox(saveButton, discardButton);
+
   public EditButtonTableCell(List<Node> extraButtons) {
     editDeleteBox.getChildren().add(deleteButton);
     editDeleteBox.getChildren().addAll(extraButtons);
@@ -78,12 +81,18 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
         handleDeleteButtonClick();
       }
     });
+    randomButton.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent t) {
+        handleRandomButtonClick();
+      }
+    });
   }
-  
+
   public EntityWrapper getEntityWrapper() {
     return (EntityWrapper) getTableRow().getItem();
   }
-  
+
   @Override
   protected void updateItem(RowEditState state, boolean empty) {
     super.updateItem(state, empty);
@@ -102,19 +111,19 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
         break;
     }
   }
-  
+
   void handleSaveButtonClick() {  // create
     final EntityWrapper entityWrapper = getEntityWrapper();
     if (DatabaseSingleton.INSTANCE.transaction(entityWrapper::save)) {
       updateItem(entityWrapper.getState(), false);
     }
   }
-  
+
   void handleDiscardButtonClick() {
     EntityWrapper entityWrapper = getEntityWrapper();
     entityWrapper.discardEdits();
   }
-  
+
   void handleDeleteButtonClick() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle(Utils.getString("EditCell.DeleteConfirmTitle"));
@@ -134,5 +143,12 @@ public class EditButtonTableCell<S extends EditableTableRowItem>
           "Dialog.Delete.FailureContent");
     }
   }
-  
+
+  void handleRandomButtonClick() {
+    final EntityWrapper entityWrapper = getEntityWrapper();
+    if (DatabaseSingleton.INSTANCE.transaction(entityWrapper::addRandom)) {
+      updateItem(entityWrapper.getState(), false);
+    }
+  }
+
 }

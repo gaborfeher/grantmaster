@@ -351,7 +351,7 @@ public class DatabaseConnection {
       newConnection.close();
       return null;
     }
-    Utils.logMemoryUsage();
+    Utils.logMemoryUsage("after openDatabase");
     return newConnection;
   }
 

@@ -20,6 +20,8 @@ package com.github.gaborfeher.grantmaster.logic.wrappers;
 import com.github.gaborfeher.grantmaster.framework.base.EntityWrapper;
 import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
 import com.github.gaborfeher.grantmaster.framework.utils.Utils;
+import com.github.gaborfeher.grantmaster.logic.entities.BudgetCategory;
+import com.github.gaborfeher.grantmaster.logic.entities.Currency;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import com.github.gaborfeher.grantmaster.logic.entities.ProjectReport;
 import java.time.LocalDate;
@@ -74,6 +76,16 @@ public class ProjectWrapper extends EntityWrapper<Project> {
       return false;  // Refuse changing it.
     }
     return super.setProperty(name, value, paramType);
+  }
+
+  @Override
+  protected boolean fillRandom(EntityManager em) {
+    entity.setName("RND" + Utils.testRandom.nextInt(100000));
+    entity.setAccountCurrency((Currency) Utils.testRandom.pickFromList(CurrencyWrapper.getCurrencyWrappers(em)).getEntity());
+    entity.setGrantCurrency((Currency) Utils.testRandom.pickFromList(CurrencyWrapper.getCurrencyWrappers(em)).getEntity());
+    entity.setExpenseMode(Project.ExpenseMode.NORMAL_AUTO_BY_SOURCE);
+    entity.setIncomeType(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.INCOME).get(0));
+    return true;
   }
 
 }

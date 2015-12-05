@@ -53,7 +53,7 @@ public class MainApp extends Application {
         System.getProperty("java.runtime.version"),
         System.getProperty("java.vm.name"),
         System.getProperty("java.vm.version"));
-    Utils.logMemoryUsage();
+    Utils.logMemoryUsage("startup");
 
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPage.fxml"));
     loader.setResources(Utils.getResourceBundle());
@@ -73,7 +73,7 @@ public class MainApp extends Application {
         ev.consume();  // Prevent the closing of this application.
       } else {
         logger.info("shutdown - bye!");
-        Utils.logMemoryUsage();
+        Utils.logMemoryUsage("shutdown");
       }
     });
   }

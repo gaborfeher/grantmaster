@@ -95,6 +95,13 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
     return success;
   }
 
+  public final boolean addRandom(EntityManager em) {
+    boolean success = DatabaseSingleton.INSTANCE.runOrRollback(
+        (EntityManager em0) -> fillRandom(em) && validate() && saveInternal(em0), em);
+    requestTableRefresh();
+    return success;
+  }
+
   @Override
   public RowEditState getState() {
     return state;
@@ -166,6 +173,10 @@ public abstract class EntityWrapper<T extends EntityBase> implements EditableTab
       }
       return false;
     }
+  }
+
+  protected boolean fillRandom(EntityManager em) {
+    return true;
   }
 
   public boolean delete(EntityManager em) {

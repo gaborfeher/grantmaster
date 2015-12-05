@@ -555,4 +555,13 @@ public class ProjectExpenseWrapper extends EntityWrapper<ProjectExpense> {
       entity.getSourceAllocations().clear();
     }
   }
+
+  @Override
+  protected boolean fillRandom(EntityManager em) {
+    entity.setPaymentDate(LocalDate.of(2015, 12, Utils.testRandom.nextInt(31) + 1));
+    setProperty("accountingCurrencyAmount", Utils.testRandom.nextBig(100, 100000), BigDecimal.class);
+    entity.setBudgetCategory(Utils.testRandom.pickFromList(GlobalBudgetCategoryWrapper.getBudgetCategories(em, BudgetCategory.Direction.PAYMENT)));
+    return true;
+  }
+
 }
