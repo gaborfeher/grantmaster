@@ -1,0 +1,72 @@
+<h1>GrantMaster2</h1>
+
+<div id="main">
+  <div id="project-list">
+    <div>
+      <button (click)="loadFile()">Load</button>
+      <button (click)="saveFile()">Save</button>
+    </div>
+    <div (click)="selectMenuItem(-2)"
+      [ngClass]="{selected: selectedMenuItemId === -2}">
+      Budget summary
+    </div>
+    <div (click)="selectMenuItem(-1)"
+      [ngClass]="{selected: selectedMenuItemId === -1}">
+      New project:
+      <input type="text" [(ngModel)]="newProjectName" />
+      <button (click)="addProject()">Add</button>
+    </div>
+    <div *ngFor="#project of dataService.database.projects; #id = index"
+      (click)="selectMenuItem(id)"
+      [ngClass]="{selected: isSelectedMenuItem(id)}"
+      class="project-list-item">
+
+      <ProjectItem
+        [project]="project"
+        [path]="['projects', selectedProjectId()]"
+        [selected]="isSelectedMenuItem(id)">
+      </ProjectItem>
+
+    </div>
+  </div>
+
+  <div id="right-view">
+    <div id="project-view" *ngIf="selectedProject()">
+      <h2>{{selectedProject().name}}</h2>
+      <div id="project-top">
+        <div id="project-income-list">
+          <h3>Incomes</h3>
+
+          <Spreadsheet
+            [list]="selectedProject().incomes"
+            [columns]="incomeColumns"
+            [path]="['projects', selectedProjectId(), 'incomes']"
+            [newItemPath]="['projects', selectedProjectId(), 'newIncome']">
+          </Spreadsheet>
+        </div>
+        <div id="project-budget-list">
+          <h3>Budget</h3>
+          <Spreadsheet
+            [list]="selectedProject().categories"
+            [columns]="categoryColumns"
+            [path]="['projects', selectedProjectId(), 'categories']"
+            [newItemPath]="['projects', selectedProjectId(), 'newCategory']">
+          </Spreadsheet>
+        </div>
+      </div>
+
+      <div id="expense-list">
+        <h3>Expenses</h3>
+        <Spreadsheet
+          [list]="selectedProject().expenses"
+          [columns]="expenseColumns"
+          [path]="['projects', selectedProjectId(), 'expenses']"
+          [newItemPath]="['projects', selectedProjectId(), 'newExpense']">
+        </Spreadsheet>
+      </div>
+    </div>
+    <TagList *ngIf="selectedMenuItemId === -2"
+      [path]="['budgetCategories']"
+      [root]="dataService.database.budgetCategories"></TagList>
+  </div>
+</div>

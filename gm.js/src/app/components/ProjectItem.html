@@ -1,0 +1,15 @@
+<div *ngIf="!selected">
+  {{project.name}}
+</div>
+
+<div *ngIf="selected">
+  <div *ngIf="!editing">
+    {{project.name}}
+    <button (click)="startEdit()">Edit</button>
+  </div>
+  <div *ngIf="editing">
+    <input type="text" [(ngModel)]="editedProjectName" />
+    <button (click)="commitEdit()">Commit</button>
+  </div>
+</div>
+

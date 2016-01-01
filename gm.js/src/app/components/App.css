@@ -1,0 +1,30 @@
+#main {
+  display: flex;
+}
+
+#project-list {
+  width: 200px;
+  border: 1px solid black;
+}
+
+#right-view {
+  border: 1px solid blue;
+  flex: 1;
+}
+
+div.selected {
+  background-color: blue;
+  color: white;
+}
+
+#project-top {
+  display: flex;
+}
+
+#project-income-list {
+  width: 50%;
+}
+#project-budget-list {
+  width: 50%;
+}
+

@@ -1,0 +1,21 @@
+
+<input
+  *ngIf="column.kind === 'number' || column.kind === 'string' || column.kind === 'date'"
+  #ref
+  type="text"
+  [(ngModel)]="value"
+  (focus)="onFocus()"
+  (blur)="onBlur(ref)"
+  (keyup)="$event.keyCode === 27 && resetEdit()"
+  [disabled]="column.editable === false"
+  class="kind-{{column.kind}}"
+  (keydown.enter)="onEnter(ref)">
+
+
+<select *ngIf="column.kind === 'dropdown'"
+  (focus)="startEdit()"
+  (blur)="commitEdit()"
+  [(ngModel)]="value"
+  [disabled]="column.editable === false">
+  <option *ngFor="#item of column.items" value="{{item.key}}">{{item.value.split(' ').join('&nbsp;')}}</option>
+</select>

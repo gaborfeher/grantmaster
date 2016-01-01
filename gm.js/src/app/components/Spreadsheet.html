@@ -1,0 +1,26 @@
+<table class="spreadsheet">
+  <tr>
+    <td></td>
+    <td *ngFor="#column of columns">
+      {{column.value}}
+    </td>
+  </tr>
+  <tr *ngIf="newItemPath">
+    <td><button (click)="addNewItem()">Add</button>
+    <td *ngFor="#column of columns">
+      <CellEntry
+        [column]="column"
+        [item]="dataService.getIn(newItemPath)"
+        [path]="[newItemPath, column.key]"></CellEntry>
+    </td>
+  </tr>
+  <tr *ngFor="#item of list.reverse(); #i = index">
+    <td></td>
+    <td *ngFor="#column of columns">
+      <CellEntry
+        [column]="column"
+        [item]="item"
+        [path]="[path, list.size - i - 1, column.key]"></CellEntry>
+    </td>
+  </tr>
+</table>

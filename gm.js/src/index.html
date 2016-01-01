@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>GrantMaster2</title>
+    <script src="../node_modules/systemjs/dist/system.src.js"></script>
+    <script src="../node_modules/angular2/bundles/angular2.dev.js"></script>
+    <script src="../node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="../node_modules/immutable/dist/immutable.js"></script>
+    <script src="../node_modules/bignumber.js/bignumber.js"></script>
+
+    <script>
+      System.config({
+        paths: {
+          '*': '../node_modules/*.js',
+          'app/*': 'app/*',
+        },
+      });
+      System.defaultJSExtensions = true;
+      System.import('app/components/App');
+    </script>
+  </head>
+  <body>
+    <App>loading...</App>
+  </body>
+</html>
