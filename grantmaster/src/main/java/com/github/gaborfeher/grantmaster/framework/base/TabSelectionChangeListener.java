@@ -43,9 +43,20 @@ public class TabSelectionChangeListener implements ChangeListener<Tab> {
   public static void activateTab(Tab tab) {
     logger.info("activate tab {}", tab.getText());
     activeTab = tab;
+    if (tab.getProperties().containsKey("manager")) {
+      ((TabManager) tab.getProperties().get("manager")).onActivate();
+    }
     TablePageControllerBase controller = getController(tab);
     if (controller != null) {
       controller.onMyTabIsSelected();
+    }
+  }
+
+  public static void deactivateTab(Tab tab) {
+    logger.info("deactivate tab {}", tab.getText());
+    activeTab = tab;
+    if (tab.getProperties().containsKey("manager")) {
+      ((TabManager) tab.getProperties().get("manager")).onDeactivate();
     }
   }
 
@@ -62,6 +73,9 @@ public class TabSelectionChangeListener implements ChangeListener<Tab> {
 
   @Override
   public void changed(ObservableValue<? extends Tab> ov, Tab oldTab, Tab newTab) {
+    if (oldTab != null) {
+      deactivateTab(oldTab);
+    }
     activateTab(newTab);
   }
 }

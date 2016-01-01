@@ -21,14 +21,11 @@ import com.github.gaborfeher.grantmaster.framework.base.TablePageControllerBase;
 import com.github.gaborfeher.grantmaster.logic.wrappers.ProjectWrapper;
 import com.github.gaborfeher.grantmaster.framework.base.RowEditState;
 import com.github.gaborfeher.grantmaster.framework.ui.cells.EditButtonTableCell;
-import com.github.gaborfeher.grantmaster.framework.utils.Utils;
 import com.github.gaborfeher.grantmaster.logic.entities.Project;
 import java.io.IOException;
 import java.util.List;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javax.persistence.EntityManager;
 
@@ -52,13 +49,7 @@ public class ProjectListTabController extends TablePageControllerBase<ProjectWra
 
   private Tab createProjectTab(Project project) throws IOException {
     Tab newTab = new Tab(project.getName());
-    final ProjectTabController controller;
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectTab.fxml"));
-    loader.setResources(Utils.getResourceBundle());
-    Parent projectPage = loader.load();
-    controller = loader.getController();
-    controller.init(project);
-    newTab.setContent(projectPage);
+    newTab.getProperties().put("manager", new DestructiveProjectTabManager(newTab, project));
     return newTab;
   }
 
