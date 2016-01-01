@@ -78,7 +78,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </TableColumn>
     <TableColumn text="%BudgetCategory" sortable="false" prefWidth="150" styleClass="textColumn" >
       <cellFactory>
-        <BudgetCategoryTableCellFactory property="budgetCategory" direction="PAYMENT"/>
+        <ProjectBudgetCategoryTableCellFactory property="budgetCategory" />
       </cellFactory>
       <cellValueFactory>
         <EntityPropertyValueFactory property="budgetCategory" />
