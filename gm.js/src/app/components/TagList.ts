@@ -1,8 +1,8 @@
-///<reference path='../data/Model.ts'/>
+///<reference path='../data/TagNode.ts'/>
 
 import {ChangeDetectionStrategy, Component, Input, View} from 'angular2/core';
 import {NgFor} from 'angular2/common';
-import {TagNode} from '../data/Model';
+import {TagNode} from '../data/TagNode';
 import {DataService} from './DataService';
 import {TagName} from './TagName';
 import {CellEntry} from './CellEntry';

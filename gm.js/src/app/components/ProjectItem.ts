@@ -1,8 +1,8 @@
-///<reference path='../data/Model.ts'/>
+///<reference path='../data/Project.ts'/>
 
 import {Component, Input, View} from 'angular2/core';
 import {NgIf, NgModel} from 'angular2/common';
-import {Project} from '../data/Model';
+import {Project} from '../data/Project';
 import {DataService} from './DataService';
 
 @Component({

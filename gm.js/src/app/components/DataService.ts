@@ -1,7 +1,17 @@
-///<reference path='../data/Model.ts'/>
+///<reference path='../data/Database.ts'/>
+///<reference path='../data/Expense.ts'/>
+///<reference path='../data/Income.ts'/>
+///<reference path='../data/Project.ts'/>
+///<reference path='../data/ProjectCategory.ts'/>
+///<reference path='../data/TagNode.ts'/>
+import {Database} from '../data/Database';
+import {Expense} from '../data/Expense';
+import {Income} from '../data/Income';
+import {Project} from '../data/Project';
+import {ProjectCategory} from '../data/ProjectCategory';
+import {TagNode} from '../data/TagNode';
 
 import {Injectable} from 'angular2/core';
-import {Database, Expense, Income, Project, ProjectCategory, TagNode} from '../data/Model';
 import {JSONParser} from '../data/JSONParser';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
