@@ -1,9 +1,11 @@
+///<reference path='../data/Changes.ts'/>
 ///<reference path='../data/Database.ts'/>
 ///<reference path='../data/Expense.ts'/>
 ///<reference path='../data/Income.ts'/>
 ///<reference path='../data/Project.ts'/>
 ///<reference path='../data/ProjectCategory.ts'/>
 ///<reference path='../data/TagNode.ts'/>
+import {Changes} from '../data/Changes';
 import {Database} from '../data/Database';
 import {Expense} from '../data/Expense';
 import {Income} from '../data/Income';
@@ -33,39 +35,43 @@ export class DataService {
       .setIn(
         ['budgetCategories', 'subTags'],
         Immutable.List([new TagNode({name: 'cat1'}), new TagNode({name: 'cat2'})]))
-      .addProject(
-        (new Project({name: 'aaa'}))
-          .set(
-            'categories',
-            Immutable.List([
-              new ProjectCategory({tagName: 'cat1'}),
-              new ProjectCategory({tagName: 'cat2'})]))
-          .addIncome(new Income({
+      .addProject(new Project({
+        name: 'aaa',
+        categories: Immutable.List([
+          new ProjectCategory({tagName: 'cat1'}),
+          new ProjectCategory({tagName: 'cat2'})]),
+        incomes: Immutable.List([
+          new Income({
             date: '2015-01-01',
             foreignAmount: new BigNumber(1000),
-            exchangeRate: new BigNumber(305)}))
-          .addExpense(new Expense({
+            exchangeRate: new BigNumber(305)})]),
+        expenses: Immutable.List([
+          new Expense({
             date: '2015-02-02',
             localAmount: new BigNumber(1480),
-            category: 'cat1'}))
-          .addExpense(new Expense({
+            category: 'cat1'}),
+          new Expense({
             date: '2015-02-05',
             localAmount: new BigNumber(990),
-            category: 'cat2'})))
+            category: 'cat2'})])
+        }).recomputeIncomes())
       .addProject(new Project({name: 'bbb'}))
       .recomputeBudgetCategories();
     let monsterMode = false;
     if (monsterMode) {
+      console.log('monster mode');
       for (var i = 1; i < 1000; ++i) {
         console.log('adding test ', i);
         this.database = this.database
           .updateIn(
             ['projects', 0],
-            project => project.addExpense(new Expense({
-              date: 'monster' + (i).toString(),
-              localAmount: new BigNumber(i + 1),
-              category: 'cat' + (i % 2 + 1).toString()
-            })))
+            project => project.set(
+              'expenses',
+              project.expenses.push(new Expense({
+                date: '2015-01-' + (i).toString(),
+                localAmount: new BigNumber(i + 1),
+                category: 'cat' + (i % 2 + 1).toString()
+            }))).recomputeExpenses())
           .recomputeBudgetCategories();
       }
     }
@@ -102,30 +108,14 @@ export class DataService {
     let newItem = this.database.getIn(newItemPath);
     let itemType = targetPath[2];
 
-    let database2 = this.database
+    let database = this.database
       .setIn(
         newItemPath,
-        this.database.getIn(newItemTemplatePath))
-
-    let projectPath = targetPath.slice(0, 2);
-    if (itemType === 'expenses') {
-      database2 = database2
-        .updateIn(
-          projectPath,
-          project => project.addExpense(newItem))
-        .recomputeBudgetCategories();
-    } else if (itemType === 'incomes') {
-      database2 = database2.updateIn(
-        projectPath,
-        project => project.addIncome(newItem));
-    } else if (itemType === 'categories') {
-      database2 = database2.updateIn(
-        targetPath.slice(0, 3),
-        categories => categories.push(newItem));
-    } else {
-      console.error('bad itemType');
-    }
-    this.updateDatabase(database2);
+        this.database.getIn(newItemTemplatePath));
+    this.updateByPath<any>(  // any should be Immutable.List
+      targetPath,
+      list => list.push(newItem),
+      database);
   }
 
   addProject(project: Project) {
@@ -133,46 +123,39 @@ export class DataService {
       this.database.set('projects', this.database.projects.push(project)));
   }
 
-  onGlobalChange(msg) {
-
-    let path = this.flattenPath(msg.path);
-
-    let projectPath = path.slice(0, 2);
-    let itemType = path[2];
-
-    let itemIndex = path[3];
-    let propertyName = path[4];
-    if (itemType === 'expenses') {
-      if (propertyName === 'date' || propertyName === 'localAmount') {
-        this.updateDatabase(this.database
-          .updateIn(
-            projectPath,
-            project => project.updateExpenseAndPropagate(
-              itemIndex,
-              project.expenses.get(itemIndex).set(propertyName, msg.value)))
-          .recomputeBudgetCategories());
-        return;
-      } else if (propertyName === 'category') {
-        this.updateDatabase(this.database
-          .setIn(path, msg.value)
-          .updateIn(
-            projectPath,
-            project => project.recomputeBudgetCategories())
-          .recomputeBudgetCategories());
-        return;
-      }
-    } else if (itemType === 'incomes') {
-      if (propertyName === 'exchangeRate' || propertyName === 'foreignAmount' || propertyName === 'date') {
-        this.updateDatabase(this.database.updateIn(
-          projectPath,
-          project => project.updateIncomeAndPropagate(
-            itemIndex,
-            project.incomes.get(itemIndex).set(propertyName, msg.value))));
-        return;
+  updateByPath<T>(path: Array<string>, updater: (object: T) => T, database?: Database) {
+    function recursiveUpdate(object, path: Array<string>, updater, changes: Changes) {
+      let pathHead = path[0];
+      let pathTail = path.slice(1);
+      if (pathTail.length === 0) {
+        let updatedProperty = updater(object.get(pathHead));
+        object = object.set(pathHead, updatedProperty);
+        if ('onPropertyChange' in object) {
+          object = object.onPropertyChange(pathHead, changes);
+          if ('onChange' in object) {
+            object = object.onChange(changes);
+          }
+        }
+        return object;
+      } else {
+        let subObject = object.get(pathHead);
+        subObject = recursiveUpdate(subObject, pathTail, updater, changes);
+        object = object.set(pathHead, subObject);
+        if ('onChange' in object) {
+          object = object.onChange(changes);
+        }
+        return object;
       }
     }
 
-    this.updateDatabase(this.database.setIn(path, msg.value));
+    database = database || this.database;
+    let changes: Changes = new Changes();
+    database = recursiveUpdate(database, path, updater, changes);
+    this.updateDatabase(database);
+  }
+
+  setByPath(path: Array<any>, value: any) {
+    this.updateByPath(this.flattenPath(path), (_1) => value);
   }
 
   setProjectName(projectPath: Array<any>, name: string) {

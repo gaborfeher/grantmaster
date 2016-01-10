@@ -1,9 +1,11 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./IRecord.ts'/>
 ///<reference path='./BigNumber.ts'/>
+///<reference path='./Changes.ts'/>
+///<reference path='./IRecord.ts'/>
 
-import {IRecord} from './IRecord';
 import {BigNumber} from './BigNumber';
+import {Changes} from './Changes';
+import {IRecord} from './IRecord';
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
@@ -47,6 +49,13 @@ Income.prototype.spendInLocalCurrency = function(localAmount: BigNumber): Income
     spentForeignAmount: that.spentForeignAmount.plus(localAmount.dividedBy(that.exchangeRate))
   });
 };
+Income.prototype.onPropertyChange = function(property, changes) {
+  let that: Income = this;
+  if (property === 'exchangeRate' || property === 'foreignAmount' || property === 'date') {
+    changes.significantIncomeChange = true;
+  }
+  return that;
+}
 export function compareIncomes(a: Income, b: Income): number {
   if (a.date == b.date) {
     return 0;

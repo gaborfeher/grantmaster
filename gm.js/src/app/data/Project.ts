@@ -1,15 +1,17 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./IRecord.ts'/>
 ///<reference path='./BigNumber.ts'/>
+///<reference path='./Changes.ts'/>
 ///<reference path='./Expense.ts'/>
+///<reference path='./IRecord.ts'/>
 ///<reference path='./Income.ts'/>
 ///<reference path='./ProjectCategory.ts'/>
 
-import {IRecord} from './IRecord';
+import {BigNumber, bigMin} from './BigNumber';
+import {Changes} from './Changes';
 import {Expense, compareExpenses} from './Expense';
 import {Income, compareIncomes} from './Income';
+import {IRecord} from './IRecord';
 import {ProjectCategory} from './ProjectCategory';
-import {BigNumber, bigMin} from './BigNumber';
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
@@ -20,13 +22,9 @@ export interface Project extends IRecord<Project> {
   incomes: Immutable.List<Income>;
   categories: Immutable.List<ProjectCategory>;
 
-  addExpense(expense: Expense): Project;
-  updateExpenseAndPropagate(pos: number, expense: Expense): Project;
   recomputeExpenses(): Project;
   recomputeBudgetCategories(): Project;
 
-  addIncome(income: Income): Project;
-  updateIncomeAndPropagate(pos: number, income: Income): Project;
   recomputeIncomes(): Project;
 
   addLastExpenseInternal(expense: Expense): Project;
@@ -80,16 +78,6 @@ Project.prototype.recomputeExpenses = function() {
   }
   return that.recomputeBudgetCategories();
 }
-Project.prototype.updateExpenseAndPropagate = function(pos: number, expense: Expense): Project {
-  let that: Project = this;
-  return that.setIn(['expenses', pos], expense).recomputeExpenses();
-}
-Project.prototype.addExpense = function(expense: Expense): Project {
-  let that: Project = this;
-  return that
-    .set('expenses', that.expenses.push(expense))
-    .recomputeExpenses()
-}
 Project.prototype.addLastExpenseInternal = function(expense: Expense): Project {
   let that: Project = this;
   return that.fulfillExpense(expense, new BigNumber(0));
@@ -131,18 +119,6 @@ function findFirstNonEmptyIncome(incomes: Immutable.List<Income>): number {
   }
   return incomes.size - 1;
 }
-Project.prototype.addIncome = function(income: Income): Project {
-  let that: Project = this;
-  return that
-    .merge({ incomes: that.incomes.push(income) })
-    .recomputeIncomes();
-}
-Project.prototype.updateIncomeAndPropagate = function(pos: number, income: Income): Project {
-  let that: Project = this;
-  return that
-    .setIn(['incomes', pos], income.refresh())
-    .recomputeIncomes();
-}
 Project.prototype.recomputeIncomes = function(): Project {
   let that: Project = this;
   return that
@@ -154,4 +130,23 @@ Project.prototype.recomputeIncomes = function(): Project {
         .map(income => income.refresh()))
     .recomputeExpenses();
 }
-
+Project.prototype.onPropertyChange = function(property, changes): Project {
+  if (property === 'expenses') {
+    changes.significantExpenseChange = true;
+  } else if (property === 'incomes') {
+    changes.significantIncomeChange = true;
+  }
+  return this;
+}
+Project.prototype.onChange = function(changes: Changes): Project {
+  let that: Project = this;
+  if (changes.significantExpenseChange) {
+    return that.recomputeExpenses();
+  } else if (changes.budgetCategoryChange) {
+    return that.recomputeBudgetCategories();
+  } else if (changes.significantIncomeChange) {
+    return that.recomputeIncomes();
+  } else {
+    return that;
+  }
+}

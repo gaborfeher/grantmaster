@@ -1,16 +1,18 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
+///<reference path='./Changes.ts'/>
+///<reference path='./Expense.ts'/>
 ///<reference path='./IRecord.ts'/>
 ///<reference path='./Project.ts'/>
-///<reference path='./Expense.ts'/>
 ///<reference path='./Income.ts'/>
 ///<reference path='./TagNode.ts'/>
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
+import {Changes} from './Changes';
+import {Expense} from './Expense';
 import {IRecord} from './IRecord';
 import {Project} from './Project';
-import {Expense} from './Expense';
 import {Income} from './Income';
 import {TagNode} from './TagNode';
 
@@ -114,4 +116,12 @@ Database.prototype.recomputeBudgetCategories = function() {
       return true;
     });
   return that.set('budgetCategories', mapBudgetCategories(that.budgetCategories, map));
+}
+Database.prototype.onChange = function(changes: Changes) {
+  let that: Database = this;
+  if (changes.significantExpenseChange || changes.budgetCategoryChange) {
+    return that.recomputeBudgetCategories();
+  } else {
+    return that;
+  }
 }

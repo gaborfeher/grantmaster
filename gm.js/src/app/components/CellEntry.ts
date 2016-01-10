@@ -187,7 +187,7 @@ export class CellEntry {
       let errors = [];
       if (this.validate(val, errors)) {
         let val2 = this.column.kind === 'number' ? new BigNumber(val) : val;
-        this.dataService.onGlobalChange({path: this.path, value: val2});
+        this.dataService.setByPath(this.path, val2);
         this.editMode = false;
       } else {
         if (focused) {
