@@ -57,11 +57,6 @@ class App {
 
     this.selectedMenuItemId = -2;
 
-    this.newExpenseTemplate = new Expense();
-    this.newIncomeTemplate = new Income();
-    this.newCategoryTemplate = new ProjectCategory();
-
-
     this.incomeColumns = [
       {
         key: 'date',
