@@ -130,16 +130,16 @@ Project.prototype.recomputeIncomes = function(): Project {
         .map(income => income.refresh()))
     .recomputeExpenses();
 }
-Project.prototype.onPropertyChange = function(property, changes): Project {
+Project.prototype.onChange = function(property: string, changes: Changes): Project {
+  let that: Project = this;
   if (property === 'expenses') {
     changes.significantExpenseChange = true;
   } else if (property === 'incomes') {
     changes.significantIncomeChange = true;
+  } else if (property === 'categories') {
+    changes.projectCategoryListChange = true;
   }
-  return this;
-}
-Project.prototype.onChange = function(changes: Changes): Project {
-  let that: Project = this;
+
   if (changes.significantExpenseChange) {
     return that.recomputeExpenses();
   } else if (changes.budgetCategoryChange) {

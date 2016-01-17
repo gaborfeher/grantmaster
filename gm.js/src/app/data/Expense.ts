@@ -33,7 +33,7 @@ Expense.prototype.resetComputed = function(): Expense {
     .set('foreignAmount', new BigNumber(0))
     .set('exchangeRate', new BigNumber(0));
 }
-Expense.prototype.onPropertyChange = function(property, changes): Expense {
+Expense.prototype.onChange = function(property: string, changes: Changes): Expense {
   if (property === 'date' || property === 'localAmount') {
     changes.significantExpenseChange = true;
   } else if (property === 'category') {

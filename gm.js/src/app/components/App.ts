@@ -4,6 +4,7 @@
 ///<reference path='../data/Project.ts'/>
 ///<reference path='../data/ProjectCategory.ts'/>
 ///<reference path='../data/TagNode.ts'/>
+import {AppState} from '../data/AppState';
 import {Expense} from '../data/Expense';
 import {Income} from '../data/Income';
 import {Project} from '../data/Project';
@@ -36,8 +37,6 @@ var dialog = remote.require('dialog');
   directives: [NgClass, NgFor, NgIf, NgModel, Spreadsheet, ProjectItemComponent, TagList],
 })
 class App {
-  selectedMenuItemId: number;
-
   newExpenseTemplate: Expense;
   newIncomeTemplate: Income;
   newCategoryTemplate: ProjectCategory;
@@ -53,9 +52,6 @@ class App {
     var that = this;
 
     this.dataService = dataService;
-    this.dataService.subscribe(function() { that.refreshCalculations(); });
-
-    this.selectedMenuItemId = -2;
 
     this.incomeColumns = [
       {
@@ -79,77 +75,6 @@ class App {
       {key: 'localAmount', value: 'Local amount', kind: 'number', editable: false},
       {key: 'spentForeignAmount', value: 'Spent (F)', kind: 'number', editable: false},
       {key: 'spentLocalAmount', value: 'Spent (L)', kind: 'number', editable : false}];
-
-    this.refreshCalculations();
-  }
-
-  refreshCalculations() {
-    var that = this;
-
-    function getCategoryList() {
-      function toNames(prefix: string) {
-        return function(node: TagNode) {
-          var x = {key: node.name, value: prefix + node.name};
-          return Immutable.List([x]).concat(
-            node.subTags.flatMap(node => toNames(prefix + '  ')(node)));
-        }
-      }
-      return toNames('')(that.dataService.database.budgetCategories);
-    }
-
-    function getProjectCategoryList():
-      Immutable.List<{key: string, value: string}> {
-
-      let project = that.selectedProject();
-      if (project === undefined) {
-        return Immutable.List([]);
-      }
-      return project.categories.map(
-        (value: ProjectCategory) =>
-          ({key: value.tagName, value: value.tagName})).toList();
-    }
-
-    this.categoryColumns = [
-      {
-        key: 'tagName',
-        value: 'Name',
-        kind: 'dropdown',
-        items: getCategoryList()
-      },
-      {
-        key: 'limitForeign',
-        value: 'Limit (F)',
-        kind: 'number',
-        constraints: ['positive']
-      },
-      {
-        key: 'limitPercentageForeign',
-        value: 'Limit% (F)',
-        kind: 'number',
-        constraints: ['min:0', 'max:100']
-      },
-      {key: 'spentForeign', value: 'Spent (F)', kind: 'number', editable: false},
-      {key: 'spentLocal', value: 'Spent (L)', kind: 'number', editable: false},
-    ];
-
-    this.expenseColumns = [
-      {
-        key: 'date',
-        value: 'Date',
-        kind: 'date',
-        constraints: ['not_null'],
-      },
-      {key: 'category', value: 'Category', kind: 'dropdown', items: getProjectCategoryList()},
-      {key: 'accountNo', value: 'Account Number', kind: 'string'},
-      {key: 'partner', value: 'Partner', kind: 'string'},
-      {
-        key: 'localAmount',
-        value: 'Local amount',
-        kind: 'number',
-        constraints: ['positive']
-      },
-      {key: 'foreignAmount', value: 'Foreign amount', kind: 'number', editable: false},
-      {key: 'exchangeRate', value: 'Exchange rate', kind: 'number', editable: false}];
   }
 
   addProject() {
@@ -159,25 +84,15 @@ class App {
   }
 
   selectMenuItem(id: number) {
-    this.selectedMenuItemId = id;
-    this.refreshCalculations();
+    this.dataService.setByPath(['mainMenuSelectedItemId'], id);
   }
 
-  isSelectedMenuItem(id: number) {
-    return this.selectedMenuItemId === id;
+  isSelectedMenuItem(id: number): boolean {
+    return this.dataService.state.mainMenuSelectedItemId === id;
   }
 
-  selectedProjectId(): number {
-    return this.selectedMenuItemId >= 0 ? this.selectedMenuItemId : undefined;
-  }
-
-  selectedProject(): Project {
-    return this.selectedMenuItemId >= 0 ? this.dataService.database.projects.get(this.selectedMenuItemId) : undefined;
-  }
-
-  onDataChange(dummy: number) {
-    console.log('app changes: ', dummy);
-    this.refreshCalculations();
+  state(): AppState {
+    return this.dataService.state;
   }
 
   loadFile() {
@@ -191,7 +106,7 @@ class App {
     console.log('saveFile');
     var fname = dialog.showSaveDialog();
     console.log('fname= ', fname);
-    fs.writeFile(fname, JSON.stringify(this.dataService.database.toJSON()));
+    fs.writeFile(fname, JSON.stringify(this.dataService.state.database.toJSON()));
   }
 
 }

@@ -1,14 +1,13 @@
 <table>
   <tr>
     <td>Name</td>
-    <td *ngFor="#column of columns">
+    <td *ngFor="#column of table.columns">
       {{column}}
     </td>
   </tr>
-  <tr *ngFor="#row of rows">
+  <tr *ngFor="#row of table.rows">
     <td><TagName [node]="row.node" [path]="row.path"></TagName></td>
-    <!-- <td *ngFor="#column of columns">{{row.node.summaries.get(column)}}</td> -->
-    <td *ngFor="#column of columns">
+    <td *ngFor="#column of table.columns">
       <CellEntry
         [item]="row.node.summaries"
         [column]="{key: column, kind: 'number', editable: false}"></CellEntry>

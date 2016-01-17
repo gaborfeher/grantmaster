@@ -117,8 +117,11 @@ Database.prototype.recomputeBudgetCategories = function() {
     });
   return that.set('budgetCategories', mapBudgetCategories(that.budgetCategories, map));
 }
-Database.prototype.onChange = function(changes: Changes) {
+Database.prototype.onChange = function(property: string, changes: Changes): Database {
   let that: Database = this;
+  if (property === 'budgetCategories' && changes.tagNodeTreeChange) {
+    changes.budgetCategoryTreeChange = true;
+  }
   if (changes.significantExpenseChange || changes.budgetCategoryChange) {
     return that.recomputeBudgetCategories();
   } else {
