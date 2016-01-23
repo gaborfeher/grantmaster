@@ -119,6 +119,13 @@ export class StateService {
       state);
   }
 
+  removeItem(targetPath: Array<any>, index: number) {
+    targetPath = this.flattenPath(targetPath);
+    this.updateByPath<any>(  // any should be Immutable.List
+      targetPath,
+      list => list.remove(index));
+  }
+
   addProject(project: Project) {
     this.updateState(
       this.state.updateIn(['database', 'projects'], projects => projects.push(project)));

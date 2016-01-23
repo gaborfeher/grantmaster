@@ -30,16 +30,4 @@ export class Spreadsheet {
   constructor(stateService: StateService) {
     this.stateService = stateService;
   }
-
-  getValue(val: any): any {
-    if (val === undefined) {
-      return '';
-    } else {
-      return val;
-    }
-  }
-
-  addNewItem() {
-    this.stateService.addNewItem(this.table, this.path);
-  }
 }

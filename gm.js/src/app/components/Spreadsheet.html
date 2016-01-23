@@ -6,7 +6,7 @@
     </td>
   </tr>
   <tr>
-    <td><button (click)="addNewItem()">Add</button>
+    <td><button (click)="stateService.addNewItem(table, path)">Add</button>
     <td *ngFor="#column of table.columns">
       <CellEntry
         [column]="column"
@@ -15,7 +15,7 @@
     </td>
   </tr>
   <tr *ngFor="#item of list.reverse(); #i = index">
-    <td></td>
+    <td><button (click)="stateService.removeItem(path, list.size - i - 1)">Remove</button></td>
     <td *ngFor="#column of table.columns">
       <CellEntry
         [column]="column"
