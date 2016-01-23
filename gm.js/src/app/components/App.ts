@@ -1,24 +1,15 @@
-///<reference path='../data/Database.ts'/>
-///<reference path='../data/Expense.ts'/>
-///<reference path='../data/Income.ts'/>
-///<reference path='../data/Project.ts'/>
-///<reference path='../data/ProjectCategory.ts'/>
-///<reference path='../data/TagNode.ts'/>
-import {AppState} from '../data/AppState';
-import {Expense} from '../data/Expense';
-import {Income} from '../data/Income';
-import {Project} from '../data/Project';
-import {ProjectCategory} from '../data/ProjectCategory';
-import {TagNode} from '../data/TagNode';
+///<reference path='../state/database/Project.ts'/>
+import {AppState} from '../state/AppState';
+import {Project} from '../state/database/Project';
 
 import {ChangeDetectionStrategy, Component, View} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
-import {JSONParser} from '../data/JSONParser';
+import {JSONParser} from '../state/database/JSONParser';
 import {ProjectItemComponent} from './ProjectItem';
 import {Spreadsheet} from './Spreadsheet';
 import {TagList} from './TagList';
-import {DataService} from './DataService';
+import {StateService} from './StateService';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
@@ -37,21 +28,18 @@ var dialog = remote.require('dialog');
   directives: [NgClass, NgFor, NgIf, NgModel, Spreadsheet, ProjectItemComponent, TagList],
 })
 class App {
-  newExpenseTemplate: Expense;
-  newIncomeTemplate: Income;
-  newCategoryTemplate: ProjectCategory;
   newProjectName: string;
 
   incomeColumns: Array<Object>;
   expenseColumns: Array<Object>;
   categoryColumns: Array<Object>;
 
-  dataService: DataService;
+  stateService: StateService;
 
-  constructor(dataService: DataService) {
+  constructor(stateService: StateService) {
     var that = this;
 
-    this.dataService = dataService;
+    this.stateService = stateService;
 
     this.incomeColumns = [
       {
@@ -78,37 +66,37 @@ class App {
   }
 
   addProject() {
-    this.dataService.addProject(
+    this.stateService.addProject(
       new Project({name: this.newProjectName}));
     this.newProjectName = '';
   }
 
   selectMenuItem(id: number) {
-    this.dataService.setByPath(['mainMenuSelectedItemId'], id);
+    this.stateService.setByPath(['mainMenuSelectedItemId'], id);
   }
 
   isSelectedMenuItem(id: number): boolean {
-    return this.dataService.state.mainMenuSelectedItemId === id;
+    return this.stateService.state.mainMenuSelectedItemId === id;
   }
 
   state(): AppState {
-    return this.dataService.state;
+    return this.stateService.state;
   }
 
   loadFile() {
     var fname = dialog.showOpenDialog();
     console.log(fname[0]);
     var data = fs.readFileSync(fname[0]);
-    this.dataService.loadDatabase(JSON.parse(data));
+    this.stateService.loadDatabase(JSON.parse(data));
   }
 
   saveFile() {
     console.log('saveFile');
     var fname = dialog.showSaveDialog();
     console.log('fname= ', fname);
-    fs.writeFile(fname, JSON.stringify(this.dataService.state.database.toJSON()));
+    fs.writeFile(fname, JSON.stringify(this.stateService.state.database.toJSON()));
   }
 
 }
-bootstrap(App, [DataService, JSONParser]);
+bootstrap(App, [StateService, JSONParser]);
 

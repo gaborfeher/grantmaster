@@ -1,4 +1,4 @@
-export var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+export var BigNumber = require('../../../../node_modules/bignumber.js/bignumber.js');
 
 BigNumber.config({
   DECIMAL_PLACES: 30,

@@ -1,11 +1,10 @@
-///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./IRecord.ts'/>
-///<reference path='./BigNumber.ts'/>
+///<reference path='../core/IRecord.ts'/>
+///<reference path='../core/BigNumber.ts'/>
 
-import {IRecord} from './IRecord';
-import {BigNumber} from './BigNumber';
+import {IRecord} from '../core/IRecord';
+import {BigNumber} from '../core/BigNumber';
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
+var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface ProjectCategory extends IRecord<ProjectCategory> {
   tagName: string;

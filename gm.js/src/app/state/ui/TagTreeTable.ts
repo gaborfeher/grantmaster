@@ -1,11 +1,10 @@
-///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./Database.ts'/>
+///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
 
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
+var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
-import {IRecord} from './IRecord';
-import {TagNode} from './TagNode';
+import {IRecord} from '../core/IRecord';
+import {TagNode} from '../database/TagNode';
 
 export interface TagTreeTable extends IRecord<TagTreeTable> {
   columns: Array<string>,

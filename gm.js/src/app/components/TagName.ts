@@ -1,9 +1,9 @@
-///<reference path='../data/TagNode.ts'/>
+///<reference path='../state/database/TagNode.ts'/>
 
 import {ChangeDetectionStrategy, Component, Input, View} from 'angular2/core';
 import {NgFor, NgIf} from 'angular2/common';
-import {TagNode} from '../data/TagNode';
-import {DataService} from './DataService';
+import {TagNode} from '../state/database/TagNode';
+import {StateService} from './StateService';
 
 @Component({
   selector: 'TagName',
@@ -25,11 +25,11 @@ export class TagName {
   editing: boolean;
   editedName: string;
 
-  dataService: DataService;
+  stateService: StateService;
 
-  constructor(dataService: DataService) {
+  constructor(stateService: StateService) {
     this.editing = false;
-    this.dataService = dataService;
+    this.stateService = stateService;
   }
 
   startEdit() {
@@ -39,11 +39,11 @@ export class TagName {
 
   commitEdit() {
     this.editing = false;
-    this.dataService.setTagName(this.path, this.editedName);
+    this.stateService.setTagName(this.path, this.editedName);
   }
 
   add() {
-    this.dataService.addSubTag(this.path);
+    this.stateService.addSubTag(this.path);
   }
 
 }

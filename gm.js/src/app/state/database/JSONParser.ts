@@ -13,7 +13,7 @@ import {Project} from './Project';
 import {ProjectCategory} from './ProjectCategory';
 import {TagNode} from './TagNode';
 
-var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+var BigNumber = require('../../../../node_modules/bignumber.js/bignumber.js');
 
 @Injectable()
 export class JSONParser {

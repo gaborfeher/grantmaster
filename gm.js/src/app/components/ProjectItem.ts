@@ -1,9 +1,9 @@
-///<reference path='../data/Project.ts'/>
+///<reference path='../state/database/Project.ts'/>
 
 import {Component, Input, View} from 'angular2/core';
 import {NgIf, NgModel} from 'angular2/common';
-import {Project} from '../data/Project';
-import {DataService} from './DataService';
+import {Project} from '../state/database/Project';
+import {StateService} from './StateService';
 
 @Component({
   selector: 'ProjectItem',
@@ -23,11 +23,11 @@ export class ProjectItemComponent {
   @Input() path: Array<string>;
   editing: boolean;
   editedProjectName: string;
-  dataService: DataService;
+  stateService: StateService;
 
-  constructor(dataService: DataService) {
+  constructor(stateService: StateService) {
     this.editing = false;
-    this.dataService = dataService;
+    this.stateService = stateService;
   }
 
   startEdit() {
@@ -37,7 +37,7 @@ export class ProjectItemComponent {
 
   commitEdit() {
     this.editing = false;
-    this.dataService.setProjectName(this.path, this.editedProjectName);
+    this.stateService.setProjectName(this.path, this.editedProjectName);
   }
 
 }

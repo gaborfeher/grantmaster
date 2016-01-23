@@ -1,13 +1,13 @@
-///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./BigNumber.ts'/>
-///<reference path='./Changes.ts'/>
-///<reference path='./IRecord.ts'/>
+///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
+///<reference path='../core/BigNumber.ts'/>
+///<reference path='../core/Changes.ts'/>
+///<reference path='../core/IRecord.ts'/>
 
-import {BigNumber} from './BigNumber';
-import {Changes} from './Changes';
-import {IRecord} from './IRecord';
+import {BigNumber} from '../core/BigNumber';
+import {Changes} from '../core/Changes';
+import {IRecord} from '../core/IRecord';
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
+var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface Income extends IRecord<Income> {
   date: string;

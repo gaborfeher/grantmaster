@@ -1,9 +1,9 @@
-///<reference path='../data/TagNode.ts'/>
-///<reference path='../data/TagTreeTable.ts'/>
+///<reference path='../state/database/TagNode.ts'/>
+///<reference path='../state/ui/TagTreeTable.ts'/>
 
 import {ChangeDetectionStrategy, Component, Input, View} from 'angular2/core';
 import {NgFor} from 'angular2/common';
-import {TagTreeTable} from '../data/TagTreeTable';
+import {TagTreeTable} from '../state/ui/TagTreeTable';
 import {TagName} from './TagName';
 import {CellEntry} from './CellEntry';
 

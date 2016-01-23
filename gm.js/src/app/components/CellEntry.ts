@@ -1,6 +1,6 @@
 import {Input, Component, View, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
-import {DataService} from './DataService';
+import {StateService} from './StateService';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
@@ -27,11 +27,11 @@ export class CellEntry {
   masterValue: string;
   value: string;
   flatPath: any;
-  dataService: DataService;
+  stateService: StateService;
 
-  constructor(dataService: DataService) {
+  constructor(stateService: StateService) {
     this.editMode = false;
-    this.dataService = dataService;
+    this.stateService = stateService;
   }
 
   ngOnChanges(chg) {
@@ -187,7 +187,7 @@ export class CellEntry {
       let errors = [];
       if (this.validate(val, errors)) {
         let val2 = this.column.kind === 'number' ? new BigNumber(val) : val;
-        this.dataService.setByPath(this.path, val2);
+        this.stateService.setByPath(this.path, val2);
         this.editMode = false;
       } else {
         if (focused) {

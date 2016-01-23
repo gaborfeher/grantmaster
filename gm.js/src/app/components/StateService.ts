@@ -1,27 +1,27 @@
-///<reference path='../data/AppState.ts'/>
-///<reference path='../data/Changes.ts'/>
-///<reference path='../data/Database.ts'/>
-///<reference path='../data/Expense.ts'/>
-///<reference path='../data/Income.ts'/>
-///<reference path='../data/Project.ts'/>
-///<reference path='../data/ProjectCategory.ts'/>
-///<reference path='../data/TagNode.ts'/>
-import {AppState} from '../data/AppState';
-import {Changes} from '../data/Changes';
-import {Database} from '../data/Database';
-import {Expense} from '../data/Expense';
-import {Income} from '../data/Income';
-import {Project} from '../data/Project';
-import {ProjectCategory} from '../data/ProjectCategory';
-import {TagNode} from '../data/TagNode';
+///<reference path='../state/AppState.ts'/>
+///<reference path='../state/core/Changes.ts'/>
+///<reference path='../state/database/Database.ts'/>
+///<reference path='../state/database/Expense.ts'/>
+///<reference path='../state/database/Income.ts'/>
+///<reference path='../state/database/Project.ts'/>
+///<reference path='../state/database/ProjectCategory.ts'/>
+///<reference path='../state/database/TagNode.ts'/>
+import {AppState} from '../state/AppState';
+import {Changes} from '../state/core/Changes';
+import {Database} from '../state/database/Database';
+import {Expense} from '../state/database/Expense';
+import {Income} from '../state/database/Income';
+import {Project} from '../state/database/Project';
+import {ProjectCategory} from '../state/database/ProjectCategory';
+import {TagNode} from '../state/database/TagNode';
 
 import {Injectable} from 'angular2/core';
-import {JSONParser} from '../data/JSONParser';
+import {JSONParser} from '../state/database/JSONParser';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
 @Injectable()
-export class DataService {
+export class StateService {
   state: AppState;
   observers: Array<any>;
   jsonParser: JSONParser;

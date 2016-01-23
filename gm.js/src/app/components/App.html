@@ -16,7 +16,7 @@
       <input type="text" [(ngModel)]="newProjectName" />
       <button (click)="addProject()">Add</button>
     </div>
-    <div *ngFor="#project of dataService.state.database.projects; #id = index"
+    <div *ngFor="#project of stateService.state.database.projects; #id = index"
       (click)="selectMenuItem(id)"
       [ngClass]="{selected: isSelectedMenuItem(id)}"
       class="project-list-item">
@@ -66,6 +66,6 @@
       </div>
     </div>
     <TagList *ngIf="isSelectedMenuItem(-2)"
-      [table]="dataService.state.budgetCategoryTable"></TagList>
+      [table]="stateService.state.budgetCategoryTable"></TagList>
   </div>
 </div>

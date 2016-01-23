@@ -10,7 +10,7 @@
     <td *ngFor="#column of columns">
       <CellEntry
         [column]="column"
-        [item]="dataService.getIn(newItemPath)"
+        [item]="stateService.getIn(newItemPath)"
         [path]="[newItemPath, column.key]"></CellEntry>
     </td>
   </tr>

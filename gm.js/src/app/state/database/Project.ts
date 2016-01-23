@@ -1,19 +1,19 @@
-///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./BigNumber.ts'/>
-///<reference path='./Changes.ts'/>
+///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
+///<reference path='../core/BigNumber.ts'/>
+///<reference path='../core/Changes.ts'/>
+///<reference path='../core/IRecord.ts'/>
 ///<reference path='./Expense.ts'/>
-///<reference path='./IRecord.ts'/>
 ///<reference path='./Income.ts'/>
 ///<reference path='./ProjectCategory.ts'/>
 
-import {BigNumber, bigMin} from './BigNumber';
-import {Changes} from './Changes';
+import {BigNumber, bigMin} from '../core/BigNumber';
+import {Changes} from '../core/Changes';
+import {IRecord} from '../core/IRecord';
 import {Expense, compareExpenses} from './Expense';
 import {Income, compareIncomes} from './Income';
-import {IRecord} from './IRecord';
 import {ProjectCategory} from './ProjectCategory';
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
+var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface Project extends IRecord<Project> {
   name: string;

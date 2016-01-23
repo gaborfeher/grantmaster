@@ -2,7 +2,7 @@ import {Component, Input, View, ChangeDetectionStrategy} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 import {CellEntry} from './CellEntry';
-import {DataService} from './DataService';
+import {StateService} from './StateService';
 
 @Component({
   selector: 'Spreadsheet',
@@ -23,10 +23,10 @@ export class Spreadsheet {
   @Input() path: Array<any>;
   @Input() newItemPath: Array<any>;
 
-  dataService: DataService;
+  stateService: StateService;
 
-  constructor(dataService: DataService) {
-    this.dataService = dataService;
+  constructor(stateService: StateService) {
+    this.stateService = stateService;
   }
 
   getValue(val: any): any {
@@ -38,6 +38,6 @@ export class Spreadsheet {
   }
 
   addNewItem() {
-    this.dataService.addNewItem(this.newItemPath, this.path);
+    this.stateService.addNewItem(this.newItemPath, this.path);
   }
 }

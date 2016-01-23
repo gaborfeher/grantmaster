@@ -1,18 +1,18 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./Database.ts'/>
-///<reference path='./TagTreeTable.ts'/>
-///<reference path='../data/Changes.ts'/>
+///<reference path='./database/Database.ts'/>
+///<reference path='./ui/TagTreeTable.ts'/>
+///<reference path='./core/Changes.ts'/>
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
-import {Changes} from '../data/Changes';
-import {Database} from './Database';
-import {IRecord} from './IRecord';
-import {Project} from './Project';
-import {ProjectCategory} from './ProjectCategory';
-import {TableColumn} from './TableColumn';
-import {TagNode} from './TagNode';
-import {TagTreeTable} from './TagTreeTable';
+import {Changes} from './core/Changes';
+import {Database} from './database/Database';
+import {IRecord} from './core/IRecord';
+import {Project} from './database/Project';
+import {ProjectCategory} from './database/ProjectCategory';
+import {TableColumn} from './ui/TableColumn';
+import {TagNode} from './database/TagNode';
+import {TagTreeTable} from './ui/TagTreeTable';
 
 export interface AppState extends IRecord<AppState> {
   database: Database;

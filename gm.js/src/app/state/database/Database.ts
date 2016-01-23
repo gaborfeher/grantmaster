@@ -1,17 +1,18 @@
-///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./Changes.ts'/>
+///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
+///<reference path='../core/BigNumber.ts'/>
+///<reference path='../core/Changes.ts'/>
+///<reference path='../core/IRecord.ts'/>
 ///<reference path='./Expense.ts'/>
-///<reference path='./IRecord.ts'/>
 ///<reference path='./Project.ts'/>
 ///<reference path='./Income.ts'/>
 ///<reference path='./TagNode.ts'/>
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
-var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
-import {Changes} from './Changes';
+import {BigNumber} from '../core/BigNumber';
+import {Changes} from '../core/Changes';
+import {IRecord} from '../core/IRecord';
 import {Expense} from './Expense';
-import {IRecord} from './IRecord';
 import {Project} from './Project';
 import {Income} from './Income';
 import {TagNode} from './TagNode';
