@@ -15,6 +15,7 @@ export interface BigNumber {
   dividedBy(other: BigNumber): BigNumber;
   times(other: BigNumber): BigNumber;
   lessThan(other: BigNumber): boolean;
+  greaterThanOrEqualTo(other: BigNumber): boolean;
 }
 export function bigMin(a: BigNumber, b: BigNumber): BigNumber {
   return a.lessThan(b) ? a : b;

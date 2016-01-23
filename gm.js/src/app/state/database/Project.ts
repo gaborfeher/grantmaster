@@ -77,7 +77,7 @@ Project.prototype.addLastExpenseInternal = function(expense: Expense): Project {
 };
 Project.prototype.fulfillExpense = function(expense: Expense, fulfilledAmount: BigNumber): Project {
   let that: Project = this;
-  if (fulfilledAmount >= expense.localAmount) {
+  if (fulfilledAmount.greaterThanOrEqualTo(expense.localAmount)) {
     let exchangeRate = expense.localAmount.dividedBy(expense.foreignAmount);
     return that.merge({
       expenses: that.expenses.push(
