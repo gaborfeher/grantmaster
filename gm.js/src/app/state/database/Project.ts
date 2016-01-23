@@ -35,13 +35,6 @@ export var Project = Immutable.Record({
   incomes: Immutable.List(),
   expenses: Immutable.List(),
   categories: Immutable.List(),
-
-  newExpense: new Expense({}),
-  newExpenseTemplate: new Expense({}),
-  newIncome: new Income({}),
-  newIncomeTemplate: new Income({}),
-  newCategory: new ProjectCategory({}),
-  newCategoryTemplate: new ProjectCategory({})
 });
 Project.prototype.recomputeBudgetCategories = function() {
   let that: Project = this;

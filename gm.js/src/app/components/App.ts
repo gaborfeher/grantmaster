@@ -40,29 +40,6 @@ class App {
     var that = this;
 
     this.stateService = stateService;
-
-    this.incomeColumns = [
-      {
-        key: 'date',
-        value: 'Date',
-        kind: 'date',
-        constraints: ['not_null'],
-      },
-      {
-        key: 'foreignAmount',
-        value: 'Foreign amount',
-        kind: 'number',
-        constraints: ['not_null', 'positive']
-      },
-      {
-        key: 'exchangeRate',
-        value: 'Exchange rate',
-        kind: 'number',
-        constraints: ['not_null', 'positive']
-      },
-      {key: 'localAmount', value: 'Local amount', kind: 'number', editable: false},
-      {key: 'spentForeignAmount', value: 'Spent (F)', kind: 'number', editable: false},
-      {key: 'spentLocalAmount', value: 'Spent (L)', kind: 'number', editable : false}];
   }
 
   addProject() {

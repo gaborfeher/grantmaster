@@ -1,15 +1,17 @@
+///<reference path='../state/ui/GenericTable.ts'/>
+
 import {Component, Input, View, ChangeDetectionStrategy} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 import {CellEntry} from './CellEntry';
+import {GenericTable} from '../state/ui/GenericTable';
 import {StateService} from './StateService';
 
 @Component({
   selector: 'Spreadsheet',
   properties: [
     'list',
-    'newItemPath',
-    'columns',
+    'table',
     'path'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,7 +23,7 @@ import {StateService} from './StateService';
 })
 export class Spreadsheet {
   @Input() path: Array<any>;
-  @Input() newItemPath: Array<any>;
+  @Input() table: GenericTable<any>;
 
   stateService: StateService;
 
@@ -38,6 +40,6 @@ export class Spreadsheet {
   }
 
   addNewItem() {
-    this.stateService.addNewItem(this.newItemPath, this.path);
+    this.stateService.addNewItem(this.table, this.path);
   }
 }

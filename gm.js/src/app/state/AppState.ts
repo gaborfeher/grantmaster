@@ -1,28 +1,39 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 ///<reference path='./database/Database.ts'/>
+///<reference path='./database/ProjectCategory.ts'/>
+///<reference path='./database/Expense.ts'/>
+///<reference path='./database/Income.ts'/>
+///<reference path='./ui/GenericTable.ts'/>
 ///<reference path='./ui/TagTreeTable.ts'/>
+///<reference path='./ui/TableColumn.ts'/>
 ///<reference path='./core/Changes.ts'/>
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
 import {Changes} from './core/Changes';
 import {Database} from './database/Database';
+import {Expense} from './database/Expense';
+import {Income} from './database/Income';
 import {IRecord} from './core/IRecord';
 import {Project} from './database/Project';
 import {ProjectCategory} from './database/ProjectCategory';
 import {TableColumn} from './ui/TableColumn';
 import {TagNode} from './database/TagNode';
+import {GenericTable} from './ui/GenericTable';
 import {TagTreeTable} from './ui/TagTreeTable';
 
 export interface AppState extends IRecord<AppState> {
   database: Database;
   budgetCategoryTable: TagTreeTable;
 
+  expenseTable: GenericTable<Expense>;
+  incomeTable: GenericTable<Income>;
+  categoryTable: GenericTable<ProjectCategory>;
+
   mainMenuSelectedItemId: number;
-  categoryColumns: Immutable.List<TableColumn>;
-  expenseColumns: Immutable.List<TableColumn>;
 
   updateTableColumns(): AppState;
+  resetNewItems(): AppState;
   onChange(): AppState;
   getSelectedProjectId(): number;
   getSelectedProject(): Project;
@@ -33,7 +44,20 @@ export var AppState = Immutable.Record({
 
   mainMenuSelectedItemId: -2,
   categoryColumns: Immutable.List(),
-  expenseColumns: Immutable.List()
+  expenseColumns: Immutable.List(),
+
+  expenseTable: new GenericTable({
+    myPath: ['expenseTable'],
+    newItemTemplate: new Expense()
+  }),
+  incomeTable: new GenericTable({
+    myPath: ['incomeTable'],
+    newItemTemplate: new Income()
+  }),
+  categoryTable: new GenericTable({
+    myPath: ['categoryTable'],
+    newItemTemplate: new ProjectCategory()
+  })
 });
 AppState.prototype.getSelectedProjectId = function(): number {
   let that: AppState = this;
@@ -154,12 +178,62 @@ AppState.prototype.updateTableColumns = function(): AppState {
     ]);
   }
 
+  let incomeColumns = Immutable.List([
+    new TableColumn({
+      key: 'date',
+      value: 'Date',
+      kind: 'date',
+      constraints: ['not_null'],
+    }),
+    new TableColumn({
+      key: 'foreignAmount',
+      value: 'Foreign amount',
+      kind: 'number',
+      constraints: ['not_null', 'positive']
+    }),
+    new TableColumn({
+      key: 'exchangeRate',
+      value: 'Exchange rate',
+      kind: 'number',
+      constraints: ['not_null', 'positive']
+    }),
+    new TableColumn({
+      key: 'localAmount',
+      value: 'Local amount',
+      kind: 'number',
+      editable: false
+    }),
+    new TableColumn({
+      key: 'spentForeignAmount',
+      value: 'Spent (F)',
+      kind: 'number',
+      editable: false
+    }),
+    new TableColumn({
+      key: 'spentLocalAmount',
+      value: 'Spent (L)',
+      kind: 'number',
+      editable : false
+    })
+  ]);
+
   return that
-    .set('categoryColumns', categoryColumns)
-    .set('expenseColumns', expenseColumns);
+    .setIn(['incomeTable', 'columns'], incomeColumns)
+    .setIn(['categoryTable', 'columns'], categoryColumns)
+    .setIn(['expenseTable', 'columns'], expenseColumns);
+}
+AppState.prototype.resetNewItems = function(): AppState {
+  let that: AppState = this;
+  return that
+    .updateIn(['incomeTable'], table => table.resetNewItem())
+    .updateIn(['categoryTable'], table => table.resetNewItem())
+    .updateIn(['expenseTable'], table => table.resetNewItem());
 }
 AppState.prototype.onChange = function(property: string, changes: Changes): AppState {
   let that: AppState = this;
+  if (property === 'mainMenuSelectedItemId') {
+    that = that.resetNewItems();
+  }
   if (changes.budgetCategoryChange
       || changes.budgetCategoryTreeChange
       || changes.significantExpenseChange) {

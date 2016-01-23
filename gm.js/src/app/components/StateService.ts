@@ -6,14 +6,16 @@
 ///<reference path='../state/database/Project.ts'/>
 ///<reference path='../state/database/ProjectCategory.ts'/>
 ///<reference path='../state/database/TagNode.ts'/>
-import {AppState} from '../state/AppState';
+///<reference path='../state/ui/GenericTable.ts'/>
 import {Changes} from '../state/core/Changes';
+import {AppState} from '../state/AppState';
 import {Database} from '../state/database/Database';
 import {Expense} from '../state/database/Expense';
 import {Income} from '../state/database/Income';
 import {Project} from '../state/database/Project';
 import {ProjectCategory} from '../state/database/ProjectCategory';
 import {TagNode} from '../state/database/TagNode';
+import {GenericTable} from '../state/ui/GenericTable';
 
 import {Injectable} from 'angular2/core';
 import {JSONParser} from '../state/database/JSONParser';
@@ -101,26 +103,19 @@ export class StateService {
     return this.state.getIn(this.flattenPath(path));
   }
 
-  addNewItem(newItemPath: Array<any>, targetPath: Array<any>) {
-    newItemPath = this.flattenPath(newItemPath);
+  addNewItem(table: GenericTable<any>, targetPath: Array<any>) {
+    let newItemPath = table.myPath.concat(['newItem']);
     targetPath = this.flattenPath(targetPath);
 
-    let newItemTemplatePath = [];
-    for (var i = 0; i < newItemPath.length; ++i) {
-      newItemTemplatePath.push(newItemPath[i]);
-    }
-    newItemTemplatePath[newItemTemplatePath.length - 1] =
-      newItemTemplatePath[newItemTemplatePath.length - 1] + 'Template';
-    let newItem = this.state.getIn(newItemPath);
     let itemType = targetPath[2];
 
     let state = this.state
       .setIn(
         newItemPath,
-        this.state.getIn(newItemTemplatePath));
+        table.newItemTemplate);
     this.updateByPath<any>(  // any should be Immutable.List
       targetPath,
-      list => list.push(newItem),
+      list => list.push(table.newItem),
       state);
   }
 

@@ -39,18 +39,16 @@
 
           <Spreadsheet
             [list]="state().getSelectedProject().incomes"
-            [columns]="incomeColumns"
-            [path]="['database', 'projects', state().getSelectedProjectId(), 'incomes']"
-            [newItemPath]="['database', 'projects', state().getSelectedProjectId(), 'newIncome']">
+            [table]="state().incomeTable"
+            [path]="['database', 'projects', state().getSelectedProjectId(), 'incomes']">
           </Spreadsheet>
         </div>
         <div id="project-budget-list">
           <h3>Budget</h3>
           <Spreadsheet
             [list]="state().getSelectedProject().categories"
-            [columns]="state().categoryColumns"
-            [path]="['database', 'projects', state().getSelectedProjectId(), 'categories']"
-            [newItemPath]="['database', 'projects', state().getSelectedProjectId(), 'newCategory']">
+            [table]="state().categoryTable"
+            [path]="['database', 'projects', state().getSelectedProjectId(), 'categories']">
           </Spreadsheet>
         </div>
       </div>
@@ -59,9 +57,8 @@
         <h3>Expenses</h3>
         <Spreadsheet
           [list]="state().getSelectedProject().expenses"
-          [columns]="state().expenseColumns"
           [path]="['database', 'projects', state().getSelectedProjectId(), 'expenses']"
-          [newItemPath]="['database', 'projects', state().getSelectedProjectId(), 'newExpense']">
+          [table]="state().expenseTable">
         </Spreadsheet>
       </div>
     </div>
