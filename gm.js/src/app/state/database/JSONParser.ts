@@ -6,6 +6,7 @@
 ///<reference path='./TagNode.ts'/>
 
 import {Injectable} from 'angular2/core';
+import {Currency} from './Currency';
 import {Database} from './Database';
 import {Expense} from './Expense';
 import {Income} from './Income';
@@ -21,8 +22,13 @@ export class JSONParser {
   parseDatabase(jsonData) {
     var that = this;
     return new Database({
-      projects: that.parseList(jsonData.projects, project => that.parseProject(project)),
-      budgetCategories: that.parseTagNode(jsonData.budgetCategories)
+      projects: that.parseList(
+        jsonData.projects,
+        project => that.parseProject(project)),
+      budgetCategories: that.parseTagNode(jsonData.budgetCategories),
+      currencies: that.parseList(
+        jsonData.currencies,
+        currency => that.parseCurrency(currency))
     }).recomputeBudgetCategories();
   }
 
@@ -79,6 +85,12 @@ export class JSONParser {
     return new TagNode({
       name: node.name,
       subTags: that.parseList(node.subTags, node => that.parseTagNode(node)),
+    });
+  }
+
+  parseCurrency(currency: any): Currency {
+    return new Currency({
+      name: currency.name
     });
   }
 

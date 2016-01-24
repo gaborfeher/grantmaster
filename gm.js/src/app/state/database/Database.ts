@@ -12,6 +12,7 @@ var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 import {BigNumber} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
 import {IRecord} from '../core/IRecord';
+import {Currency} from './Currency';
 import {Expense} from './Expense';
 import {Project} from './Project';
 import {Income} from './Income';
@@ -21,6 +22,7 @@ import {TagNode} from './TagNode';
 export interface Database extends IRecord<Database> {
   projects: Immutable.List<Project>;
   budgetCategories: TagNode;
+  currencies: Immutable.List<Currency>;
 
   addProject(project: Project): Database;
   renameTag(oldName: string, newName: string): Database;
@@ -29,8 +31,7 @@ export interface Database extends IRecord<Database> {
 export var Database = Immutable.Record({
   projects: Immutable.List([]),
   budgetCategories: new TagNode({name: 'Budget categories'}),
-  programs: Immutable.Map({}),
-  currencies: Immutable.Map({}),
+  currencies: Immutable.List([]),
 });
 Database.prototype.addProject = function(project: Project): Database {
   var that: Database = this;

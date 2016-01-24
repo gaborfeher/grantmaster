@@ -11,6 +11,7 @@
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
 import {Changes} from './core/Changes';
+import {Currency} from './database/Currency';
 import {Database} from './database/Database';
 import {Expense} from './database/Expense';
 import {Income} from './database/Income';
@@ -29,6 +30,7 @@ export interface AppState extends IRecord<AppState> {
   expenseTable: GenericTable<Expense>;
   incomeTable: GenericTable<Income>;
   categoryTable: GenericTable<ProjectCategory>;
+  currencyTable: GenericTable<Currency>;
 
   mainMenuSelectedItemId: number;
 
@@ -42,9 +44,7 @@ export var AppState = Immutable.Record({
   database: new Database(),
   budgetCategoryTable: new TagTreeTable(),
 
-  mainMenuSelectedItemId: -2,
-  categoryColumns: Immutable.List(),
-  expenseColumns: Immutable.List(),
+  mainMenuSelectedItemId: -3,
 
   expenseTable: new GenericTable({
     myPath: ['expenseTable'],
@@ -57,6 +57,17 @@ export var AppState = Immutable.Record({
   categoryTable: new GenericTable({
     myPath: ['categoryTable'],
     newItemTemplate: new ProjectCategory()
+  }),
+  currencyTable: new GenericTable({
+    myPath: ['currencyTable'],
+    newItemTemplate: new Currency(),
+    columns: Immutable.List([
+      new TableColumn({
+        key: 'name',
+        value: 'Name',
+        kind: 'string'
+      })
+    ])
   })
 });
 AppState.prototype.getSelectedProjectId = function(): number {
@@ -227,6 +238,7 @@ AppState.prototype.updateTableColumns = function(): AppState {
 AppState.prototype.resetNewItems = function(): AppState {
   let that: AppState = this;
   return that
+    .updateIn(['currencyTable'], table => table.resetNewItem())
     .updateIn(['incomeTable'], table => table.resetNewItem())
     .updateIn(['categoryTable'], table => table.resetNewItem())
     .updateIn(['expenseTable'], table => table.resetNewItem());

@@ -6,9 +6,13 @@
       <button (click)="loadFile()">Load</button>
       <button (click)="saveFile()">Save</button>
     </div>
+    <div (click)="selectMenuItem(-3)"
+      [ngClass]="{selected: isSelectedMenuItem(-3)}">
+      Budget summary
+    </div>
     <div (click)="selectMenuItem(-2)"
       [ngClass]="{selected: isSelectedMenuItem(-2)}">
-      Budget summary
+      Currencies
     </div>
     <div (click)="selectMenuItem(-1)"
       [ngClass]="{selected: isSelectedMenuItem(-1)}">
@@ -62,7 +66,15 @@
         </Spreadsheet>
       </div>
     </div>
-    <TagList *ngIf="isSelectedMenuItem(-2)"
+    <TagList *ngIf="isSelectedMenuItem(-3)"
       [table]="stateService.state.budgetCategoryTable"></TagList>
+    <div *ngIf="isSelectedMenuItem(-2)">
+      <h3>Currencies</h3>
+      <Spreadsheet
+        [list]="state().database.currencies"
+        [path]="['database', 'currencies']"
+        [table]="state().currencyTable">
+      </Spreadsheet>
+    </div>
   </div>
 </div>
