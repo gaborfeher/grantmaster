@@ -93,7 +93,9 @@ AppState.prototype.updateTableColumns = function(): AppState {
       key: 'tagName',
       value: 'Name',
       kind: 'dropdown',
-      items: getCategoryList()
+      items: getCategoryList(),
+      editable: false,
+      editableAtCreation: true
     }),
     new TableColumn({
       key: 'limitForeign',

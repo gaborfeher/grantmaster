@@ -7,7 +7,7 @@
   (focus)="onFocus()"
   (blur)="onBlur(ref)"
   (keyup)="$event.keyCode === 27 && resetEdit()"
-  [disabled]="column.editable === false"
+  [disabled]="!column.isEditable(creationMode)"
   class="kind-{{column.kind}}"
   (keydown.enter)="onEnter(ref)">
 
@@ -16,6 +16,6 @@
   (focus)="startEdit()"
   (blur)="commitEdit()"
   [(ngModel)]="value"
-  [disabled]="column.editable === false">
+  [disabled]="!column.isEditable(creationMode)">
   <option *ngFor="#item of column.items" value="{{item.key}}">{{item.value.split(' ').join('&nbsp;')}}</option>
 </select>

@@ -1,9 +1,10 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
-
+///<reference path='./TableColumn.ts'/>
 
 var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 import {IRecord} from '../core/IRecord';
+import {TableColumn} from './TableColumn';
 import {TagNode} from '../database/TagNode';
 
 export interface TagTreeTable extends IRecord<TagTreeTable> {
@@ -16,7 +17,9 @@ export var TagTreeTable = Immutable.Record({
   rows: []
 });
 TagTreeTable.prototype.refresh = function(node: TagNode, path: Array<string>): TagTreeTable {
-  let columns = node.summaries.keySeq().toArray();
+  let columns = node.summaries.keySeq()
+    .map(columnName => new TableColumn({key: columnName, kind: 'number', editable: false}))
+    .toArray();
   function getGlobalCategoryList(node: TagNode, path: Array<string | number>, list: Array<Object>) {
     list.push({node: node, path: path});
     node.subTags.forEach(

@@ -11,6 +11,9 @@ export interface TableColumn extends IRecord<TableColumn> {
   items: Immutable.List<string>;
   constraints: Immutable.List<string>;
   editable: boolean;
+  editableAtCreation: boolean;
+
+  isEditable(creatiobMode: boolean): boolean;
 }
 export var TableColumn = Immutable.Record({
   key: '',
@@ -18,5 +21,9 @@ export var TableColumn = Immutable.Record({
   kind: '',
   items: Immutable.List(),
   constraints: Immutable.List(),
-  editable: true
+  editable: true,
+  editableAtCreation: true
 });
+TableColumn.prototype.isEditable = function(creationMode: boolean) {
+  return creationMode ? this.editableAtCreation : this.editable;
+}

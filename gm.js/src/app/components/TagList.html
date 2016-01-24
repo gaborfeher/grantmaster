@@ -2,7 +2,7 @@
   <tr>
     <td>Name</td>
     <td *ngFor="#column of table.columns">
-      {{column}}
+      {{column.key}}
     </td>
   </tr>
   <tr *ngFor="#row of table.rows">
@@ -10,7 +10,7 @@
     <td *ngFor="#column of table.columns">
       <CellEntry
         [item]="row.node.summaries"
-        [column]="{key: column, kind: 'number', editable: false}"></CellEntry>
+        [column]="column"></CellEntry>
     </td>
   </tr>
 </table>

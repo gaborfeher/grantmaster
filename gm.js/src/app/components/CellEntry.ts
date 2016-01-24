@@ -1,6 +1,10 @@
+///<reference path='./StateService.ts'/>
+///<reference path='../state/ui/TableColumn.ts'/>
+
 import {Input, Component, View, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
 import {StateService} from './StateService';
+import {TableColumn} from '../state/ui/TableColumn';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
@@ -11,6 +15,7 @@ var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
     'item',
     'column',
     'path',
+    'creationMode'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -21,7 +26,7 @@ var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 })
 export class CellEntry {
   @Input() item;
-  @Input() column;
+  @Input() column: TableColumn;
   @Input() path: Array<string>;
   editMode: boolean;
   masterValue: string;
@@ -112,7 +117,7 @@ export class CellEntry {
         i += 1;
       }
       var numberValue = new BigNumber(value);
-      for (var j = 0; j < this.column.constraints.length; ++j) {
+      for (var j = 0; j < this.column.constraints.size; ++j) {
         var constraint = this.column.constraints[j];
         if (constraint === 'positive') {
           if (numberValue !== undefined) {

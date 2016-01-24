@@ -9,6 +9,7 @@
     <td><button (click)="stateService.addNewItem(table, path)">Add</button>
     <td *ngFor="#column of table.columns">
       <CellEntry
+        [creationMode]="true"
         [column]="column"
         [item]="table.newItem"
         [path]="[table.myPath, 'newItem', column.key]"></CellEntry>
