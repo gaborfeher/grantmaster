@@ -44,15 +44,22 @@ Project.prototype.recomputeBudgetCategories = function() {
       return true;
     }
   );
-  that.expenses.forEach(
-    expense => {
-      if (expense.category in map) {
-        // TODO: make category compulsory, remove this check
-        map[expense.category] =
-          map[expense.category].addSpentAmounts(expense.localAmount, expense.foreignAmount);
+  that = that.set(
+    'expenses',
+    that.expenses.map(
+      expense => {
+        let overshoot = false;
+        if (expense.category in map) {
+          // TODO: make category compulsory, remove this check
+          map[expense.category] =
+            map[expense.category].addSpentAmounts(expense.localAmount, expense.foreignAmount);
+          if (map[expense.category].overshoot) {
+            overshoot = true;
+          }
+        }
+        return expense.set('overshoot', overshoot);
       }
-      return true;
-    }
+    )
   );
   return that.set('categories', that.categories.map(category => map[category.tagName]));
 }
@@ -139,7 +146,7 @@ Project.prototype.onChange = function(property: string, changes: Changes): Proje
 
   if (changes.significantExpenseChange) {
     return that.recomputeExpenses();
-  } else if (changes.budgetCategoryChange) {
+  } else if (changes.budgetCategoryChange || changes.projectCategoryListChange) {
     return that.recomputeBudgetCategories();
   } else if (changes.significantIncomeChange) {
     return that.recomputeIncomes();
