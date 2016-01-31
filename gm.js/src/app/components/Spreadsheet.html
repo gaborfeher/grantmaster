@@ -15,7 +15,7 @@
         [path]="[table.myPath, 'newItem', column.key]"></CellEntry>
     </td>
   </tr>
-  <tr *ngFor="#item of list.reverse(); #i = index">
+  <tr *ngFor="#item of list.reverse(); #i = index" [ngClass]="getCssClassForItem(item)">
     <td><button (click)="stateService.removeItem(path, list.size - i - 1)">Remove</button></td>
     <td *ngFor="#column of table.columns">
       <CellEntry

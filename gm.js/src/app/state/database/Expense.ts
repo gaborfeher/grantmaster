@@ -15,6 +15,9 @@ export interface Expense extends IRecord<Expense> {
   exchangeRate: BigNumber;
   category: string;
 
+  multiPart: boolean;
+  overshoot: boolean;
+
   resetComputed(): Expense;
 }
 export var Expense = Immutable.Record({
@@ -24,13 +27,19 @@ export var Expense = Immutable.Record({
   exchangeRate: undefined,
   accountNo: undefined,
   partner: undefined,
-  category: undefined
+  category: undefined,
+
+  multiPart: false,
+  overshoot: false
 });
 Expense.prototype.resetComputed = function(): Expense {
   let that: Expense = this;
-  return that
-    .set('foreignAmount', new BigNumber(0))
-    .set('exchangeRate', new BigNumber(0));
+  return that.merge({
+    foreignAmount: new BigNumber(0),
+    exchangeRate: new BigNumber(0),
+    multiPart: false,
+    overshoot: false
+  });
 }
 Expense.prototype.onChange = function(property: string, changes: Changes): Expense {
   if (property === 'date' || property === 'localAmount') {

@@ -28,7 +28,6 @@ export interface Project extends IRecord<Project> {
   recomputeIncomes(): Project;
 
   addLastExpenseInternal(expense: Expense): Project;
-  fulfillExpense(expense: Expense, fulfilledAmount: BigNumber): Project;
 }
 export var Project = Immutable.Record({
   name: '',
@@ -73,35 +72,40 @@ Project.prototype.recomputeExpenses = function() {
 }
 Project.prototype.addLastExpenseInternal = function(expense: Expense): Project {
   let that: Project = this;
-  return that.fulfillExpense(expense, new BigNumber(0));
-};
-Project.prototype.fulfillExpense = function(expense: Expense, fulfilledAmount: BigNumber): Project {
-  let that: Project = this;
-  if (fulfilledAmount.greaterThanOrEqualTo(expense.localAmount)) {
-    let exchangeRate = expense.localAmount.dividedBy(expense.foreignAmount);
-    return that.merge({
-      expenses: that.expenses.push(
-        expense.set('exchangeRate', exchangeRate)
-      )
-    });
-  } else {
+
+  let fulfilledAmount = new BigNumber(0);
+  let iteration = 0;
+  while (fulfilledAmount.lessThan(expense.localAmount)) {
+    iteration += 1;
     let pos = findFirstNonEmptyIncome(that.incomes);
     let income = that.incomes.get(pos);
     let neededValue = expense.localAmount.minus(fulfilledAmount);
     let valueToTake = neededValue;
+    let availableValue = income.localAmount.minus(income.spentLocalAmount);
     if (pos < that.incomes.size - 1) {
       // If this is not the last possible income, then cap fulfillment amount
       // to this income.
-      let availableValue = income.localAmount.minus(income.spentLocalAmount);
       valueToTake = bigMin(neededValue, availableValue);
+    } else if (availableValue.lessThan(neededValue)) {
+      expense = expense.set('overshoot', true);
     }
-    return that.merge({
+    that = that.merge({
       incomes: that.incomes.set(pos, income.spendInLocalCurrency(valueToTake))
-    }).fulfillExpense(
-      expense.merge({
-        foreignAmount: expense.foreignAmount.plus(valueToTake.dividedBy(income.exchangeRate))
-      }), fulfilledAmount.plus(valueToTake));
+    });
+    expense = expense.merge({
+      foreignAmount:
+        expense.foreignAmount.plus(valueToTake.dividedBy(income.exchangeRate)),
+      multiPart: iteration > 1
+    });
+    fulfilledAmount = fulfilledAmount.plus(valueToTake);
   }
+
+  let exchangeRate = expense.localAmount.dividedBy(expense.foreignAmount);
+  return that.merge({
+    expenses: that.expenses.push(
+      expense.set('exchangeRate', exchangeRate)
+    )
+  });
 };
 function findFirstNonEmptyIncome(incomes: Immutable.List<Income>): number {
   for (let i = 0; i < incomes.size; ++i) {

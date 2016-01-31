@@ -15,3 +15,14 @@ table.spreadsheet td {
   margin: 0px;
   height: 25px;
 }
+
+/* Later definition takes precedence. */
+.multiPart-expense td {
+  color: blue;
+}
+
+.overshoot-expense td {
+  color: red;
+}
+
+

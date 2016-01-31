@@ -62,7 +62,8 @@
         <Spreadsheet
           [list]="state().getSelectedProject().expenses"
           [path]="['database', 'projects', state().getSelectedProjectId(), 'expenses']"
-          [table]="state().expenseTable">
+          [table]="state().expenseTable"
+          [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
         </Spreadsheet>
       </div>
     </div>
