@@ -23,6 +23,7 @@ export interface Database extends IRecord<Database> {
   projects: Immutable.List<Project>;
   budgetCategories: TagNode;
   currencies: Immutable.List<Currency>;
+  localCurrency: string;
 
   addProject(project: Project): Database;
   renameTag(oldName: string, newName: string): Database;
@@ -32,6 +33,7 @@ export var Database = Immutable.Record({
   projects: Immutable.List([]),
   budgetCategories: new TagNode({name: 'Budget categories'}),
   currencies: Immutable.List([]),
+  localCurrency: ''
 });
 Database.prototype.addProject = function(project: Project): Database {
   var that: Database = this;
@@ -124,7 +126,7 @@ Database.prototype.onChange = function(property: string, changes: Changes): Data
   if (property === 'budgetCategories' && changes.tagNodeTreeChange) {
     changes.budgetCategoryTreeChange = true;
   }
-  if (changes.significantExpenseChange || changes.budgetCategoryChange) {
+  if (changes.projectProperty === 'expenses') {
     return that.recomputeBudgetCategories();
   } else {
     return that;

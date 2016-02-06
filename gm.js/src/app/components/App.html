@@ -5,6 +5,8 @@
     <div>
       <button (click)="loadFile()">Load</button>
       <button (click)="saveFile()">Save</button>
+      <button (click)="loadExample1()">Load Example 1</button>
+      <button (click)="loadExample2()">Load Example 2</button>
     </div>
     <div (click)="selectMenuItem(-3)"
       [ngClass]="{selected: isSelectedMenuItem(-3)}">
@@ -37,6 +39,14 @@
   <div id="right-view">
     <div id="project-view" *ngIf="state().getSelectedProject()">
       <h2>{{state().getSelectedProject().name}}</h2>
+
+      Foreign currency:
+      <CurrencySelector
+        [value]="state().getSelectedProject().foreignCurrency"
+        [currencies]="state().database.currencies"
+        [path]="['database', 'projects', state().getSelectedProjectId(), 'foreignCurrency']">
+      </CurrencySelector>
+
       <div id="project-top">
         <div id="project-income-list">
           <h3>Incomes</h3>
@@ -71,6 +81,12 @@
       [table]="stateService.state.budgetCategoryTable"></TagList>
     <div *ngIf="isSelectedMenuItem(-2)">
       <h3>Currencies</h3>
+      Local currency:
+      <CurrencySelector
+        [value]="state().database.localCurrency"
+        [currencies]="state().database.currencies"
+        [path]="['database', 'localCurrency']">
+      </CurrencySelector>
       <Spreadsheet
         [list]="state().database.currencies"
         [path]="['database', 'currencies']"

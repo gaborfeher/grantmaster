@@ -1,0 +1,9 @@
+<select
+  [ngModel]="value"
+  (ngModelChange)="stateService.setByPath(path, $event)">
+  <option
+    *ngFor="#currency of currencies"
+    value="{{currency.name}}"
+    >{{currency.name}}</option>
+</select>
+

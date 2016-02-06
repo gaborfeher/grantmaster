@@ -1,4 +1,4 @@
-///<reference path='../state/AppState.ts'/>
+//<reference path='../state/AppState.ts'/>
 ///<reference path='../state/core/Changes.ts'/>
 ///<reference path='../state/database/Database.ts'/>
 ///<reference path='../state/database/Expense.ts'/>
@@ -37,53 +37,7 @@ export class StateService {
 
   constructor(jsonParser: JSONParser) {
     this.jsonParser = jsonParser;
-    this.observers = [];
-    let database = new Database()
-      .setIn(
-        ['budgetCategories', 'subTags'],
-        Immutable.List([new TagNode({name: 'cat1'}), new TagNode({name: 'cat2'})]))
-      .addProject(new Project({
-        name: 'aaa',
-        categories: Immutable.List([
-          new ProjectCategory({tagName: 'cat1'}),
-          new ProjectCategory({tagName: 'cat2'})]),
-        incomes: Immutable.List([
-          new Income({
-            date: '2015-01-01',
-            foreignAmount: new BigNumber(1000),
-            exchangeRate: new BigNumber(305)})]),
-        expenses: Immutable.List([
-          new Expense({
-            date: '2015-02-02',
-            localAmount: new BigNumber(1480),
-            category: 'cat1'}),
-          new Expense({
-            date: '2015-02-05',
-            localAmount: new BigNumber(990),
-            category: 'cat2'})])
-        }).recomputeIncomes())
-      .addProject(new Project({name: 'bbb'}))
-      .recomputeBudgetCategories();
-    let monsterMode = false;
-    if (monsterMode) {
-      console.log('monster mode');
-      for (var i = 1; i < 1000; ++i) {
-        console.log('adding test ', i);
-        database = database
-          .updateIn(
-            ['projects', 0],
-            project => project.set(
-              'expenses',
-              project.expenses.push(new Expense({
-                date: '2015-01-' + (i).toString(),
-                localAmount: new BigNumber(i + 1),
-                category: 'cat' + (i % 2 + 1).toString()
-            }))).recomputeExpenses())
-          .recomputeBudgetCategories();
-      }
-    }
-    this.state = new AppState({database: database})
-      .onChange('', {budgetCategoryTreeChange: true})
+    this.state = new AppState({database: new Database()});
   }
 
   updateState(state: AppState) {
@@ -173,6 +127,7 @@ export class StateService {
   setTagName(tagPath: Array<any>, newName: string) {
     let namePath = this.flattenPath([tagPath, 'name']);
     let oldName = this.state.getIn(namePath);
+    // TODO: make this triggered by the name change?
     let state = this.state.updateIn(
       ['database'],
       db => db.renameTag(oldName, newName));

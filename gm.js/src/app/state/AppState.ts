@@ -34,7 +34,7 @@ export interface AppState extends IRecord<AppState> {
 
   mainMenuSelectedItemId: number;
 
-  updateTableColumns(): AppState;
+  updateProjectTableColumns(): AppState;
   resetNewItems(): AppState;
   onChange(): AppState;
   getSelectedProjectId(): number;
@@ -86,8 +86,12 @@ AppState.prototype.getSelectedProject = function(): Project {
     return undefined;
   }
 }
-AppState.prototype.updateTableColumns = function(): AppState {
+AppState.prototype.updateProjectTableColumns = function(): AppState {
   let that: AppState = this;
+  let project = that.getSelectedProject();
+  if (project === undefined) {
+    return that;
+  }
 
   function getCategoryList() {
     function toNames(prefix: string) {
@@ -110,25 +114,25 @@ AppState.prototype.updateTableColumns = function(): AppState {
     }),
     new TableColumn({
       key: 'limitForeign',
-      value: 'Limit (F)',
+      value: 'Limit (' + project.foreignCurrency + ')',
       kind: 'number',
       constraints: ['positive']
     }),
     new TableColumn({
       key: 'limitPercentageForeign',
-      value: 'Limit% (F)',
+      value: 'Limit% (' + project.foreignCurrency + ')',
       kind: 'number',
       constraints: ['min:0', 'max:100']
     }),
     new TableColumn({
       key: 'spentForeign',
-      value: 'Spent (F)',
+      value: 'Spent (' + project.foreignCurrency + ')',
       kind: 'number',
       editable: false
     }),
     new TableColumn({
       key: 'spentLocal',
-      value: 'Spent (L)',
+      value: 'Spent (' + that.database.localCurrency + ')',
       kind: 'number',
       editable: false
     }),
@@ -136,11 +140,6 @@ AppState.prototype.updateTableColumns = function(): AppState {
 
   function getProjectCategoryList():
     Immutable.List<{key: string, value: string}> {
-
-    let project = that.getSelectedProject();
-    if (project === undefined) {
-      return Immutable.List([]);
-    }
     return project.categories.map(
       (value: ProjectCategory) =>
         ({key: value.tagName, value: value.tagName})).toList();
@@ -172,13 +171,13 @@ AppState.prototype.updateTableColumns = function(): AppState {
       }),
       new TableColumn({
         key: 'localAmount',
-        value: 'Local amount',
+        value: 'Amount (' + project.foreignCurrency + ')',
         kind: 'number',
         constraints: ['positive']
       }),
       new TableColumn({
         key: 'foreignAmount',
-        value: 'Foreign amount',
+        value: 'Amount (' + project.foreignCurrency + ')',
         kind: 'number',
         editable: false
       }),
@@ -212,19 +211,19 @@ AppState.prototype.updateTableColumns = function(): AppState {
     }),
     new TableColumn({
       key: 'localAmount',
-      value: 'Local amount',
+      value: 'Amount (' + that.database.localCurrency + ')',
       kind: 'number',
       editable: false
     }),
     new TableColumn({
       key: 'spentForeignAmount',
-      value: 'Spent (F)',
+      value: 'Spent (' + project.foreignCurrency + ')',
       kind: 'number',
       editable: false
     }),
     new TableColumn({
       key: 'spentLocalAmount',
-      value: 'Spent (L)',
+      value: 'Spent (' + that.database.localCurrency + ')',
       kind: 'number',
       editable : false
     })
@@ -248,18 +247,20 @@ AppState.prototype.onChange = function(property: string, changes: Changes): AppS
   if (property === 'mainMenuSelectedItemId') {
     that = that.resetNewItems();
   }
-  if (changes.budgetCategoryChange
-      || changes.budgetCategoryTreeChange
-      || changes.significantExpenseChange) {
+  if (changes.projectProperty === 'expenses'
+      || changes.budgetCategoryTreeChange) {
     return that
       .set(
         'budgetCategoryTable',
         that.budgetCategoryTable.refresh(
           that.database.budgetCategories,
           ['database', 'budgetCategories']))
-      .updateTableColumns();
-  } else if (property === 'mainMenuSelectedItemId' || changes.projectCategoryListChange) {
-    return that.updateTableColumns();
+      .updateProjectTableColumns();
+  } else if (property === 'mainMenuSelectedItemId' ||
+    changes.projectProperty === 'categories' ||
+    changes.projectProperty === 'foreignCurrency') {
+
+    return that.updateProjectTableColumns();
   } else {
     return that;
   }

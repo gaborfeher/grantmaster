@@ -6,10 +6,12 @@ import {ChangeDetectionStrategy, Component, View} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 import {JSONParser} from '../state/database/JSONParser';
+import {CurrencySelector} from './CurrencySelector';
 import {ProjectItemComponent} from './ProjectItem';
 import {Spreadsheet} from './Spreadsheet';
 import {TagList} from './TagList';
 import {StateService} from './StateService';
+import {ExampleData1, ExampleData2} from './ExampleData';
 
 var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
 
@@ -25,7 +27,7 @@ var dialog = remote.require('dialog');
 @View({
   templateUrl: './app/components/App.html',
   styleUrls: ['./app/components/App.css'],
-  directives: [NgClass, NgFor, NgIf, NgModel, Spreadsheet, ProjectItemComponent, TagList],
+  directives: [NgClass, NgFor, NgIf, NgModel, CurrencySelector, Spreadsheet, ProjectItemComponent, TagList],
 })
 class App {
   newProjectName: string;
@@ -65,6 +67,14 @@ class App {
     console.log(fname[0]);
     var data = fs.readFileSync(fname[0]);
     this.stateService.loadDatabase(JSON.parse(data));
+  }
+
+  loadExample1() {
+    this.stateService.loadDatabase(ExampleData1());
+  }
+
+  loadExample2() {
+    this.stateService.loadDatabase(ExampleData2());
   }
 
   saveFile() {

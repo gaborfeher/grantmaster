@@ -49,13 +49,6 @@ Income.prototype.spendInLocalCurrency = function(localAmount: BigNumber): Income
     spentForeignAmount: that.spentForeignAmount.plus(localAmount.dividedBy(that.exchangeRate))
   });
 };
-Income.prototype.onChange = function(property: string, changes: Changes): Income {
-  let that: Income = this;
-  if (property === 'exchangeRate' || property === 'foreignAmount' || property === 'date') {
-    changes.significantIncomeChange = true;
-  }
-  return that;
-}
 export function compareIncomes(a: Income, b: Income): number {
   if (a.date == b.date) {
     return 0;

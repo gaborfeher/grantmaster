@@ -28,69 +28,71 @@ export class JSONParser {
       budgetCategories: that.parseTagNode(jsonData.budgetCategories),
       currencies: that.parseList(
         jsonData.currencies,
-        currency => that.parseCurrency(currency))
+        currency => that.parseCurrency(currency)),
+      localCurrency: jsonData.localCurrency
     }).recomputeBudgetCategories();
   }
 
-  parseList<F, T>(list: Array<F>, mapper: (F) => T ): Immutable.List<T> {
+  parseList<F, T>(jsonData: Array<F>, mapper: (F) => T ): Immutable.List<T> {
     let list2 = [];
-    for (var i = 0; i < list.length; ++i) {
-      list2.push(mapper(list[i]));
+    for (var i = 0; i < jsonData.length; ++i) {
+      list2.push(mapper(jsonData[i]));
     }
     return Immutable.List(list2);
   }
 
-  parseProject(json: any): Project {
+  parseProject(jsonData: any): Project {
     let that = this;
     let project = new Project({
-      name: json.name,
-      incomes: that.parseList(json.incomes, income => that.parseIncome(income)),
-      expenses: that.parseList(json.expenses, expense => that.parseExpense(expense)),
-      categories: that.parseList(json.categories, category => that.parseCategory(category)),
+      name: jsonData.name,
+      incomes: that.parseList(jsonData.incomes, income => that.parseIncome(income)),
+      expenses: that.parseList(jsonData.expenses, expense => that.parseExpense(expense)),
+      categories: that.parseList(jsonData.categories, category => that.parseCategory(category)),
+      foreignCurrency: jsonData.foreignCurrency,
     });
     return project
       .recomputeIncomes()
       .recomputeBudgetCategories();
   }
 
-  parseExpense(expense: any): Expense {
+  parseExpense(jsonData: any): Expense {
     return new Expense({
-      date: expense.date,
-      localAmount: new BigNumber(expense.localAmount),
-      accountNo: expense.accountNo,
-      partner: expense.partner,
-      category: expense.category
+      date: jsonData.date,
+      localAmount: new BigNumber(jsonData.localAmount),
+      accountNo: jsonData.accountNo,
+      partner: jsonData.partner,
+      category: jsonData.category
     });
   }
 
-  parseIncome(income: any): Income {
+  parseIncome(jsonData: any): Income {
     return new Income({
-      date: income.date,
-      foreignAmount: new BigNumber(income.foreignAmount),
-      exchangeRate: new BigNumber(income.exchangeRate)
+      date: jsonData.date,
+      foreignAmount: new BigNumber(jsonData.foreignAmount),
+      exchangeRate: new BigNumber(jsonData.exchangeRate)
     });
   }
 
-  parseCategory(category: any): ProjectCategory {
+  parseCategory(jsonData: any): ProjectCategory {
     var that = this;
     return new ProjectCategory({
-      tagName: category.tagName,
-      limitForeign: category.limitForeign,
-      limitPercentageForeign: category.limitPercentageForeign
+      tagName: jsonData.tagName,
+      limitForeign: jsonData.limitForeign,
+      limitPercentageForeign: jsonData.limitPercentageForeign
     });
   }
 
-  parseTagNode(node: any): TagNode {
+  parseTagNode(jsonData: any): TagNode {
     var that = this;
     return new TagNode({
-      name: node.name,
-      subTags: that.parseList(node.subTags, node => that.parseTagNode(node)),
+      name: jsonData.name,
+      subTags: that.parseList(jsonData.subTags, node => that.parseTagNode(node)),
     });
   }
 
-  parseCurrency(currency: any): Currency {
+  parseCurrency(jsonData: any): Currency {
     return new Currency({
-      name: currency.name
+      name: jsonData.name
     });
   }
 

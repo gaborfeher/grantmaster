@@ -41,14 +41,6 @@ Expense.prototype.resetComputed = function(): Expense {
     overshoot: false
   });
 }
-Expense.prototype.onChange = function(property: string, changes: Changes): Expense {
-  if (property === 'date' || property === 'localAmount') {
-    changes.significantExpenseChange = true;
-  } else if (property === 'category') {
-    changes.budgetCategoryChange = true;
-  }
-  return this;
-}
 export function compareExpenses(a: Expense, b: Expense): number {
   if (a.date == b.date) {
     return 0;

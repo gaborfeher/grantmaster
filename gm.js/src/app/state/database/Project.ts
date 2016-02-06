@@ -17,6 +17,7 @@ var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface Project extends IRecord<Project> {
   name: string;
+  foreignCurrency: string;
 
   expenses: Immutable.List<Expense>;
   incomes: Immutable.List<Income>;
@@ -34,6 +35,7 @@ export var Project = Immutable.Record({
   incomes: Immutable.List(),
   expenses: Immutable.List(),
   categories: Immutable.List(),
+  foreignCurrency: '',
 });
 Project.prototype.recomputeBudgetCategories = function() {
   let that: Project = this;
@@ -136,19 +138,14 @@ Project.prototype.recomputeIncomes = function(): Project {
 }
 Project.prototype.onChange = function(property: string, changes: Changes): Project {
   let that: Project = this;
-  if (property === 'expenses') {
-    changes.significantExpenseChange = true;
-  } else if (property === 'incomes') {
-    changes.significantIncomeChange = true;
-  } else if (property === 'categories') {
-    changes.projectCategoryListChange = true;
-  }
+  changes.projectProperty = property;
 
-  if (changes.significantExpenseChange) {
+  if (property === 'expenses') {
     return that.recomputeExpenses();
-  } else if (changes.budgetCategoryChange || changes.projectCategoryListChange) {
+  } else if (property === 'categories') {
+    // The only reason we recompute here is because limits may have changed.
     return that.recomputeBudgetCategories();
-  } else if (changes.significantIncomeChange) {
+  } else if (property === 'incomes') {
     return that.recomputeIncomes();
   } else {
     return that;
