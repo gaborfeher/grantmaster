@@ -10,6 +10,7 @@
 
 var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
+import {BigNumber} from './core/BigNumber';
 import {Changes} from './core/Changes';
 import {Currency} from './database/Currency';
 import {Database} from './database/Database';
@@ -35,6 +36,7 @@ export interface AppState extends IRecord<AppState> {
   mainMenuSelectedItemId: number;
 
   updateProjectTableColumns(): AppState;
+  updateBudgetCategories(): AppState;
   resetNewItems(): AppState;
   onChange(): AppState;
   getSelectedProjectId(): number;
@@ -93,22 +95,24 @@ AppState.prototype.updateProjectTableColumns = function(): AppState {
     return that;
   }
 
-  function getCategoryList() {
+  function getExpenseCategoryList() {
     function toNames(prefix: string) {
       return function(node: TagNode) {
-        var x = {key: node.name, value: prefix + node.name};
+        let x = {key: node.name, value: prefix + node.name};
         return Immutable.List([x]).concat(
           node.subTags.flatMap(node => toNames(prefix + '  ')(node)));
       }
     }
-    return toNames('')(that.database.budgetCategories);
+    // the plan is that expenses will always be at index 0, and incomes at index 1
+    let expenseCategories = that.database.budgetCategories.subTags.get(0);
+    return toNames('')(expenseCategories);
   }
   let categoryColumns = Immutable.List([
     new TableColumn({
       key: 'tagName',
       value: 'Name',
       kind: 'dropdown',
-      items: getCategoryList(),
+      items: getExpenseCategoryList(),
       editable: false,
       editableAtCreation: true
     }),
@@ -242,6 +246,71 @@ AppState.prototype.resetNewItems = function(): AppState {
     .updateIn(['categoryTable'], table => table.resetNewItem())
     .updateIn(['expenseTable'], table => table.resetNewItem());
 }
+
+
+function mapBudgetCategories(node: TagNode, map: Object): TagNode {
+  node = node.set('subTags', node.subTags.map(subTag => mapBudgetCategories(subTag, map)));
+  let items = {};
+  if (node.name in map) {
+    let localItems = map[node.name];
+    for (var key in localItems) {
+      if (localItems.hasOwnProperty(key)) {
+        let year = key.split(':')[1];
+        items[year] = localItems[key];
+      }
+    }
+  }
+
+  node.subTags.forEach(
+    subTag => {
+      subTag.summaries.forEach(
+        (summaryItem, year) => {
+          items[year] = items[year] || new BigNumber(0);
+          items[year] = items[year].plus(summaryItem);
+          return true;
+        }
+      );
+      return true;
+    });
+
+
+  let orderedItems = Immutable.OrderedMap();
+  for (var year in items) {
+    if (items.hasOwnProperty(year)) {
+      orderedItems = orderedItems.set(year, items[year]);
+    }
+  }
+  node = node.set('summaries', orderedItems);
+  return node;
+}
+AppState.prototype.updateBudgetCategories = function() {
+  let that: AppState = this;
+
+  var map = {};  // map[category name][year] = sum
+  that.database.projects.forEach(
+    project => {
+      project.expenses.forEach(
+        expense => {
+          let year = expense.date.split('-')[0];
+          let amount = expense.localAmount;
+          let category = expense.category;
+          let key = category + ':' + year;
+          map[category] = map[category] || {};
+          let baseAmount = map[category][key] || new BigNumber(0);
+          map[category][key] = baseAmount.plus(amount);
+          return true;
+        });
+      return true;
+    });
+
+  let budgetCategoriesWithSums =
+    mapBudgetCategories(that.database.budgetCategories, map);
+  return that.set(
+    'budgetCategoryTable',
+    that.budgetCategoryTable.refresh(
+      budgetCategoriesWithSums,
+      ['database', 'budgetCategories']))
+}
 AppState.prototype.onChange = function(property: string, changes: Changes): AppState {
   let that: AppState = this;
   if (property === 'mainMenuSelectedItemId') {
@@ -250,11 +319,7 @@ AppState.prototype.onChange = function(property: string, changes: Changes): AppS
   if (changes.projectProperty === 'expenses'
       || changes.budgetCategoryTreeChange) {
     return that
-      .set(
-        'budgetCategoryTable',
-        that.budgetCategoryTable.refresh(
-          that.database.budgetCategories,
-          ['database', 'budgetCategories']))
+      .updateBudgetCategories()
       .updateProjectTableColumns();
   } else if (property === 'mainMenuSelectedItemId' ||
     changes.projectProperty === 'categories' ||

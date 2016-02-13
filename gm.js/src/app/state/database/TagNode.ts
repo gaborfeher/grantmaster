@@ -18,7 +18,7 @@ export interface TagNode extends IRecord<TagNode> {
 export var TagNode = Immutable.Record({
   name: undefined,
   subTags: Immutable.List(),
-  summaries: Immutable.OrderedMap()
+  summaries: Immutable.OrderedMap()  // only used in copies of nodes inside UI state
 });
 TagNode.prototype.onChange = function(property: string, changes: Changes): TagNode {
   // TODO: filter out summary changes?

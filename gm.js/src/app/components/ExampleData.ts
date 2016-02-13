@@ -44,16 +44,25 @@ export function ExampleData1() {
       }
     ],
     "budgetCategories": {
-      "name": "Budget categories",
+      "name": "Budget",
       "subTags": [
         {
-          "name": "cat1",
-          "subTags": [],
+          "name": "Expenses",
+          "subTags": [
+            {
+              "name": "cat1",
+              "subTags": [],
+            },
+            {
+              "name": "cat2",
+              "subTags": [],
+            }
+          ],
         },
         {
-          "name": "cat2",
+          "name": "Incomes",
           "subTags": [],
-        }
+        },
       ],
     },
     "currencies": [

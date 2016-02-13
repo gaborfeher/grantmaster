@@ -30,7 +30,7 @@ export class JSONParser {
         jsonData.currencies,
         currency => that.parseCurrency(currency)),
       localCurrency: jsonData.localCurrency
-    }).recomputeBudgetCategories();
+    });
   }
 
   parseList<F, T>(jsonData: Array<F>, mapper: (F) => T ): Immutable.List<T> {

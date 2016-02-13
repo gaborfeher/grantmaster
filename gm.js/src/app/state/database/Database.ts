@@ -27,7 +27,6 @@ export interface Database extends IRecord<Database> {
 
   addProject(project: Project): Database;
   renameTag(oldName: string, newName: string): Database;
-  recomputeBudgetCategories(): Database;
 }
 export var Database = Immutable.Record({
   projects: Immutable.List([]),
@@ -64,71 +63,10 @@ Database.prototype.renameTag = function(oldName: string, newName: string) {
         )
       })));
 }
-function mapBudgetCategories(node: TagNode, map: Object): TagNode {
-  node = node.set('subTags', node.subTags.map(subTag => mapBudgetCategories(subTag, map)));
-  let items = {};
-  if (node.name in map) {
-    let localItems = map[node.name];
-    for (var key in localItems) {
-      if (localItems.hasOwnProperty(key)) {
-        let year = key.split(':')[1];
-        items[year] = localItems[key];
-      }
-    }
-  }
-
-  node.subTags.forEach(
-    subTag => {
-      subTag.summaries.forEach(
-        (summaryItem, year) => {
-          items[year] = items[year] || new BigNumber(0);
-          items[year] = items[year].plus(summaryItem);
-          return true;
-        }
-      );
-      return true;
-    });
-
-
-  let orderedItems = Immutable.OrderedMap();
-  for (var year in items) {
-    if (items.hasOwnProperty(year)) {
-      orderedItems = orderedItems.set(year, items[year]);
-    }
-  }
-  
-  node = node.set('summaries', orderedItems);
-  
-  return node;
-}
-Database.prototype.recomputeBudgetCategories = function() {
-  let that: Database = this;
-  var map = {};
-  that.projects.forEach(
-    project => {
-      project.expenses.forEach(
-        expense => {
-          let year = expense.date.split('-')[0];
-          let amount = expense.localAmount;
-          let category = expense.category;
-          let key = category + ':' + year;
-          map[category] = map[category] || {};
-          let baseAmount = map[category][key] || new BigNumber(0);
-          map[category][key] = baseAmount.plus(amount);
-          return true;
-        });
-      return true;
-    });
-  return that.set('budgetCategories', mapBudgetCategories(that.budgetCategories, map));
-}
 Database.prototype.onChange = function(property: string, changes: Changes): Database {
   let that: Database = this;
   if (property === 'budgetCategories' && changes.tagNodeTreeChange) {
     changes.budgetCategoryTreeChange = true;
   }
-  if (changes.projectProperty === 'expenses') {
-    return that.recomputeBudgetCategories();
-  } else {
-    return that;
-  }
+  return that;
 }
