@@ -8,6 +8,7 @@ import {bootstrap} from 'angular2/platform/browser';
 import {JSONParser} from '../state/database/JSONParser';
 import {CurrencySelector} from './CurrencySelector';
 import {ProjectItemComponent} from './ProjectItem';
+import {ProjectViewer} from './ProjectViewer';
 import {Spreadsheet} from './Spreadsheet';
 import {TagList} from './TagList';
 import {StateService} from './StateService';
@@ -27,7 +28,7 @@ var dialog = remote.require('dialog');
 @View({
   templateUrl: './app/components/App.html',
   styleUrls: ['./app/components/App.css'],
-  directives: [NgClass, NgFor, NgIf, NgModel, CurrencySelector, Spreadsheet, ProjectItemComponent, TagList],
+  directives: [NgClass, NgFor, NgIf, NgModel, ProjectViewer, CurrencySelector, Spreadsheet, ProjectItemComponent, TagList],
 })
 class App {
   newProjectName: string;

@@ -1,0 +1,41 @@
+<div id="project-view">
+  <h2>{{project.name}}</h2>
+
+  Foreign currency:
+  <CurrencySelector
+    [value]="project.foreignCurrency"
+    [currencies]="currencyList"
+    [path]="[path, 'foreignCurrency']">
+  </CurrencySelector>
+
+  <div id="project-top">
+    <div id="project-income-list">
+      <h3>Incomes</h3>
+
+      <Spreadsheet
+        [list]="project.incomes"
+        [table]="projectUIState.incomeTable"
+        [path]="[path, 'incomes']">
+      </Spreadsheet>
+    </div>
+    <div id="project-budget-list">
+      <h3>Budget</h3>
+      <Spreadsheet
+        [list]="project.categories"
+        [table]="projectUIState.categoryTable"
+        [path]="[path, 'categories']">
+      </Spreadsheet>
+    </div>
+  </div>
+
+  <div id="expense-list">
+    <h3>Expenses</h3>
+    <Spreadsheet
+      [list]="project.expenses"
+      [path]="[path, 'expenses']"
+      [table]="projectUIState.expenseTable"
+      [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
+    </Spreadsheet>
+  </div>
+</div>
+

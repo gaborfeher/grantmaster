@@ -37,46 +37,12 @@
   </div>
 
   <div id="right-view">
-    <div id="project-view" *ngIf="state().getSelectedProject()">
-      <h2>{{state().getSelectedProject().name}}</h2>
-
-      Foreign currency:
-      <CurrencySelector
-        [value]="state().getSelectedProject().foreignCurrency"
-        [currencies]="state().database.currencies"
-        [path]="['database', 'projects', state().getSelectedProjectId(), 'foreignCurrency']">
-      </CurrencySelector>
-
-      <div id="project-top">
-        <div id="project-income-list">
-          <h3>Incomes</h3>
-
-          <Spreadsheet
-            [list]="state().getSelectedProject().incomes"
-            [table]="state().incomeTable"
-            [path]="['database', 'projects', state().getSelectedProjectId(), 'incomes']">
-          </Spreadsheet>
-        </div>
-        <div id="project-budget-list">
-          <h3>Budget</h3>
-          <Spreadsheet
-            [list]="state().getSelectedProject().categories"
-            [table]="state().categoryTable"
-            [path]="['database', 'projects', state().getSelectedProjectId(), 'categories']">
-          </Spreadsheet>
-        </div>
-      </div>
-
-      <div id="expense-list">
-        <h3>Expenses</h3>
-        <Spreadsheet
-          [list]="state().getSelectedProject().expenses"
-          [path]="['database', 'projects', state().getSelectedProjectId(), 'expenses']"
-          [table]="state().expenseTable"
-          [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
-        </Spreadsheet>
-      </div>
-    </div>
+    <ProjectViewer *ngIf="state().getSelectedProject()"
+      [project]="state().getSelectedProject()"
+      [path]="['database', 'projects', state().getSelectedProjectId()]"
+      [projectUIState]="state().projectUIState"
+      [currencyList]="state().database.currencies">
+    </ProjectViewer>
     <TagList *ngIf="isSelectedMenuItem(-3)"
       [table]="stateService.state.budgetCategoryTable"></TagList>
     <div *ngIf="isSelectedMenuItem(-2)">

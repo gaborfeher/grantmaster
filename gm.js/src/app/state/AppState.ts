@@ -27,11 +27,8 @@ import {TagTreeTable} from './ui/TagTreeTable';
 export interface AppState extends IRecord<AppState> {
   database: Database;
   budgetCategoryTable: TagTreeTable;
-
-  expenseTable: GenericTable<Expense>;
-  incomeTable: GenericTable<Income>;
-  categoryTable: GenericTable<ProjectCategory>;
   currencyTable: GenericTable<Currency>;
+  projectUIState: Immutable.Record.Class;
 
   mainMenuSelectedItemId: number;
 
@@ -48,18 +45,22 @@ export var AppState = Immutable.Record({
 
   mainMenuSelectedItemId: -3,
 
-  expenseTable: new GenericTable({
-    myPath: ['expenseTable'],
-    newItemTemplate: new Expense()
-  }),
-  incomeTable: new GenericTable({
-    myPath: ['incomeTable'],
-    newItemTemplate: new Income()
-  }),
-  categoryTable: new GenericTable({
-    myPath: ['categoryTable'],
-    newItemTemplate: new ProjectCategory()
-  }),
+  // TODO: move this into own class
+  projectUIState: new (Immutable.Record({
+    expenseTable: new GenericTable({
+      myPath: ['projectUIState', 'expenseTable'],
+      newItemTemplate: new Expense()
+    }),
+    incomeTable: new GenericTable({
+      myPath: ['projectUIState', 'incomeTable'],
+      newItemTemplate: new Income()
+    }),
+    categoryTable: new GenericTable({
+      myPath: ['projectUIState', 'categoryTable'],
+      newItemTemplate: new ProjectCategory()
+    }),
+  })),
+
   currencyTable: new GenericTable({
     myPath: ['currencyTable'],
     newItemTemplate: new Currency(),
@@ -88,6 +89,7 @@ AppState.prototype.getSelectedProject = function(): Project {
     return undefined;
   }
 }
+// TODO: move this into ProjectViewer
 AppState.prototype.updateProjectTableColumns = function(): AppState {
   let that: AppState = this;
   let project = that.getSelectedProject();
@@ -234,17 +236,17 @@ AppState.prototype.updateProjectTableColumns = function(): AppState {
   ]);
 
   return that
-    .setIn(['incomeTable', 'columns'], incomeColumns)
-    .setIn(['categoryTable', 'columns'], categoryColumns)
-    .setIn(['expenseTable', 'columns'], expenseColumns);
+    .setIn(['projectUIState', 'incomeTable', 'columns'], incomeColumns)
+    .setIn(['projectUIState', 'categoryTable', 'columns'], categoryColumns)
+    .setIn(['projectUIState', 'expenseTable', 'columns'], expenseColumns);
 }
 AppState.prototype.resetNewItems = function(): AppState {
   let that: AppState = this;
   return that
     .updateIn(['currencyTable'], table => table.resetNewItem())
-    .updateIn(['incomeTable'], table => table.resetNewItem())
-    .updateIn(['categoryTable'], table => table.resetNewItem())
-    .updateIn(['expenseTable'], table => table.resetNewItem());
+    .updateIn(['projectUIState', 'incomeTable'], table => table.resetNewItem())
+    .updateIn(['projectUIState', 'categoryTable'], table => table.resetNewItem())
+    .updateIn(['projectUIState', 'expenseTable'], table => table.resetNewItem());
 }
 
 

@@ -17,14 +17,5 @@ div.selected {
   color: white;
 }
 
-#project-top {
-  display: flex;
-}
 
-#project-income-list {
-  width: 50%;
-}
-#project-budget-list {
-  width: 50%;
-}
 
