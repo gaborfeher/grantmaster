@@ -1,4 +1,9 @@
 'use strict';
+
+declare var require: any;
+declare var __dirname: any;
+declare var process: any;
+
 const electron = require('electron');
 const app = electron.app;
 

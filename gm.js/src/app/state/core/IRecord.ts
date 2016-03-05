@@ -1,6 +1,7 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
 
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
+declare var require: any;
+export var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface IRecord<T> extends Immutable.Record.Class {
   // Scavenged from:

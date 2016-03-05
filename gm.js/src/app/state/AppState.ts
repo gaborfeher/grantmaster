@@ -8,7 +8,6 @@
 ///<reference path='./ui/TableColumn.ts'/>
 ///<reference path='./core/Changes.ts'/>
 
-var Immutable = require('../../../node_modules/immutable/dist/immutable.js');
 
 import {BigNumber} from './core/BigNumber';
 import {Changes} from './core/Changes';
@@ -16,7 +15,7 @@ import {Currency} from './database/Currency';
 import {Database} from './database/Database';
 import {Expense} from './database/Expense';
 import {Income} from './database/Income';
-import {IRecord} from './core/IRecord';
+import {Immutable, IRecord} from './core/IRecord';
 import {Project} from './database/Project';
 import {ProjectCategory} from './database/ProjectCategory';
 import {TableColumn} from './ui/TableColumn';

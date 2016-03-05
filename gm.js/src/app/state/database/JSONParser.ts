@@ -6,6 +6,7 @@
 ///<reference path='./TagNode.ts'/>
 
 import {Injectable} from 'angular2/core';
+
 import {Currency} from './Currency';
 import {Database} from './Database';
 import {Expense} from './Expense';
@@ -14,7 +15,7 @@ import {Project} from './Project';
 import {ProjectCategory} from './ProjectCategory';
 import {TagNode} from './TagNode';
 
-var BigNumber = require('../../../../node_modules/bignumber.js/bignumber.js');
+import {BigNumber} from '../core/BigNumber';
 
 @Injectable()
 export class JSONParser {

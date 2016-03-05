@@ -1,9 +1,7 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
 ///<reference path='./TableColumn.ts'/>
 
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
-
-import {IRecord} from '../core/IRecord';
+import {Immutable, IRecord} from '../core/IRecord';
 import {TableColumn} from './TableColumn';
 import {TagNode} from '../database/TagNode';
 

@@ -1,4 +1,4 @@
-//<reference path='../state/AppState.ts'/>
+///<reference path='../state/AppState.ts'/>
 ///<reference path='../state/core/Changes.ts'/>
 ///<reference path='../state/database/Database.ts'/>
 ///<reference path='../state/database/Expense.ts'/>
@@ -7,20 +7,20 @@
 ///<reference path='../state/database/ProjectCategory.ts'/>
 ///<reference path='../state/database/TagNode.ts'/>
 ///<reference path='../state/ui/GenericTable.ts'/>
-import {Changes} from '../state/core/Changes';
+
+import {Injectable} from 'angular2/core';
+
 import {AppState} from '../state/AppState';
+import {BigNumber} from '../state/core/BigNumber';
+import {Changes} from '../state/core/Changes';
 import {Database} from '../state/database/Database';
 import {Expense} from '../state/database/Expense';
 import {Income} from '../state/database/Income';
 import {Project} from '../state/database/Project';
 import {ProjectCategory} from '../state/database/ProjectCategory';
 import {TagNode} from '../state/database/TagNode';
-import {GenericTable} from '../state/ui/GenericTable';
-
-import {Injectable} from 'angular2/core';
 import {JSONParser} from '../state/database/JSONParser';
-
-var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+import {GenericTable} from '../state/ui/GenericTable';
 
 @Injectable()
 export class StateService {

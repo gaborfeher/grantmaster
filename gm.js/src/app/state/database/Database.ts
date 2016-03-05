@@ -7,17 +7,14 @@
 ///<reference path='./Income.ts'/>
 ///<reference path='./TagNode.ts'/>
 
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
-
 import {BigNumber} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
-import {IRecord} from '../core/IRecord';
+import {Immutable, IRecord} from '../core/IRecord';
 import {Currency} from './Currency';
 import {Expense} from './Expense';
 import {Project} from './Project';
 import {Income} from './Income';
 import {TagNode} from './TagNode';
-
 
 export interface Database extends IRecord<Database> {
   projects: Immutable.List<Project>;

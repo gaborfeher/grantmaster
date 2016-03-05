@@ -8,12 +8,10 @@
 
 import {BigNumber, bigMin} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
-import {IRecord} from '../core/IRecord';
+import {Immutable, IRecord} from '../core/IRecord';
 import {Expense, compareExpenses} from './Expense';
 import {Income, compareIncomes} from './Income';
 import {ProjectCategory} from './ProjectCategory';
-
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
 
 export interface Project extends IRecord<Project> {
   name: string;

@@ -1,8 +1,6 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
 
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
-
-import {IRecord} from '../core/IRecord';
+import {Immutable, IRecord} from '../core/IRecord';
 
 export interface TableColumn extends IRecord<TableColumn> {
   key: string;

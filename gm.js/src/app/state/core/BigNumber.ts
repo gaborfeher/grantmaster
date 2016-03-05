@@ -1,3 +1,4 @@
+declare var require: any;
 export var BigNumber = require('../../../../node_modules/bignumber.js/bignumber.js');
 
 BigNumber.config({
@@ -16,6 +17,8 @@ export interface BigNumber {
   times(other: BigNumber): BigNumber;
   lessThan(other: BigNumber): boolean;
   greaterThanOrEqualTo(other: BigNumber): boolean;
+  round(dp: number, rm: number): BigNumber;
+  toFormat(): string;
 }
 export function bigMin(a: BigNumber, b: BigNumber): BigNumber {
   return a.lessThan(b) ? a : b;

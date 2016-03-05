@@ -1,12 +1,15 @@
+///<reference path="../../../node_modules/angular2/typings/browser.d.ts"/>
+
 ///<reference path='./StateService.ts'/>
+///<reference path='../state/core/BigNumber.ts'/>
 ///<reference path='../state/ui/TableColumn.ts'/>
 
 import {Input, Component, View, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
-import {StateService} from './StateService';
-import {TableColumn} from '../state/ui/TableColumn';
 
-var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+import {StateService} from './StateService';
+import {BigNumber} from '../state/core/BigNumber';
+import {TableColumn} from '../state/ui/TableColumn';
 
 
 @Component({
@@ -44,7 +47,7 @@ export class CellEntry {
     this.value = this.masterValue;
   }
 
-  formatNumber(num: any /*BigNumber*/): string {
+  formatNumber(num: BigNumber): string {
     let s = num.round(3, BigNumber.HALF_UP).toFormat();
     let dotPos = s.indexOf('.');
     if (dotPos < 0) {

@@ -1,20 +1,21 @@
+///<reference path="../../../node_modules/angular2/typings/browser.d.ts"/>
 ///<reference path='../state/database/Project.ts'/>
-import {AppState} from '../state/AppState';
-import {Project} from '../state/database/Project';
 
 import {ChangeDetectionStrategy, Component, View} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
-import {JSONParser} from '../state/database/JSONParser';
+
 import {CurrencySelector} from './CurrencySelector';
 import {ProjectItemComponent} from './ProjectItem';
-import {ProjectViewer} from './ProjectViewer';
-import {Spreadsheet} from './Spreadsheet';
 import {TagList} from './TagList';
 import {StateService} from './StateService';
 import {ExampleData1, ExampleData2} from './ExampleData';
+import {ProjectViewer} from './ProjectViewer';
+import {Spreadsheet} from './Spreadsheet';
 
-var BigNumber = require('../../../node_modules/bignumber.js/bignumber.js');
+import {AppState} from '../state/AppState';
+import {Project} from '../state/database/Project';
+import {JSONParser} from '../state/database/JSONParser';
 
 var w: any = window;
 var fs = w.require('fs');

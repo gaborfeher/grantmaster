@@ -5,9 +5,7 @@
 
 import {BigNumber} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
-import {IRecord} from '../core/IRecord';
-
-var Immutable = require('../../../../node_modules/immutable/dist/immutable.js');
+import {Immutable, IRecord} from '../core/IRecord';
 
 export interface Income extends IRecord<Income> {
   date: string;
