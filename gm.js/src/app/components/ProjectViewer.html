@@ -15,6 +15,7 @@
       <Spreadsheet
         [list]="project.incomes"
         [table]="projectUIState.incomeTable"
+        [columns]="incomeColumns"
         [path]="[path, 'incomes']">
       </Spreadsheet>
     </div>
@@ -23,6 +24,7 @@
       <Spreadsheet
         [list]="project.categories"
         [table]="projectUIState.categoryTable"
+        [columns]="categoryColumns"
         [path]="[path, 'categories']">
       </Spreadsheet>
     </div>
@@ -34,6 +36,7 @@
       [list]="project.expenses"
       [path]="[path, 'expenses']"
       [table]="projectUIState.expenseTable"
+      [columns]="expenseColumns"
       [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
     </Spreadsheet>
   </div>

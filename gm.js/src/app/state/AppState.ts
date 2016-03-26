@@ -31,7 +31,6 @@ export interface AppState extends IRecord<AppState> {
 
   mainMenuSelectedItemId: number;
 
-  updateProjectTableColumns(): AppState;
   updateBudgetCategories(): AppState;
   resetNewItems(): AppState;
   onChange(): AppState;
@@ -87,157 +86,6 @@ AppState.prototype.getSelectedProject = function(): Project {
   } else {
     return undefined;
   }
-}
-// TODO: move this into ProjectViewer
-AppState.prototype.updateProjectTableColumns = function(): AppState {
-  let that: AppState = this;
-  let project = that.getSelectedProject();
-  if (project === undefined) {
-    return that;
-  }
-
-  function getExpenseCategoryList() {
-    function toNames(prefix: string) {
-      return function(node: TagNode) {
-        let x = {key: node.name, value: prefix + node.name};
-        return Immutable.List([x]).concat(
-          node.subTags.flatMap(node => toNames(prefix + '  ')(node)));
-      }
-    }
-    // the plan is that expenses will always be at index 0, and incomes at index 1
-    let expenseCategories = that.database.budgetCategories.subTags.get(0);
-    return toNames('')(expenseCategories);
-  }
-  let categoryColumns = Immutable.List([
-    new TableColumn({
-      key: 'tagName',
-      value: 'Name',
-      kind: 'dropdown',
-      items: getExpenseCategoryList(),
-      editable: false,
-      editableAtCreation: true
-    }),
-    new TableColumn({
-      key: 'limitForeign',
-      value: 'Limit (' + project.foreignCurrency + ')',
-      kind: 'number',
-      constraints: ['positive']
-    }),
-    new TableColumn({
-      key: 'limitPercentageForeign',
-      value: 'Limit% (' + project.foreignCurrency + ')',
-      kind: 'number',
-      constraints: ['min:0', 'max:100']
-    }),
-    new TableColumn({
-      key: 'spentForeign',
-      value: 'Spent (' + project.foreignCurrency + ')',
-      kind: 'number',
-      editable: false
-    }),
-    new TableColumn({
-      key: 'spentLocal',
-      value: 'Spent (' + that.database.localCurrency + ')',
-      kind: 'number',
-      editable: false
-    }),
-  ]);
-
-  function getProjectCategoryList():
-    Immutable.List<{key: string, value: string}> {
-    return project.categories.map(
-      (value: ProjectCategory) =>
-        ({key: value.tagName, value: value.tagName})).toList();
-  }
-  let expenseColumns = Immutable.List();
-  if (that.mainMenuSelectedItemId >= 0) {
-    expenseColumns = Immutable.List([
-      new TableColumn({
-        key: 'date',
-        value: 'Date',
-        kind: 'date',
-        constraints: ['not_null'],
-      }),
-      new TableColumn({
-        key: 'category',
-        value: 'Category',
-        kind: 'dropdown',
-        items: getProjectCategoryList()
-      }),
-      new TableColumn({
-        key: 'accountNo',
-        value: 'Account Number',
-        kind: 'string'
-      }),
-      new TableColumn({
-        key: 'partner',
-        value: 'Partner',
-        kind: 'string'
-      }),
-      new TableColumn({
-        key: 'localAmount',
-        value: 'Amount (' + project.foreignCurrency + ')',
-        kind: 'number',
-        constraints: ['positive']
-      }),
-      new TableColumn({
-        key: 'foreignAmount',
-        value: 'Amount (' + project.foreignCurrency + ')',
-        kind: 'number',
-        editable: false
-      }),
-      new TableColumn({
-        key: 'exchangeRate',
-        value: 'Exchange rate',
-        kind: 'number',
-        editable: false
-      })
-    ]);
-  }
-
-  let incomeColumns = Immutable.List([
-    new TableColumn({
-      key: 'date',
-      value: 'Date',
-      kind: 'date',
-      constraints: ['not_null'],
-    }),
-    new TableColumn({
-      key: 'foreignAmount',
-      value: 'Foreign amount',
-      kind: 'number',
-      constraints: ['not_null', 'positive']
-    }),
-    new TableColumn({
-      key: 'exchangeRate',
-      value: 'Exchange rate',
-      kind: 'number',
-      constraints: ['not_null', 'positive']
-    }),
-    new TableColumn({
-      key: 'localAmount',
-      value: 'Amount (' + that.database.localCurrency + ')',
-      kind: 'number',
-      editable: false
-    }),
-    new TableColumn({
-      key: 'spentForeignAmount',
-      value: 'Spent (' + project.foreignCurrency + ')',
-      kind: 'number',
-      editable: false
-    }),
-    new TableColumn({
-      key: 'spentLocalAmount',
-      value: 'Spent (' + that.database.localCurrency + ')',
-      kind: 'number',
-      editable : false
-    })
-  ]);
-
-  return that
-    .setIn(['projectUIState', 'incomeTable', 'columns'], incomeColumns)
-    .setIn(['projectUIState', 'categoryTable', 'columns'], categoryColumns)
-    .setIn(['projectUIState', 'expenseTable', 'columns'], expenseColumns);
 }
 AppState.prototype.resetNewItems = function(): AppState {
   let that: AppState = this;
@@ -319,14 +167,7 @@ AppState.prototype.onChange = function(property: string, changes: Changes): AppS
   }
   if (changes.projectProperty === 'expenses'
       || changes.budgetCategoryTreeChange) {
-    return that
-      .updateBudgetCategories()
-      .updateProjectTableColumns();
-  } else if (property === 'mainMenuSelectedItemId' ||
-    changes.projectProperty === 'categories' ||
-    changes.projectProperty === 'foreignCurrency') {
-
-    return that.updateProjectTableColumns();
+    return that.updateBudgetCategories();
   } else {
     return that;
   }

@@ -12,6 +12,7 @@ import {StateService} from './StateService';
   properties: [
     'list',
     'table',
+    'columns',
     'path',
     'rowStyleClasses'
   ],
