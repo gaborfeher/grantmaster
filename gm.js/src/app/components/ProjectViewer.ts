@@ -1,4 +1,5 @@
 import {Component, Input, View, ChangeDetectionStrategy} from 'angular2/core';
+import {BudgetCategorySelector} from './BudgetCategorySelector';
 import {CurrencySelector} from './CurrencySelector';
 import {Spreadsheet} from './Spreadsheet';
 import {Database} from '../state/database/Database';
@@ -21,7 +22,7 @@ import {TableColumn} from '../state/ui/TableColumn';
 @View({
   templateUrl: 'app/components/ProjectViewer.html',
   styleUrls: ['app/components/ProjectViewer.css'],
-  directives: [Spreadsheet, CurrencySelector],
+  directives: [Spreadsheet, BudgetCategorySelector, CurrencySelector],
 })
 export class ProjectViewer {
   @Input() project: Project;
@@ -30,19 +31,6 @@ export class ProjectViewer {
   expenseColumns: any;
   incomeColumns: any;
   categoryColumns: any;
-
-  getExpenseCategoryList() {
-    function toNames(prefix: string) {
-      return function(node: TagNode) {
-        let x = {key: node.name, value: prefix + node.name};
-        return Immutable.List([x]).concat(
-          node.subTags.flatMap(node => toNames(prefix + '  ')(node)));
-      }
-    }
-    // the plan is that expenses will always be at index 0, and incomes at index 1
-    let expenseCategories = this.database.budgetCategories.subTags.get(0);
-    return toNames('')(expenseCategories);
-  }
 
   getProjectCategoryList():
     Immutable.List<{key: string, value: string}> {
@@ -96,7 +84,7 @@ export class ProjectViewer {
         key: 'tagName',
         value: 'Name',
         kind: 'dropdown',
-        items: this.getExpenseCategoryList(),
+        items: this.database.getExpenseBudgetCategories().getSubTreeAsUIList(),
         editable: false,
         editableAtCreation: true
       }),

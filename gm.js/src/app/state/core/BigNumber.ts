@@ -14,7 +14,7 @@ export interface BigNumber {
   minus(other: BigNumber): BigNumber;
   plus(other: BigNumber): BigNumber;
   dividedBy(other: BigNumber): BigNumber;
-  times(other: BigNumber): BigNumber;
+  times(other: BigNumber|number): BigNumber;
   lessThan(other: BigNumber): boolean;
   greaterThanOrEqualTo(other: BigNumber): boolean;
   round(dp: number, rm: number): BigNumber;

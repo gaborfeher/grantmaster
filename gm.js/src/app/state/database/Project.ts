@@ -16,6 +16,7 @@ import {ProjectCategory} from './ProjectCategory';
 export interface Project extends IRecord<Project> {
   name: string;
   foreignCurrency: string;
+  incomeCategory: string;
 
   expenses: Immutable.List<Expense>;
   incomes: Immutable.List<Income>;
@@ -34,6 +35,7 @@ export var Project = Immutable.Record({
   expenses: Immutable.List(),
   categories: Immutable.List(),
   foreignCurrency: '',
+  incomeCategory: '',
 });
 Project.prototype.recomputeBudgetCategories = function() {
   let that: Project = this;

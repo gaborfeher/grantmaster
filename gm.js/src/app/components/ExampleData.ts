@@ -4,6 +4,7 @@ export function ExampleData1() {
     "projects": [
       {
         "name": "aaa",
+        "incomeCategory": "income_cat1",
         "incomes": [
           {
             "date": "2015-01-01",
@@ -61,7 +62,16 @@ export function ExampleData1() {
         },
         {
           "name": "Incomes",
-          "subTags": [],
+          "subTags": [
+            {
+              "name": "income_cat1",
+              "subTags": [],
+            },
+            {
+              "name": "income_cat2",
+              "subTags": [],
+            }
+          ],
         },
       ],
     },

@@ -12,6 +12,8 @@ export interface TagNode extends IRecord<TagNode> {
   subTags: Immutable.List<TagNode>;
 
   summaries: Immutable.OrderedMap<string, BigNumber>;
+
+  getSubTreeAsUIList();
 }
 export var TagNode = Immutable.Record({
   name: undefined,
@@ -22,4 +24,15 @@ TagNode.prototype.onChange = function(property: string, changes: Changes): TagNo
   // TODO: filter out summary changes?
   changes.tagNodeTreeChange = true;
   return this;
+}
+TagNode.prototype.getSubTreeAsUIList = function() {
+  let root: TagNode = this;
+  function toNames(prefix: string) {
+    return function(node: TagNode) {
+      let x = {key: node.name, value: prefix + node.name};
+      return Immutable.List([x]).concat(
+        node.subTags.flatMap(node => toNames(prefix + '  ')(node)));
+    }
+  }
+  return toNames('')(root);
 }

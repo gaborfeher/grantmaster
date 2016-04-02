@@ -50,6 +50,7 @@ export class JSONParser {
       expenses: that.parseList(jsonData.expenses, expense => that.parseExpense(expense)),
       categories: that.parseList(jsonData.categories, category => that.parseCategory(category)),
       foreignCurrency: jsonData.foreignCurrency,
+      incomeCategory: jsonData.incomeCategory,
     });
     return project
       .recomputeIncomes()

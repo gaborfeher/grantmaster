@@ -97,9 +97,15 @@ AppState.prototype.resetNewItems = function(): AppState {
 }
 
 
-function mapBudgetCategories(node: TagNode, map: Object): TagNode {
-  node = node.set('subTags', node.subTags.map(subTag => mapBudgetCategories(subTag, map)));
-  let items = {};
+function sumBudgetCategories(
+    node: TagNode, map: Object, rootNode: boolean): TagNode {
+  node = node.set(
+    'subTags',
+    node.subTags.map(subTag => sumBudgetCategories(subTag, map, false)));
+  let items = {};  // year -> value (sum for this node)
+
+  // Take out income/expense values directly assigned to this node 
+  // from map.
   if (node.name in map) {
     let localItems = map[node.name];
     for (var key in localItems) {
@@ -110,12 +116,17 @@ function mapBudgetCategories(node: TagNode, map: Object): TagNode {
     }
   }
 
+  // Add values from subtree into items.
+  let firstChild = true;
   node.subTags.forEach(
     subTag => {
+      let multiplier = 1.0;
+      if (firstChild && rootNode) multiplier = -1.0;  // Expenses.
+      firstChild = false;
       subTag.summaries.forEach(
         (summaryItem, year) => {
           items[year] = items[year] || new BigNumber(0);
-          items[year] = items[year].plus(summaryItem);
+          items[year] = items[year].plus(summaryItem.times(multiplier));
           return true;
         }
       );
@@ -149,11 +160,25 @@ AppState.prototype.updateBudgetCategories = function() {
           map[category][key] = baseAmount.plus(amount);
           return true;
         });
+      if (project.incomeCategory != '') {
+        project.incomes.forEach(
+          income => {
+            let year = income.date.split('-')[0];
+            let amount = income.localAmount;
+            let category = project.incomeCategory;
+            let key = category + ':' + year;
+            map[category] = map[category] || {};
+            let baseAmount = map[category][key] || new BigNumber(0);
+            map[category][key] = baseAmount.plus(amount);
+            return true;
+          });
+      }
+
       return true;
     });
 
   let budgetCategoriesWithSums =
-    mapBudgetCategories(that.database.budgetCategories, map);
+    sumBudgetCategories(that.database.budgetCategories, map, true);
   return that.set(
     'budgetCategoryTable',
     that.budgetCategoryTable.refresh(
@@ -166,6 +191,8 @@ AppState.prototype.onChange = function(property: string, changes: Changes): AppS
     that = that.resetNewItems();
   }
   if (changes.projectProperty === 'expenses'
+      || changes.projectProperty === 'incomes'
+      || changes.projectProperty === 'incomeCategory'
       || changes.budgetCategoryTreeChange) {
     return that.updateBudgetCategories();
   } else {

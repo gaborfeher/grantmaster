@@ -24,6 +24,9 @@ export interface Database extends IRecord<Database> {
 
   addProject(project: Project): Database;
   renameTag(oldName: string, newName: string): Database;
+
+  getExpenseBudgetCategories(): TagNode;
+  getIncomeBudgetCategories(): TagNode;
 }
 export var Database = Immutable.Record({
   projects: Immutable.List([]),
@@ -66,4 +69,10 @@ Database.prototype.onChange = function(property: string, changes: Changes): Data
     changes.budgetCategoryTreeChange = true;
   }
   return that;
+}
+Database.prototype.getExpenseBudgetCategories = function(): TagNode {
+  return this.budgetCategories.subTags.get(0);
+}
+Database.prototype.getIncomeBudgetCategories = function(): TagNode {
+  return this.budgetCategories.subTags.get(1);
 }
