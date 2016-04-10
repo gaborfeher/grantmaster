@@ -50,7 +50,7 @@ Project.prototype.recomputeBudgetCategories = function() {
     'expenses',
     that.expenses.map(
       expense => {
-        let overshoot = false;
+        let overshoot = expense.overshoot;
         if (expense.category in map) {
           // TODO: make category compulsory, remove this check
           map[expense.category] =
