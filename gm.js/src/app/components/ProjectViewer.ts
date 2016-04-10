@@ -1,4 +1,4 @@
-import {Component, Input, View, ChangeDetectionStrategy} from 'angular2/core';
+import {Component, Input, ChangeDetectionStrategy} from 'angular2/core';
 import {BudgetCategorySelector} from './BudgetCategorySelector';
 import {CurrencySelector} from './CurrencySelector';
 import {Spreadsheet} from './Spreadsheet';
@@ -17,9 +17,7 @@ import {TableColumn} from '../state/ui/TableColumn';
     'projectUIState',
     'currencyList',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/ProjectViewer.html',
   styleUrls: ['app/components/ProjectViewer.css'],
   directives: [Spreadsheet, BudgetCategorySelector, CurrencySelector],

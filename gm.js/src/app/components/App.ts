@@ -1,7 +1,7 @@
 ///<reference path="../../../node_modules/angular2/typings/browser.d.ts"/>
 ///<reference path='../state/database/Project.ts'/>
 
-import {ChangeDetectionStrategy, Component, View} from 'angular2/core';
+import {ChangeDetectionStrategy, Component} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 
@@ -24,9 +24,7 @@ var dialog = remote.require('dialog');
 
 @Component({
   selector: 'App',
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app/components/App.html',
   styleUrls: ['./app/components/App.css'],
   directives: [NgClass, NgFor, NgIf, NgModel, ProjectViewer, CurrencySelector, Spreadsheet, ProjectItemComponent, TagList],

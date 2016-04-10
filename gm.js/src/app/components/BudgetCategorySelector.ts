@@ -1,6 +1,6 @@
 ///<reference path='./StateService.ts'/>
 
-import {Input, Component, View, ChangeDetectionStrategy} from 'angular2/core';
+import {Input, Component, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
 import {StateService} from './StateService';
 import {TagNode} from '../state/database/TagNode';
@@ -12,9 +12,7 @@ import {TagNode} from '../state/database/TagNode';
     'path',
     'root'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/BudgetCategorySelector.html',
   styleUrls: ['app/components/BudgetCategorySelector.css'],
   directives: [NgModel],

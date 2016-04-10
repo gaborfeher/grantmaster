@@ -1,6 +1,6 @@
 ///<reference path='../state/database/TagNode.ts'/>
 
-import {ChangeDetectionStrategy, Component, Input, View} from 'angular2/core';
+import {ChangeDetectionStrategy, Component, Input} from 'angular2/core';
 import {NgFor, NgIf} from 'angular2/common';
 import {TagNode} from '../state/database/TagNode';
 import {StateService} from './StateService';
@@ -11,9 +11,7 @@ import {StateService} from './StateService';
     'path',
     'node',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app/components/TagName.html',
   styleUrls: ['./app/components/TagName.css'],
   directives: [NgFor, NgIf]

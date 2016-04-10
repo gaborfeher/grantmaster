@@ -1,6 +1,6 @@
 ///<reference path='../state/ui/GenericTable.ts'/>
 
-import {Component, Input, View, ChangeDetectionStrategy} from 'angular2/core';
+import {Component, Input, ChangeDetectionStrategy} from 'angular2/core';
 import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
 import {bootstrap} from 'angular2/platform/browser';
 import {CellEntry} from './CellEntry';
@@ -16,9 +16,7 @@ import {StateService} from './StateService';
     'path',
     'rowStyleClasses'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/Spreadsheet.html',
   styleUrls: ['app/components/Spreadsheet.css'],
   directives: [CellEntry, NgClass, NgFor, NgIf, NgModel],

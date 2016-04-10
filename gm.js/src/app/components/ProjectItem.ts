@@ -1,6 +1,6 @@
 ///<reference path='../state/database/Project.ts'/>
 
-import {Component, Input, View} from 'angular2/core';
+import {Component, Input} from 'angular2/core';
 import {NgIf, NgModel} from 'angular2/common';
 import {Project} from '../state/database/Project';
 import {StateService} from './StateService';
@@ -11,9 +11,7 @@ import {StateService} from './StateService';
     'project',
     'selected',
     'path'
-  ]
-})
-@View({
+  ],
   templateUrl: './app/components/ProjectItem.html',
   styleUrls: ['./app/components/ProjectItem.css'],
   directives: [NgIf, NgModel],

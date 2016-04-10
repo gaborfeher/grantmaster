@@ -1,6 +1,6 @@
 ///<reference path='./StateService.ts'/>
 
-import {Component, View, ChangeDetectionStrategy} from 'angular2/core';
+import {Component, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
 import {StateService} from './StateService';
 
@@ -11,9 +11,7 @@ import {StateService} from './StateService';
     'path',
     'currencies'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/CurrencySelector.html',
   styleUrls: ['app/components/CurrencySelector.css'],
   directives: [NgModel],

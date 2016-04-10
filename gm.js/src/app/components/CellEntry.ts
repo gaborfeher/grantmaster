@@ -4,7 +4,7 @@
 ///<reference path='../state/core/BigNumber.ts'/>
 ///<reference path='../state/ui/TableColumn.ts'/>
 
-import {Input, Component, View, ChangeDetectionStrategy} from 'angular2/core';
+import {Input, Component, ChangeDetectionStrategy} from 'angular2/core';
 import {NgFor, NgIf, NgModel} from 'angular2/common';
 
 import {StateService} from './StateService';
@@ -20,9 +20,7 @@ import {TableColumn} from '../state/ui/TableColumn';
     'path',
     'creationMode'
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-@View({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/CellEntry.html',
   styleUrls: ['app/components/CellEntry.css'],
   directives: [NgFor, NgIf, NgModel],
