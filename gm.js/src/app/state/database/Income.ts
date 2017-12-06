@@ -6,6 +6,7 @@
 import {BigNumber} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
 import {Immutable, IRecord} from '../core/IRecord';
+import {Utils} from '../../utils/Utils';
 
 export interface Income extends IRecord<Income> {
   date: string;
@@ -18,6 +19,8 @@ export interface Income extends IRecord<Income> {
   spendInLocalCurrency(localAmount: BigNumber): Income;
   refresh(): Income;
   resetComputed(): Income;
+
+  validate(): String[];
 }
 export var Income = Immutable.Record({
   date: undefined,
@@ -47,6 +50,18 @@ Income.prototype.spendInLocalCurrency = function(localAmount: BigNumber): Income
     spentForeignAmount: that.spentForeignAmount.plus(localAmount.dividedBy(that.exchangeRate))
   });
 };
+Income.prototype.validate = function(): String[] {
+  let that: Income = this;
+  let errors = [];
+  if (!that.date || !Utils.validateDate(that.date)) {
+    errors.push('invalid date');
+  }
+  if (!that.foreignAmount || that.foreignAmount.lessThanOrEqualTo(0.0)) {
+    errors.push('non-positive foreign amount');
+  }
+  console.log('income.validata: ', errors);
+  return errors;
+}
 export function compareIncomes(a: Income, b: Income): number {
   if (a.date == b.date) {
     return 0;

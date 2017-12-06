@@ -16,6 +16,7 @@ export interface BigNumber {
   dividedBy(other: BigNumber): BigNumber;
   times(other: BigNumber|number): BigNumber;
   lessThan(other: BigNumber): boolean;
+  lessThanOrEqualTo(other: number): boolean;
   greaterThanOrEqualTo(other: BigNumber): boolean;
   round(dp: number, rm: number): BigNumber;
   toFormat(): string;

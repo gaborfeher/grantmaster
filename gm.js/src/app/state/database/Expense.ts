@@ -5,6 +5,7 @@
 import {BigNumber} from '../core/BigNumber';
 import {Changes} from '../core/Changes';
 import {Immutable, IRecord} from '../core/IRecord';
+import {Utils} from '../../utils/Utils';
 
 export interface Expense extends IRecord<Expense> {
   date: string;
@@ -17,6 +18,7 @@ export interface Expense extends IRecord<Expense> {
   overshoot: boolean;
 
   resetComputed(): Expense;
+  validate(): String[];
 }
 export var Expense = Immutable.Record({
   date: undefined,
@@ -38,6 +40,16 @@ Expense.prototype.resetComputed = function(): Expense {
     multiPart: false,
     overshoot: false
   });
+}
+Expense.prototype.validate = function(): String[] {
+  let errors = [];
+  if (!this.date || !Utils.validateDate(this.date)) {
+    errors.push('invalid date');
+  }
+  if (!this.localAmount || this.localAmount.lessThanOrEqualTo(0.0)) {
+    errors.push('non-positive local amount');
+  }
+  return errors;
 }
 export function compareExpenses(a: Expense, b: Expense): number {
   if (a.date == b.date) {

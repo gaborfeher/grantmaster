@@ -58,6 +58,14 @@ export class StateService {
   }
 
   addNewItem(table: GenericTable<any>, targetPath: Array<any>) {
+    console.log('adding ', table.newItem);
+    let validationErrors = table.newItem.validate();
+    if (validationErrors.length > 0) {
+      console.log('validation error ', validationErrors);
+      window.alert('validation error ' + validationErrors);
+      return;
+    }
+
     let newItemPath = table.myPath.concat(['newItem']);
     targetPath = this.flattenPath(targetPath);
 

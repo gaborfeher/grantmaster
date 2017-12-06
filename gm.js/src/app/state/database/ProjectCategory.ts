@@ -18,6 +18,7 @@ export interface ProjectCategory extends IRecord<ProjectCategory> {
 
   reset(): ProjectCategory;
   addSpentAmounts(local: BigNumber, foreign: BigNumber);
+  validate(): String[];
 }
 export var ProjectCategory = Immutable.Record({
   tagName: '',
@@ -51,5 +52,10 @@ ProjectCategory.prototype.addSpentAmounts = function(local: BigNumber, foreign: 
   return that.merge({
     overshoot: overshoot
   });
+}
+ProjectCategory.prototype.validate = function(): String[] {
+  let errors = [];
+  // TODO: what to validate?
+  return errors;
 }
 
