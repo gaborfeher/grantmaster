@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {List} from 'immutable';
 
 import {Currency} from 'app/state/database/Currency';
 import {Database} from 'app/state/database/Database';
@@ -30,12 +31,12 @@ export class JSONParser {
     });
   }
 
-  parseList<F, T>(jsonData: Array<F>, mapper: (F) => T ): Immutable.List<T> {
+  parseList<F, T>(jsonData: Array<F>, mapper: (F) => T ): List<T> {
     let list2 = [];
     for (var i = 0; i < jsonData.length; ++i) {
       list2.push(mapper(jsonData[i]));
     }
-    return Immutable.List(list2);
+    return List(list2);
   }
 
   parseProject(jsonData: any): Project {

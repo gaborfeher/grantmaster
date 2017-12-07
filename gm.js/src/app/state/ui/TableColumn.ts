@@ -1,27 +1,29 @@
-///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
+import {List, Record} from 'immutable';
 
-import {Immutable, IRecord} from 'app/state/core/IRecord';
-
-export interface TableColumn extends IRecord<TableColumn> {
-  key: string;
-  value: string;
-  kind: string;
-  items: Immutable.List<string>;
-  constraints: Immutable.List<string>;
-  editable: boolean;
-  editableAtCreation: boolean;
-
-  isEditable(creatiobMode: boolean): boolean;
-}
-export var TableColumn = Immutable.Record({
+class TableColumnRecord extends Record({
   key: '',
   value: '',
   kind: '',
-  items: Immutable.List(),
-  constraints: Immutable.List(),
+  items: List(),
+  constraints: List<string>(),
   editable: true,
   editableAtCreation: true
-});
-TableColumn.prototype.isEditable = function(creationMode: boolean) {
-  return creationMode ? this.editableAtCreation : this.editable;
+}) {}
+
+export class TableColumn extends TableColumnRecord {
+  key: string;
+  value: string;
+  kind: string;
+  items: List<string>;
+  constraints: List<string>;
+  editable: boolean;
+  editableAtCreation: boolean;
+
+  constructor(params?: any) {
+    params ? super(params) : super();
+  }
+
+  isEditable(creationMode: boolean): boolean {
+    return creationMode ? this.editableAtCreation : this.editable;
+  }
 }

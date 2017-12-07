@@ -1,11 +1,19 @@
-///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
+import {Record} from 'immutable';
 
 import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
-import {Immutable, IRecord} from 'app/state/core/IRecord';
 import {Utils} from 'app/utils/Utils';
 
-export interface Income extends IRecord<Income> {
+class IncomeRecord extends Record({
+  date: undefined,
+  foreignAmount: undefined,
+  exchangeRate: undefined,
+  localAmount: undefined,
+  spentForeignAmount: undefined,
+  spentLocalAmount: undefined
+}) {}
+
+export class Income extends IncomeRecord {
   date: string;
   foreignAmount: BigNumber;
   exchangeRate: BigNumber;
@@ -13,50 +21,41 @@ export interface Income extends IRecord<Income> {
   spentForeignAmount: BigNumber;
   spentLocalAmount: BigNumber;
 
-  spendInLocalCurrency(localAmount: BigNumber): Income;
-  refresh(): Income;
-  resetComputed(): Income;
+  spendInLocalCurrency(localAmount: BigNumber): Income {
+    let that: Income = this;
+    return that.merge({
+      spentLocalAmount: that.spentLocalAmount.plus(localAmount),
+      spentForeignAmount: that.spentForeignAmount.plus(localAmount.dividedBy(that.exchangeRate))
+    });
+  }
 
-  validate(): String[];
-}
-export var Income = Immutable.Record({
-  date: undefined,
-  foreignAmount: undefined,
-  exchangeRate: undefined,
-  localAmount: undefined,
-  spentForeignAmount: undefined,
-  spentLocalAmount: undefined
-});
-Income.prototype.refresh = function(): Income {
-  let that: Income = this;
-  return that.merge({
-    localAmount: that.foreignAmount.times(that.exchangeRate)
-  });
-};
-Income.prototype.resetComputed = function(): Income {
-  let that: Income = this;
-  return that.merge({
-    spentForeignAmount: new BigNumber(0),
-    spentLocalAmount: new BigNumber(0)
-  });
-};
-Income.prototype.spendInLocalCurrency = function(localAmount: BigNumber): Income {
-  let that: Income = this;
-  return that.merge({
-    spentLocalAmount: that.spentLocalAmount.plus(localAmount),
-    spentForeignAmount: that.spentForeignAmount.plus(localAmount.dividedBy(that.exchangeRate))
-  });
-};
-Income.prototype.validate = function(): String[] {
-  let that: Income = this;
-  let errors = [];
-  if (!that.date || !Utils.validateDate(that.date)) {
-    errors.push('invalid date');
+  refresh(): Income {
+    let that: Income = this;
+    return that.merge({
+      localAmount: that.foreignAmount.times(that.exchangeRate)
+    });
   }
-  if (!that.foreignAmount || that.foreignAmount.lessThanOrEqualTo(0.0)) {
-    errors.push('non-positive foreign amount');
+
+  resetComputed(): Income {
+    let that: Income = this;
+    return that.merge({
+      spentForeignAmount: new BigNumber(0),
+      spentLocalAmount: new BigNumber(0)
+    });
   }
-  return errors;
+
+  validate(): String[] {
+    let that: Income = this;
+    let errors = [];
+    if (!that.date || !Utils.validateDate(that.date)) {
+      errors.push('invalid date');
+    }
+    if (!that.foreignAmount || that.foreignAmount.lessThanOrEqualTo(0.0)) {
+      errors.push('non-positive foreign amount');
+    }
+    return errors;
+  }
+
 }
 export function compareIncomes(a: Income, b: Income): number {
   if (a.date == b.date) {

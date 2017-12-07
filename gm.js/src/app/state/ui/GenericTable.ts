@@ -1,22 +1,24 @@
-///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
-
-import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {Record, List} from 'immutable';
 import {TableColumn} from 'app/state/ui/TableColumn';
 
-export interface GenericTable<T> extends IRecord<GenericTable<T>> {
-  newItem: T,
-  newItemTemplate: T,
-  columns: Array<TableColumn>,
-  myPath: Array<string>
-
-  resetNewItem(): GenericTable<T>;
-}
-export var GenericTable = Immutable.Record({
+class GenericTableRecord extends Record({
   newItem: undefined,
   newItemTemplate: undefined,
-  columns: [],
+  columns: List<TableColumn>([]),
   myPath: []
-});
-GenericTable.prototype.resetNewItem = function() {
-  return this.set('newItem', this.newItemTemplate);
+}) {}
+
+export class GenericTable<T> extends GenericTableRecord {
+  newItem: T;
+  newItemTemplate: T;
+  columns: List<TableColumn>;
+  myPath: Array<string>;
+
+  constructor(params?: any) {
+    params ? super(params) : super();
+  }
+
+  resetNewItem(): GenericTable<T> {
+    return this.set('newItem', this.newItemTemplate);
+  }
 }

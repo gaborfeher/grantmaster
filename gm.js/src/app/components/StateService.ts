@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {List} from 'immutable';
 
 import {AppState} from 'app/state/AppState';
 import {BigNumber} from 'app/state/core/BigNumber';
@@ -133,7 +134,7 @@ export class StateService {
   }
 
   addSubTag(parentTagPath: Array<any>) {
-    this.updateByPath<Immutable.List<TagNode>>(
+    this.updateByPath<List<TagNode>>(
       this.flattenPath([parentTagPath, 'subTags']),
       list => list.push(new TagNode({name: 'new node'})));
   }

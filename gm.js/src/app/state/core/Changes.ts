@@ -1,6 +1,6 @@
 export class Changes {
-  tagNodeTreeChange: boolean;
-  budgetCategoryTreeChange: boolean;
+  tagNodeTreeChange?: boolean;
+  budgetCategoryTreeChange?: boolean;
 
-  projectProperty: string;
+  projectProperty?: string;
 }

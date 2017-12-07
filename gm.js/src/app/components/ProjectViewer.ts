@@ -1,3 +1,5 @@
+import {List} from 'immutable';
+
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {BudgetCategorySelector} from 'app/components/BudgetCategorySelector';
 import {CurrencySelector} from 'app/components/CurrencySelector';
@@ -22,35 +24,34 @@ export class ProjectViewer {
   @Input() currencyList: any; // TODO
 
   expenseColumns: any;
-  incomeColumns: any;
+  incomeColumns: List<TableColumn>;
   categoryColumns: any;
 
-  getProjectCategoryList():
-    Immutable.List<{key: string, value: string}> {
+  getProjectCategoryList(): List<{key: string, value: string}> {
     return this.project.categories.map(
       (value: ProjectCategory) =>
         ({key: value.tagName, value: value.tagName})).toList();
   }
 
   ngOnChanges(chg) {
-    this.incomeColumns = Immutable.List([
+    this.incomeColumns = List([
       new TableColumn({
         key: 'date',
         value: 'Date',
         kind: 'date',
-        constraints: ['not_null'],
+        constraints: List(['not_null']),
       }),
       new TableColumn({
         key: 'foreignAmount',
         value: 'Foreign amount',
         kind: 'number',
-        constraints: ['not_null', 'positive']
+        constraints: List(['not_null', 'positive'])
       }),
       new TableColumn({
         key: 'exchangeRate',
         value: 'Exchange rate',
         kind: 'number',
-        constraints: ['not_null', 'positive']
+        constraints: List(['not_null', 'positive'])
       }),
       new TableColumn({
         key: 'localAmount',
@@ -72,7 +73,7 @@ export class ProjectViewer {
       })
     ]);
 
-    this.categoryColumns = Immutable.List([
+    this.categoryColumns = List([
       new TableColumn({
         key: 'tagName',
         value: 'Name',
@@ -85,13 +86,13 @@ export class ProjectViewer {
         key: 'limitForeign',
         value: 'Limit (' + this.project.foreignCurrency + ')',
         kind: 'number',
-        constraints: ['positive']
+        constraints: List(['positive'])
       }),
       new TableColumn({
         key: 'limitPercentageForeign',
         value: 'Limit% (' + this.project.foreignCurrency + ')',
         kind: 'number',
-        constraints: ['min:0', 'max:100']
+        constraints: List(['min:0', 'max:100'])
       }),
       new TableColumn({
         key: 'spentForeign',
@@ -107,12 +108,12 @@ export class ProjectViewer {
       }),
     ]);
 
-    this.expenseColumns = Immutable.List([
+    this.expenseColumns = List([
       new TableColumn({
         key: 'date',
         value: 'Date',
         kind: 'date',
-        constraints: ['not_null'],
+        constraints: List(['not_null']),
       }),
       new TableColumn({
         key: 'category',
@@ -134,7 +135,7 @@ export class ProjectViewer {
         key: 'localAmount',
         value: 'Amount (' + this.database.localCurrency + ')',
         kind: 'number',
-        constraints: ['positive']
+        constraints: List(['positive'])
       }),
       new TableColumn({
         key: 'foreignAmount',

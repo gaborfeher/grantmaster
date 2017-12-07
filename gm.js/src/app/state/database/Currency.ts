@@ -1,17 +1,18 @@
-import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {Record} from 'immutable';
 
-export interface Currency extends IRecord<Currency> {
+class CurrencyRecord extends Record({
+  name: ''
+}) {}
+
+export class Currency extends CurrencyRecord {
   name: string;
 
-  validate(): String[];
-}
-export var Currency = Immutable.Record({
-  name: ''
-});
-Currency.prototype.validate = function(): String[] {
-  let errors = [];
-  if (!this.name) {
-    errors.push('empty currency name');
+  validate(): String[] {
+    let errors = [];
+    if (!this.name) {
+      errors.push('empty currency name');
+    }
+    return errors;
   }
-  return errors;
 }
+

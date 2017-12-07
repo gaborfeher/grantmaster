@@ -108,7 +108,7 @@ export class CellEntry {
       }
       var numberValue = new BigNumber(value);
       for (var j = 0; j < this.column.constraints.size; ++j) {
-        var constraint = this.column.constraints[j];
+        var constraint = this.column.constraints.get(j);
         if (constraint === 'positive') {
           if (numberValue !== undefined) {
             if (numberValue.isNegative() || numberValue.isZero()) {
