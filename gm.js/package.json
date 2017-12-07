@@ -1,7 +1,7 @@
 {
   "name": "grantmaster2",
   "version": "0.0.0",
-  "main": "src/index.js",
+  "main": "js/index.js",
   "productName": "GrantMaster2",
   "electronVersion": "0.36.0",
   "scripts": {
