@@ -1,20 +1,15 @@
 ///<reference path='../state/database/TagNode.ts'/>
 
-import {ChangeDetectionStrategy, Component, Input} from 'angular2/core';
-import {NgFor, NgIf} from 'angular2/common';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {NgForOf, NgIf} from '@angular/common';
 import {TagNode} from '../state/database/TagNode';
 import {StateService} from './StateService';
 
 @Component({
   selector: 'TagName',
-  properties: [
-    'path',
-    'node',
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app/components/TagName.html',
   styleUrls: ['./app/components/TagName.css'],
-  directives: [NgFor, NgIf]
 })
 export class TagName {
   @Input() node: TagNode;

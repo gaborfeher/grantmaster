@@ -17,5 +17,5 @@
   (blur)="commitEdit()"
   [(ngModel)]="value"
   [disabled]="!column.isEditable(creationMode)">
-  <option *ngFor="#item of column.items" value="{{item.key}}">{{item.value.split(' ').join('&nbsp;')}}</option>
+  <option *ngFor="let item of column.items" value="{{item.key}}">{{item.value.split(' ').join('&nbsp;')}}</option>
 </select>

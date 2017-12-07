@@ -1,30 +1,24 @@
 ///<reference path='../state/ui/GenericTable.ts'/>
 
-import {Component, Input, ChangeDetectionStrategy} from 'angular2/core';
-import {NgClass, NgFor, NgIf, NgModel} from 'angular2/common';
-import {bootstrap} from 'angular2/platform/browser';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {NgModel} from '@angular/forms';
 import {CellEntry} from './CellEntry';
 import {GenericTable} from '../state/ui/GenericTable';
 import {StateService} from './StateService';
 
 @Component({
   selector: 'Spreadsheet',
-  properties: [
-    'list',
-    'table',
-    'columns',
-    'path',
-    'rowStyleClasses'
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/Spreadsheet.html',
   styleUrls: ['app/components/Spreadsheet.css'],
-  directives: [CellEntry, NgClass, NgFor, NgIf, NgModel],
 })
 export class Spreadsheet {
   @Input() path: Array<any>;
   @Input() table: GenericTable<any>;
   @Input() rowStyleClasses: any;
+  @Input() list: any;
+  @Input() columns: any;
 
   stateService: StateService;
 

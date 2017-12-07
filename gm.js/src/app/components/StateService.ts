@@ -8,7 +8,7 @@
 ///<reference path='../state/database/TagNode.ts'/>
 ///<reference path='../state/ui/GenericTable.ts'/>
 
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 
 import {AppState} from '../state/AppState';
 import {BigNumber} from '../state/core/BigNumber';

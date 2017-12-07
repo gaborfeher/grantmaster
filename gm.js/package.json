@@ -12,7 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "angular2": "2.0.0-beta.14",
+    "@angular/common": "5.0.5",
+    "@angular/compiler": "5.0.5",
+    "@angular/core": "5.0.5",
+    "@angular/forms": "5.0.5",
+    "@angular/platform-browser": "5.0.5",
+    "@angular/platform-browser-dynamic": "5.0.5",
     "bignumber.js": "2.1.4",
     "crypto-js": "3.1.5",
     "electron-debug": "^0.5.0",
@@ -21,14 +26,15 @@
     "es7-reflect-metadata": "^1.2.0",
     "immutable": "3.7.6",
     "reflect-metadata": "0.1.2",
-    "rxjs": "5.0.0-beta.2",
+    "rxjs": "5.5.0",
     "systemjs": "0.19.9",
-    "zone.js": "0.6.6"
+    "zone.js": "0.8.18"
   },
   "devDependencies": {
-    "typescript": "1.7.5",
+    "@types/core-js": "^0.9.43",
     "electron-packager": "5.0.0",
-    "electron-prebuilt": "0.36.0"
+    "electron-prebuilt": "0.36.0",
+    "typescript": "2.6.2"
   },
   "keywords": [],
   "description": ""

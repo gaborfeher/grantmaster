@@ -22,7 +22,7 @@
       <input type="text" [(ngModel)]="newProjectName" />
       <button (click)="addProject()">Add</button>
     </div>
-    <div *ngFor="#project of stateService.state.database.projects; #id = index"
+    <div *ngFor="let project of stateService.state.database.projects; let id = index"
       (click)="selectMenuItem(id)"
       [ngClass]="{selected: isSelectedMenuItem(id)}"
       class="project-list-item">

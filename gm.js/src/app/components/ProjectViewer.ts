@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectionStrategy} from 'angular2/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {BudgetCategorySelector} from './BudgetCategorySelector';
 import {CurrencySelector} from './CurrencySelector';
 import {Spreadsheet} from './Spreadsheet';
@@ -10,21 +10,16 @@ import {TableColumn} from '../state/ui/TableColumn';
 
 @Component({
   selector: 'ProjectViewer',
-  properties: [
-    'project',
-    'database',
-    'path',
-    'projectUIState',
-    'currencyList',
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/ProjectViewer.html',
   styleUrls: ['app/components/ProjectViewer.css'],
-  directives: [Spreadsheet, BudgetCategorySelector, CurrencySelector],
 })
 export class ProjectViewer {
   @Input() project: Project;
   @Input() database: Database;
+  @Input() path: Array<string>;
+  @Input() projectUIState: any; // TODO
+  @Input() currencyList: any; // TODO
 
   expenseColumns: any;
   incomeColumns: any;

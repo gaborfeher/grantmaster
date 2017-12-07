@@ -2,7 +2,7 @@
   [ngModel]="value"
   (ngModelChange)="stateService.setByPath(path, $event)">
   <option
-    *ngFor="#currency of list"
+    *ngFor="let currency of list"
     value="{{currency.key}}"
     >{{currency.value.split(' ').join('&nbsp;')}}</option>
 </select>

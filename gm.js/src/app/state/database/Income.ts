@@ -59,7 +59,6 @@ Income.prototype.validate = function(): String[] {
   if (!that.foreignAmount || that.foreignAmount.lessThanOrEqualTo(0.0)) {
     errors.push('non-positive foreign amount');
   }
-  console.log('income.validata: ', errors);
   return errors;
 }
 export function compareIncomes(a: Income, b: Income): number {

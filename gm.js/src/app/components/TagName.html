@@ -1,5 +1,5 @@
 <div>
-  <span *ngFor="#x of path">&nbsp;&nbsp;</span>
+  <span *ngFor="let x of path">&nbsp;&nbsp;</span>
   <span *ngIf="!editing">
     {{node.name}}
     <button (click)="startEdit()">Edit</button>

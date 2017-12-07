@@ -1,22 +1,16 @@
 ///<reference path='../state/database/Project.ts'/>
 
-import {Component, Input} from 'angular2/core';
-import {NgIf, NgModel} from 'angular2/common';
+import {Component, Input} from '@angular/core';
 import {Project} from '../state/database/Project';
 import {StateService} from './StateService';
 
 @Component({
   selector: 'ProjectItem',
-  properties: [
-    'project',
-    'selected',
-    'path'
-  ],
   templateUrl: './app/components/ProjectItem.html',
   styleUrls: ['./app/components/ProjectItem.css'],
-  directives: [NgIf, NgModel],
 })
 export class ProjectItemComponent {
+  @Input() selected: boolean;
   @Input() project: Project;
   @Input() path: Array<string>;
   editing: boolean;

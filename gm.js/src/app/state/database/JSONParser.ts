@@ -5,7 +5,7 @@
 ///<reference path='./Income.ts'/>
 ///<reference path='./TagNode.ts'/>
 
-import {Injectable} from 'angular2/core';
+import {Injectable} from '@angular/core';
 
 import {Currency} from './Currency';
 import {Database} from './Database';
@@ -19,6 +19,9 @@ import {BigNumber} from '../core/BigNumber';
 
 @Injectable()
 export class JSONParser {
+
+  constructor() {
+  }
 
   parseDatabase(jsonData) {
     var that = this;

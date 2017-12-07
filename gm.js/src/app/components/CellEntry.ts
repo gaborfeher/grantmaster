@@ -1,11 +1,11 @@
-///<reference path="../../../node_modules/angular2/typings/browser.d.ts"/>
 
 ///<reference path='./StateService.ts'/>
 ///<reference path='../state/core/BigNumber.ts'/>
 ///<reference path='../state/ui/TableColumn.ts'/>
 
-import {Input, Component, ChangeDetectionStrategy} from 'angular2/core';
-import {NgFor, NgIf, NgModel} from 'angular2/common';
+import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
+import {NgForOf, NgIf} from '@angular/common';
+import {NgModel} from '@angular/forms';
 
 import {StateService} from './StateService';
 import {BigNumber} from '../state/core/BigNumber';
@@ -14,21 +14,16 @@ import {Utils} from '../utils/Utils';
 
 @Component({
   selector: 'CellEntry',
-  properties: [
-    'item',
-    'column',
-    'path',
-    'creationMode'
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'app/components/CellEntry.html',
   styleUrls: ['app/components/CellEntry.css'],
-  directives: [NgFor, NgIf, NgModel],
 })
 export class CellEntry {
   @Input() item;
   @Input() column: TableColumn;
   @Input() path: Array<string>;
+  @Input() creationMode: any;  // TODO
+
   editMode: boolean;
   masterValue: string;
   value: string;

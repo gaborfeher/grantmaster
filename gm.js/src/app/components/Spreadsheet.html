@@ -1,13 +1,13 @@
 <table class="spreadsheet">
   <tr>
     <td></td>
-    <td *ngFor="#column of columns">
+    <td *ngFor="let column of columns">
       {{column.value}}
     </td>
   </tr>
   <tr>
     <td><button (click)="stateService.addNewItem(table, path)">Add</button>
-    <td *ngFor="#column of columns">
+    <td *ngFor="let column of columns">
       <CellEntry
         [creationMode]="true"
         [column]="column"
@@ -15,9 +15,9 @@
         [path]="[table.myPath, 'newItem', column.key]"></CellEntry>
     </td>
   </tr>
-  <tr *ngFor="#item of list.reverse(); #i = index" [ngClass]="getCssClassForItem(item)">
+  <tr *ngFor="let item of list.reverse(); let i = index" [ngClass]="getCssClassForItem(item)">
     <td><button (click)="stateService.removeItem(path, list.size - i - 1)">Remove</button></td>
-    <td *ngFor="#column of columns">
+    <td *ngFor="let column of columns">
       <CellEntry
         [column]="column"
         [item]="item"
