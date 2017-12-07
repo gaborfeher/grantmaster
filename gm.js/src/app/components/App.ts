@@ -1,29 +1,24 @@
-///<reference path='../state/database/Project.ts'/>
 
 import { NgModule, Injectable } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-
 import {ChangeDetectionStrategy, Component} from '@angular/core';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
-import {NgModel} from '@angular/forms';
 import {FormsModule} from '@angular/forms';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
-import {CurrencySelector} from './CurrencySelector';
-import {ProjectItemComponent} from './ProjectItem';
-import {TagList} from './TagList';
-import {StateService} from './StateService';
-import {ExampleData1, ExampleData2} from './ExampleData';
-import {ProjectViewer} from './ProjectViewer';
-import {Spreadsheet} from './Spreadsheet';
-import {BudgetCategorySelector} from './BudgetCategorySelector';
-import {CellEntry} from './CellEntry';
-import {TagName} from './TagName';
+import {CurrencySelector} from 'app/components/CurrencySelector';
+import {ProjectItemComponent} from 'app/components/ProjectItem';
+import {TagList} from 'app/components/TagList';
+import {StateService} from 'app/components/StateService';
+import {ExampleData1, ExampleData2} from 'app/components/ExampleData';
+import {ProjectViewer} from 'app/components/ProjectViewer';
+import {Spreadsheet} from 'app/components/Spreadsheet';
+import {BudgetCategorySelector} from 'app/components/BudgetCategorySelector';
+import {CellEntry} from 'app/components/CellEntry';
+import {TagName} from 'app/components/TagName';
 
-import {AppState} from '../state/AppState';
-import {Project} from '../state/database/Project';
-import {JSONParser} from '../state/database/JSONParser';
+import {AppState} from 'app/state/AppState';
+import {Project} from 'app/state/database/Project';
+import {JSONParser} from 'app/state/database/JSONParser';
 
 var w: any = window;
 var fs = w.require('fs');

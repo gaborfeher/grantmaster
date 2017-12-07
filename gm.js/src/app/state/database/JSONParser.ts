@@ -1,21 +1,14 @@
-///<reference path='./Database.ts'/>
-///<reference path='./Project.ts'/>
-///<reference path='./ProjectCategory.ts'/>
-///<reference path='./Expense.ts'/>
-///<reference path='./Income.ts'/>
-///<reference path='./TagNode.ts'/>
-
 import {Injectable} from '@angular/core';
 
-import {Currency} from './Currency';
-import {Database} from './Database';
-import {Expense} from './Expense';
-import {Income} from './Income';
-import {Project} from './Project';
-import {ProjectCategory} from './ProjectCategory';
-import {TagNode} from './TagNode';
+import {Currency} from 'app/state/database/Currency';
+import {Database} from 'app/state/database/Database';
+import {Expense} from 'app/state/database/Expense';
+import {Income} from 'app/state/database/Income';
+import {Project} from 'app/state/database/Project';
+import {ProjectCategory} from 'app/state/database/ProjectCategory';
+import {TagNode} from 'app/state/database/TagNode';
 
-import {BigNumber} from '../core/BigNumber';
+import {BigNumber} from 'app/state/core/BigNumber';
 
 @Injectable()
 export class JSONParser {

@@ -1,20 +1,13 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='../core/BigNumber.ts'/>
-///<reference path='../core/Changes.ts'/>
-///<reference path='../core/IRecord.ts'/>
-///<reference path='./Expense.ts'/>
-///<reference path='./Project.ts'/>
-///<reference path='./Income.ts'/>
-///<reference path='./TagNode.ts'/>
 
-import {BigNumber} from '../core/BigNumber';
-import {Changes} from '../core/Changes';
-import {Immutable, IRecord} from '../core/IRecord';
-import {Currency} from './Currency';
-import {Expense} from './Expense';
-import {Project} from './Project';
-import {Income} from './Income';
-import {TagNode} from './TagNode';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {Changes} from 'app/state/core/Changes';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {Currency} from 'app/state/database/Currency';
+import {Expense} from 'app/state/database/Expense';
+import {Project} from 'app/state/database/Project';
+import {Income} from 'app/state/database/Income';
+import {TagNode} from 'app/state/database/TagNode';
 
 export interface Database extends IRecord<Database> {
   projects: Immutable.List<Project>;

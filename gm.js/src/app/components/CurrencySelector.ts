@@ -1,7 +1,5 @@
-///<reference path='./StateService.ts'/>
-
 import {Component, ChangeDetectionStrategy, Input} from '@angular/core';
-import {StateService} from './StateService';
+import {StateService} from 'app/components/StateService';
 
 @Component({
   selector: 'CurrencySelector',

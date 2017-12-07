@@ -1,27 +1,18 @@
 ///<reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./database/Database.ts'/>
-///<reference path='./database/ProjectCategory.ts'/>
-///<reference path='./database/Expense.ts'/>
-///<reference path='./database/Income.ts'/>
-///<reference path='./ui/GenericTable.ts'/>
-///<reference path='./ui/TagTreeTable.ts'/>
-///<reference path='./ui/TableColumn.ts'/>
-///<reference path='./core/Changes.ts'/>
 
-
-import {BigNumber} from './core/BigNumber';
-import {Changes} from './core/Changes';
-import {Currency} from './database/Currency';
-import {Database} from './database/Database';
-import {Expense} from './database/Expense';
-import {Income} from './database/Income';
-import {Immutable, IRecord} from './core/IRecord';
-import {Project} from './database/Project';
-import {ProjectCategory} from './database/ProjectCategory';
-import {TableColumn} from './ui/TableColumn';
-import {TagNode} from './database/TagNode';
-import {GenericTable} from './ui/GenericTable';
-import {TagTreeTable} from './ui/TagTreeTable';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {Changes} from 'app/state/core/Changes';
+import {Currency} from 'app/state/database/Currency';
+import {Database} from 'app/state/database/Database';
+import {Expense} from 'app/state/database/Expense';
+import {Income} from 'app/state/database/Income';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {Project} from 'app/state/database/Project';
+import {ProjectCategory} from 'app/state/database/ProjectCategory';
+import {TableColumn} from 'app/state/ui/TableColumn';
+import {TagNode} from 'app/state/database/TagNode';
+import {GenericTable} from 'app/state/ui/GenericTable';
+import {TagTreeTable} from 'app/state/ui/TagTreeTable';
 
 export interface AppState extends IRecord<AppState> {
   database: Database;

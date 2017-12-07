@@ -1,16 +1,10 @@
 
-///<reference path='./StateService.ts'/>
-///<reference path='../state/core/BigNumber.ts'/>
-///<reference path='../state/ui/TableColumn.ts'/>
-
 import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
-import {NgModel} from '@angular/forms';
 
-import {StateService} from './StateService';
-import {BigNumber} from '../state/core/BigNumber';
-import {TableColumn} from '../state/ui/TableColumn';
-import {Utils} from '../utils/Utils';
+import {StateService} from 'app/components/StateService';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {TableColumn} from 'app/state/ui/TableColumn';
+import {Utils} from 'app/utils/Utils';
 
 @Component({
   selector: 'CellEntry',

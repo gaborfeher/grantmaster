@@ -1,9 +1,8 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='./TableColumn.ts'/>
 
-import {Immutable, IRecord} from '../core/IRecord';
-import {TableColumn} from './TableColumn';
-import {TagNode} from '../database/TagNode';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {TableColumn} from 'app/state/ui/TableColumn';
+import {TagNode} from 'app/state/database/TagNode';
 
 export interface TagTreeTable extends IRecord<TagTreeTable> {
   columns: Array<string>,

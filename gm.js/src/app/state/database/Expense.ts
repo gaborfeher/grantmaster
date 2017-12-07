@@ -1,11 +1,7 @@
-///<reference path='../core/BigNumber.ts'/>
-///<reference path='../core/Changes.ts'/>
-///<reference path='../core/IRecord.ts'/>
-
-import {BigNumber} from '../core/BigNumber';
-import {Changes} from '../core/Changes';
-import {Immutable, IRecord} from '../core/IRecord';
-import {Utils} from '../../utils/Utils';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {Changes} from 'app/state/core/Changes';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {Utils} from 'app/utils/Utils';
 
 export interface Expense extends IRecord<Expense> {
   date: string;

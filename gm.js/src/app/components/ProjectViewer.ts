@@ -1,12 +1,12 @@
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
-import {BudgetCategorySelector} from './BudgetCategorySelector';
-import {CurrencySelector} from './CurrencySelector';
-import {Spreadsheet} from './Spreadsheet';
-import {Database} from '../state/database/Database';
-import {Project} from '../state/database/Project';
-import {ProjectCategory} from '../state/database/ProjectCategory';
-import {TagNode} from '../state/database/TagNode';
-import {TableColumn} from '../state/ui/TableColumn';
+import {BudgetCategorySelector} from 'app/components/BudgetCategorySelector';
+import {CurrencySelector} from 'app/components/CurrencySelector';
+import {Spreadsheet} from 'app/components/Spreadsheet';
+import {Database} from 'app/state/database/Database';
+import {Project} from 'app/state/database/Project';
+import {ProjectCategory} from 'app/state/database/ProjectCategory';
+import {TagNode} from 'app/state/database/TagNode';
+import {TableColumn} from 'app/state/ui/TableColumn';
 
 @Component({
   selector: 'ProjectViewer',

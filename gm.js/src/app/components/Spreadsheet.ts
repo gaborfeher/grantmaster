@@ -1,11 +1,7 @@
-///<reference path='../state/ui/GenericTable.ts'/>
-
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
-import {NgModel} from '@angular/forms';
-import {CellEntry} from './CellEntry';
-import {GenericTable} from '../state/ui/GenericTable';
-import {StateService} from './StateService';
+import {CellEntry} from 'app/components/CellEntry';
+import {GenericTable} from 'app/state/ui/GenericTable';
+import {StateService} from 'app/components/StateService';
 
 @Component({
   selector: 'Spreadsheet',

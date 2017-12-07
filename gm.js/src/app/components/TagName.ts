@@ -1,9 +1,6 @@
-///<reference path='../state/database/TagNode.ts'/>
-
 import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
-import {TagNode} from '../state/database/TagNode';
-import {StateService} from './StateService';
+import {TagNode} from 'app/state/database/TagNode';
+import {StateService} from 'app/components/StateService';
 
 @Component({
   selector: 'TagName',

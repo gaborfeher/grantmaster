@@ -1,6 +1,4 @@
-///<reference path='../core/IRecord.ts'/>
-
-import {Immutable, IRecord} from '../core/IRecord';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
 
 export interface Currency extends IRecord<Currency> {
   name: string;

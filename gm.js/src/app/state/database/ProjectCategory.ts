@@ -1,10 +1,6 @@
-///<reference path='../core/IRecord.ts'/>
-///<reference path='../core/BigNumber.ts'/>
-///<reference path='../core/Changes.ts'/>
-
-import {BigNumber} from '../core/BigNumber';
-import {Changes} from '../core/Changes';
-import {Immutable, IRecord} from '../core/IRecord';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {Changes} from 'app/state/core/Changes';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
 
 export interface ProjectCategory extends IRecord<ProjectCategory> {
   tagName: string;

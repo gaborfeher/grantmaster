@@ -1,11 +1,8 @@
 ///<reference path='../../../../node_modules/immutable/dist/immutable.d.ts'/>
-///<reference path='../core/IRecord.ts'/>
-///<reference path='../core/BigNumber.ts'/>
-///<reference path='../core/Changes.ts'/>
 
-import {Immutable, IRecord} from '../core/IRecord';
-import {BigNumber} from '../core/BigNumber';
-import {Changes} from '../core/Changes';
+import {Immutable, IRecord} from 'app/state/core/IRecord';
+import {BigNumber} from 'app/state/core/BigNumber';
+import {Changes} from 'app/state/core/Changes';
 
 export interface TagNode extends IRecord<TagNode> {
   name: string;

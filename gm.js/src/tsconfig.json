@@ -13,7 +13,8 @@
     "types": [
       "core-js"
     ],
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
+    "baseUrl": "."
   }
 }
 

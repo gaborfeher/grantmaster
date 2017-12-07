@@ -1,10 +1,8 @@
 ///<reference path='./StateService.ts'/>
 
 import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
-import {NgModel} from '@angular/forms';
-import {StateService} from './StateService';
-import {TagNode} from '../state/database/TagNode';
+import {StateService} from 'app/components/StateService';
+import {TagNode} from 'app/state/database/TagNode';
 
 @Component({
   selector: 'BudgetCategorySelector',

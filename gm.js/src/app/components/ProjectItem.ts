@@ -1,8 +1,6 @@
-///<reference path='../state/database/Project.ts'/>
-
 import {Component, Input} from '@angular/core';
-import {Project} from '../state/database/Project';
-import {StateService} from './StateService';
+import {Project} from 'app/state/database/Project';
+import {StateService} from 'app/components/StateService';
 
 @Component({
   selector: 'ProjectItem',
