@@ -57,19 +57,22 @@ export class ProjectViewer {
         key: 'localAmount',
         value: 'Amount (' + this.database.localCurrency + ')',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       }),
       new TableColumn({
         key: 'spentForeignAmount',
         value: 'Spent (' + this.project.foreignCurrency + ')',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       }),
       new TableColumn({
         key: 'spentLocalAmount',
         value: 'Spent (' + this.database.localCurrency + ')',
         kind: 'number',
-        editable : false
+        editable : false,
+        editableAtCreation: false,
       })
     ]);
 
@@ -98,13 +101,15 @@ export class ProjectViewer {
         key: 'spentForeign',
         value: 'Spent (' + this.project.foreignCurrency + ')',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       }),
       new TableColumn({
         key: 'spentLocal',
         value: 'Spent (' + this.database.localCurrency + ')',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       }),
     ]);
 
@@ -141,13 +146,15 @@ export class ProjectViewer {
         key: 'foreignAmount',
         value: 'Amount (' + this.project.foreignCurrency + ')',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       }),
       new TableColumn({
         key: 'exchangeRate',
         value: 'Exchange rate',
         kind: 'number',
-        editable: false
+        editable: false,
+        editableAtCreation: false,
       })
     ]);
   }
