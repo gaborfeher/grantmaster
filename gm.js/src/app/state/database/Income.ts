@@ -53,6 +53,9 @@ export class Income extends IncomeRecord {
     if (!that.foreignAmount || that.foreignAmount.lessThanOrEqualTo(0.0)) {
       errors.push('non-positive foreign amount');
     }
+    if (!that.exchangeRate || that.exchangeRate.lessThanOrEqualTo(0.0)) {
+      errors.push('non-positive exchange rate');
+    }
     return errors;
   }
 

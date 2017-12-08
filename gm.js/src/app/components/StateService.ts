@@ -49,7 +49,7 @@ export class StateService {
   }
 
   addNewItem(table: GenericTable<any>, targetPath: Array<any>) {
-    console.log('adding ', table.newItem);
+    console.log('adding ', table.newItem.toJS());
     let validationErrors = table.newItem.validate();
     if (validationErrors.length > 0) {
       console.log('validation error ', validationErrors);
