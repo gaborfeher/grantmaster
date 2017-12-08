@@ -19,10 +19,6 @@ export class TableColumn extends TableColumnRecord {
   editable: boolean;
   editableAtCreation: boolean;
 
-  constructor(params?: any) {
-    params ? super(params) : super();
-  }
-
   isEditable(creationMode: boolean): boolean {
     return creationMode ? this.editableAtCreation : this.editable;
   }

@@ -15,15 +15,15 @@ import {TagTreeTable} from 'app/state/ui/TagTreeTable';
 
 // TODO: move this into own class in own file
 class ProjectUIState extends Record({
-  expenseTable: new GenericTable({
+  expenseTable: new GenericTable<Expense>({
     myPath: ['projectUIState', 'expenseTable'],
     newItemTemplate: new Expense()
   }),
-  incomeTable: new GenericTable({
+  incomeTable: new GenericTable<Income>({
     myPath: ['projectUIState', 'incomeTable'],
     newItemTemplate: new Income()
   }),
-  categoryTable: new GenericTable({
+  categoryTable: new GenericTable<ProjectCategory>({
     myPath: ['projectUIState', 'categoryTable'],
     newItemTemplate: new ProjectCategory()
   }),
@@ -37,12 +37,12 @@ class AppStateRecord extends Record({
 
   projectUIState: new ProjectUIState(),
 
-  currencyTable: new GenericTable({
+  currencyTable: new GenericTable<Currency>({
     myPath: ['currencyTable'],
     newItemTemplate: new Currency(),
     columns: List([
-      new TableColumn({
-        key: 'name',
+        new TableColumn({
+          key: 'name',
         value: 'Name',
         kind: 'string'
       })

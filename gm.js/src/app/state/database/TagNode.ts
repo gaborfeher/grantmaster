@@ -20,7 +20,7 @@ export class TagNode extends TagNodeRecord {
     return this;
   }
 
-  getSubTreeAsUIList(): any  {
+  getSubTreeAsUIList(): List<{key: string, value: string}> {
     let root: TagNode = this;
     function toNames(prefix: string) {
       return function(node: TagNode) {

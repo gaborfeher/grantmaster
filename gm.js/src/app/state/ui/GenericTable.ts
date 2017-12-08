@@ -14,10 +14,6 @@ export class GenericTable<T> extends GenericTableRecord {
   columns: List<TableColumn>;
   myPath: Array<string>;
 
-  constructor(params?: any) {
-    params ? super(params) : super();
-  }
-
   resetNewItem(): GenericTable<T> {
     return this.set('newItem', this.newItemTemplate);
   }

@@ -23,9 +23,9 @@ export class ProjectViewer {
   @Input() projectUIState: any; // TODO
   @Input() currencyList: any; // TODO
 
-  expenseColumns: any;
+  expenseColumns: List<TableColumn>;
   incomeColumns: List<TableColumn>;
-  categoryColumns: any;
+  categoryColumns: List<TableColumn>;
 
   getProjectCategoryList(): List<{key: string, value: string}> {
     return this.project.categories.map(

@@ -1,5 +1,4 @@
-///<reference path='./StateService.ts'/>
-
+import {List} from 'immutable';
 import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
 import {StateService} from 'app/components/StateService';
 import {TagNode} from 'app/state/database/TagNode';
@@ -12,9 +11,9 @@ import {TagNode} from 'app/state/database/TagNode';
 })
 export class BudgetCategorySelector {
   @Input() root: TagNode;
-  @Input() value: any;  // TODO
-  @Input() path: any;  // TODO
-  list: any;
+  @Input() value: string;
+  @Input() path: Array<any>;  // TODO
+  list: List<{key: string, value: string}>;
 
   stateService: StateService;
   constructor(stateService: StateService) {
