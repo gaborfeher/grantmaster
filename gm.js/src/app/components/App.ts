@@ -22,8 +22,7 @@ import {JSONParser} from 'app/state/database/JSONParser';
 
 var w: any = window;
 var fs = w.require('fs');
-var remote = w.require('remote');
-var dialog = remote.require('dialog');
+var dialog = w.require('electron').remote.dialog;
 
 
 @Component({

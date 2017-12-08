@@ -20,7 +20,7 @@
     "@angular/platform-browser-dynamic": "5.0.5",
     "bignumber.js": "2.1.4",
     "crypto-js": "3.1.5",
-    "electron-debug": "^0.5.0",
+    "electron-debug": "1.4.0",
     "es6-promise": "^3.0.2",
     "es6-shim": "0.35.0",
     "es7-reflect-metadata": "^1.2.0",
@@ -32,8 +32,8 @@
   },
   "devDependencies": {
     "@types/core-js": "^0.9.43",
-    "electron-packager": "5.0.0",
-    "electron-prebuilt": "0.36.0",
+    "electron-packager": "10.1.0",
+    "electron": "1.6.15",
     "typescript": "2.6.2"
   },
   "keywords": [],
