@@ -159,7 +159,9 @@ export class CellEntry {
       if (this.validate(val, errors)) {
         let val2 = this.column.kind === 'number' ? new BigNumber(val) : val;
         this.stateService.setByPath(this.path, val2);
-        this.editMode = false;
+        if (!focused) {
+          this.editMode = false;
+        }
       } else {
         if (focused) {
           ref.blur();  // this will trigger commitEdit again
