@@ -1,4 +1,4 @@
-import {List} from 'immutable';
+import {List, is} from 'immutable';
 
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {BudgetCategorySelector} from 'app/components/BudgetCategorySelector';
@@ -33,7 +33,40 @@ export class ProjectViewer {
         ({key: value.tagName, value: value.tagName})).toList();
   }
 
+  isChanged(chg, key, fun): boolean {
+    if (!(key in chg)) {
+      return false;
+    }
+    if (chg[key].firstChange) {
+      return true;
+    }
+    return !is(fun(chg[key].previousValue), fun(chg[key].currentValue));
+  }
+
   ngOnChanges(chg) {
+    // Rebuild column lists because they depend on this component's
+    // inputs.
+
+    // Only update a list object if its content is expected to change.
+    // This is important because angular will do reference checks on these
+    // lists, and destroy+rebuild the spreadsheet cells in case of a
+    // ref change. This, in turn would erase the focused state of cells,
+    // so we only want it to happen if there was a real change.
+    // TODO: achieve this with restructuring the column list?
+    console.log(chg);
+    if (this.isChanged(chg, 'project', (p: Project) => p.foreignCurrency) ||
+        this.isChanged(chg, 'database', (d: Database) => d.localCurrency)) {
+      this.makeIncomeColumns();
+      this.makeExpenseColumns();
+      this.makeCategoryColumns();
+    } else if (this.isChanged(chg, 'project', (p: Project) => p.categories)) {
+      this.makeExpenseColumns();
+    } else if (this.isChanged(chg, 'database', (d: Database) => d.getExpenseBudgetCategories())) {
+      this.makeCategoryColumns();
+    }
+  }
+
+  makeIncomeColumns() {
     this.incomeColumns = List([
       new TableColumn({
         key: 'date',
@@ -75,7 +108,9 @@ export class ProjectViewer {
         editableAtCreation: false,
       })
     ]);
+  }
 
+  makeCategoryColumns() {
     this.categoryColumns = List([
       new TableColumn({
         key: 'tagName',
@@ -112,7 +147,9 @@ export class ProjectViewer {
         editableAtCreation: false,
       }),
     ]);
+  }
 
+  makeExpenseColumns() {
     this.expenseColumns = List([
       new TableColumn({
         key: 'date',
