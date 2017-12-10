@@ -6,6 +6,10 @@ import {BigNumber} from 'app/state/core/BigNumber';
 import {TableColumn} from 'app/state/ui/TableColumn';
 import {Utils} from 'app/utils/Utils';
 
+declare var System;
+let fs = System._nodeRequire('fs');
+let dialog = System._nodeRequire('electron').remote.dialog;
+
 @Component({
   selector: 'CellEntry',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -162,7 +166,14 @@ export class CellEntry {
           return;
         }
 
-        if (window.confirm(errors.join('\n') + '\n\nContinue editing?')) {
+        let userChoice: number = dialog.showMessageBox({
+          type: 'warning',
+          buttons: ['OK', 'Cancel'],
+          title: 'Validation error',
+          cancelId: 1,
+          message: errors.join('\n') + '\n\nContinue editing?'
+        });
+        if (userChoice == 0) {
           setTimeout(() => ref.focus(), 0);
         } else {
           this.cancelEdit();

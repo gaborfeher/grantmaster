@@ -20,9 +20,9 @@ import {AppState} from 'app/state/AppState';
 import {Project} from 'app/state/database/Project';
 import {JSONParser} from 'app/state/database/JSONParser';
 
-var w: any = window;
-var fs = w.require('fs');
-var dialog = w.require('electron').remote.dialog;
+declare var System;
+let fs = System._nodeRequire('fs');
+let dialog = System._nodeRequire('electron').remote.dialog;
 
 
 @Component({
