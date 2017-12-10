@@ -1,52 +1,52 @@
 <div id="project-view">
-  <h2>{{project.name}}</h2>
-
-  Income cat:
-  <BudgetCategorySelector
-    [value]="project.incomeCategory"
-    [root]="database.getIncomeBudgetCategories()"
-    [path]="[path, 'incomeCategory']">
-  </BudgetCategorySelector>
-
-  Foreign currency:
-  <CurrencySelector
-    [value]="project.foreignCurrency"
-    [currencies]="currencyList"
-    [path]="[path, 'foreignCurrency']">
-  </CurrencySelector>
-
-
   <div id="project-top">
-    <div id="project-income-list">
-      <h3>Incomes</h3>
+    Income cat:
+    <BudgetCategorySelector
+      [value]="project.incomeCategory"
+      [root]="database.getIncomeBudgetCategories()"
+      [path]="[path, 'incomeCategory']">
+    </BudgetCategorySelector>
 
-      <Spreadsheet
-        [list]="project.incomes"
-        [table]="projectUIState.incomeTable"
-        [columns]="incomeColumns"
-        [path]="[path, 'incomes']">
-      </Spreadsheet>
-    </div>
-    <div id="project-budget-list">
-      <h3>Budget</h3>
-      <Spreadsheet
-        [list]="project.categories"
-        [table]="projectUIState.categoryTable"
-        [columns]="categoryColumns"
-        [path]="[path, 'categories']">
-      </Spreadsheet>
-    </div>
+    Foreign currency:
+    <CurrencySelector
+      [value]="project.foreignCurrency"
+      [currencies]="currencyList"
+      [path]="[path, 'foreignCurrency']">
+    </CurrencySelector>
   </div>
+  <div>
+    <div id="project-top">
+      <div id="project-income-list">
+        <h3>Incomes</h3>
 
-  <div id="expense-list">
-    <h3>Expenses</h3>
-    <Spreadsheet
-      [list]="project.expenses"
-      [path]="[path, 'expenses']"
-      [table]="projectUIState.expenseTable"
-      [columns]="expenseColumns"
-      [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
-    </Spreadsheet>
+        <Spreadsheet
+          [list]="project.incomes"
+          [table]="projectUIState.incomeTable"
+          [columns]="incomeColumns"
+          [path]="[path, 'incomes']">
+        </Spreadsheet>
+      </div>
+      <div id="project-budget-list">
+        <h3>Budget</h3>
+        <Spreadsheet
+          [list]="project.categories"
+          [table]="projectUIState.categoryTable"
+          [columns]="categoryColumns"
+          [path]="[path, 'categories']">
+        </Spreadsheet>
+      </div>
+    </div>
+
+    <div id="expense-list">
+      <h3>Expenses</h3>
+      <Spreadsheet
+        [list]="project.expenses"
+        [path]="[path, 'expenses']"
+        [table]="projectUIState.expenseTable"
+        [columns]="expenseColumns"
+        [rowStyleClasses]="{overshoot: 'overshoot-expense', multiPart: 'multiPart-expense'}">
+      </Spreadsheet>
+    </div>
   </div>
 </div>
 

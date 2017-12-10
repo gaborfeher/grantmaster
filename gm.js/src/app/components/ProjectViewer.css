@@ -1,10 +1,22 @@
+#project-header {
+  height: 30px;
+}
+
 #project-top {
   display: flex;
 }
 
 #project-income-list {
   width: 50%;
+  overflow: auto;
+  height: calc(30% - 50px);
 }
 #project-budget-list {
   width: 50%;
+  overflow: auto;
+  height: calc(30% - 50px);
+}
+#expense-list {
+  height: 70%;
+  overflow: auto;
 }

@@ -1,5 +1,3 @@
-<h1>GrantMaster2</h1>
-
 <div id="main">
   <div id="project-list">
     <div>
@@ -16,10 +14,10 @@
       [ngClass]="{selected: isSelectedMenuItem(-2)}">
       Currencies
     </div>
+    <div>Projects:</div>
     <div (click)="selectMenuItem(-1)"
       [ngClass]="{selected: isSelectedMenuItem(-1)}">
-      New project:
-      <input type="text" [(ngModel)]="newProjectName" />
+      <input type="text" [(ngModel)]="newProjectName" placeholder="New Project" size="17" />
       <button (click)="addProject()">Add</button>
     </div>
     <div *ngFor="let project of stateService.state.database.projects; let id = index"

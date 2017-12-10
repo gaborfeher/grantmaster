@@ -4,12 +4,13 @@
 
 #project-list {
   width: 200px;
-  border: 1px solid black;
+  border-right: 1px solid blue;
+  height: 100%;
 }
 
 #right-view {
-  border: 1px solid blue;
   flex: 1;
+  padding-left: 4px;
 }
 
 div.selected {
