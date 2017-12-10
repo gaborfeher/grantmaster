@@ -53,7 +53,6 @@ export class ProjectViewer {
     // ref change. This, in turn would erase the focused state of cells,
     // so we only want it to happen if there was a real change.
     // TODO: achieve this with restructuring the column list?
-    console.log(chg);
     if (this.isChanged(chg, 'project', (p: Project) => p.foreignCurrency) ||
         this.isChanged(chg, 'database', (d: Database) => d.localCurrency)) {
       this.makeIncomeColumns();
