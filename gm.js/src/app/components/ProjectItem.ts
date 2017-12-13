@@ -11,6 +11,8 @@ export class ProjectItemComponent {
   @Input() selected: boolean;
   @Input() project: Project;
   @Input() path: Array<string>;
+  @Input() localCurrency: string;
+
   editing: boolean;
   editedProjectName: string;
   stateService: StateService;

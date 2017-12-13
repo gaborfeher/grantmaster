@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 
 import {CurrencySelector} from 'app/components/CurrencySelector';
+import {FormattedAmount} from 'app/components/FormattedAmount';
 import {ProjectItemComponent} from 'app/components/ProjectItem';
 import {TagList} from 'app/components/TagList';
 import {StateService} from 'app/components/StateService';
@@ -94,8 +95,9 @@ export class AppComponent {
   declarations: [
     AppComponent,
     CellEntry,
-    BudgetCategorySelector,
     CurrencySelector,
+    BudgetCategorySelector,
+    FormattedAmount,
     ProjectItemComponent,
     ProjectViewer,
     Spreadsheet,

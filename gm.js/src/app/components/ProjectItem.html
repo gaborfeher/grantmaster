@@ -1,8 +1,8 @@
-<div *ngIf="!selected">
+<div *ngIf="!selected" class="left">
   {{project.name}}
 </div>
 
-<div *ngIf="selected">
+<div *ngIf="selected" class="left">
   <div *ngIf="!editing">
     {{project.name}}
     <button (click)="startEdit()">Edit</button>
@@ -12,4 +12,13 @@
     <button (click)="commitEdit()">Commit</button>
   </div>
 </div>
+
+<div class="right" *ngIf="!editing">
+  <FormattedAmount
+      [amount]="project.remainingLocalAmount"
+      [currency]="localCurrency">
+  </FormattedAmount>
+</div>
+
+<div class="clear"></div>
 

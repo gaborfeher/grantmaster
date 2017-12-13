@@ -13,12 +13,14 @@ class ProjectRecord extends Record({
   categories: List(),
   foreignCurrency: '',
   incomeCategory: '',
+  remainingLocalAmount: new BigNumber(0.0),
 }) {}
 
 export class Project extends ProjectRecord {
   name: string;
   foreignCurrency: string;
   incomeCategory: string;
+  remainingLocalAmount: BigNumber;
 
   expenses: List<Expense>;
   incomes: List<Income>;
@@ -81,15 +83,26 @@ export class Project extends ProjectRecord {
     for (let i = 0; i < expenseList.size; ++i) {
       that = that.addLastExpenseInternal(expenseList.get(i).resetComputed());
     }
-    return that.recomputeBudgetCategories();
+    return that
+        .recomputeRemaining()
+        .recomputeBudgetCategories();
+  }
+
+  recomputeRemaining(): Project {
+    let remaining: BigNumber = this.incomes
+        .map(
+            (i: Income) => i.remainingLocalAmount())
+        .reduce(
+            (a: BigNumber, b: BigNumber) => a.plus(b),
+            new BigNumber(0));
+    return this.set('remainingLocalAmount', remaining);
   }
 
   recomputeIncomes(): Project {
-    let that: Project = this;
-    return that
+    return this
       .set(
         'incomes',
-        that
+        this
           .incomes
           .sort(compareIncomes)
           .map(income => income.refresh()))

@@ -28,7 +28,8 @@
       <ProjectItem
         [project]="project"
         [path]="['database', 'projects', state().getSelectedProjectId()]"
-        [selected]="isSelectedMenuItem(id)">
+        [selected]="isSelectedMenuItem(id)"
+        [localCurrency]="state().database.localCurrency">
       </ProjectItem>
 
     </div>

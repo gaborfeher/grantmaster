@@ -2,7 +2,7 @@
 import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
 
 import {StateService} from 'app/components/StateService';
-import {BigNumber} from 'app/state/core/BigNumber';
+import {BigNumber, bigFormat} from 'app/state/core/BigNumber';
 import {TableColumn} from 'app/state/ui/TableColumn';
 import {Utils} from 'app/utils/Utils';
 
@@ -38,20 +38,6 @@ export class CellEntry {
     this.value = this.masterValue;
   }
 
-  formatNumber(num: BigNumber): string {
-    let s = num.round(3, BigNumber.HALF_UP).toFormat();
-    let dotPos = s.indexOf('.');
-    if (dotPos < 0) {
-      s += '.';
-      dotPos = s.length - 1;
-    }
-    let numDecimals = s.length - dotPos - 1;
-    for (let i = numDecimals; i < 3; ++i) {
-      s += '0';
-    }
-    return s;
-  }
-
   getRawValue(): any {
     return this.item.get(this.column.key);
   }
@@ -62,7 +48,7 @@ export class CellEntry {
       return '';
     } else {
       if (this.column.kind === 'number') {
-        return this.formatNumber(val);
+        return bigFormat(val);
       } else {
         return val;
       }

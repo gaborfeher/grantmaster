@@ -59,7 +59,12 @@ export class Income extends IncomeRecord {
     return errors;
   }
 
+  remainingLocalAmount(): BigNumber {
+    return this.localAmount.minus(this.spentLocalAmount);
+  }
+
 }
+
 export function compareIncomes(a: Income, b: Income): number {
   if (a.date == b.date) {
     return 0;
