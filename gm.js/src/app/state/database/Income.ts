@@ -2,9 +2,11 @@ import {Record} from 'immutable';
 
 import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
+import {ListItem} from 'app/state/core/ListItem';
 import {Utils} from 'app/utils/Utils';
 
 class IncomeRecord extends Record({
+  id: -1,
   date: undefined,
   foreignAmount: undefined,
   exchangeRate: undefined,
@@ -13,7 +15,8 @@ class IncomeRecord extends Record({
   spentLocalAmount: undefined
 }) {}
 
-export class Income extends IncomeRecord {
+export class Income extends IncomeRecord implements ListItem {
+  id: number;
   date: string;
   foreignAmount: BigNumber;
   exchangeRate: BigNumber;

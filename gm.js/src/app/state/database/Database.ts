@@ -13,7 +13,8 @@ class DatabaseRecord extends Record({
   projects: List([]),
   budgetCategories: new TagNode({name: 'Budget categories'}),
   currencies: List([]),
-  localCurrency: ''
+  localCurrency: '',
+  nextUniqueId: 0,
 }) {}
 
 export class Database extends DatabaseRecord {
@@ -21,6 +22,7 @@ export class Database extends DatabaseRecord {
   budgetCategories: TagNode;
   currencies: List<Currency>;
   localCurrency: string;
+  nextUniqueId: number;  // TODO
 
   addProject(project: Project): Database {
     return this.set('projects', this.projects.push(project));
@@ -66,6 +68,10 @@ export class Database extends DatabaseRecord {
       changes.budgetCategoryTreeChange = true;
     }
     return that;
+  }
+
+  incrementNextUniqueId(): Database {
+    return this.set('nextUniqueId', this.nextUniqueId + 1);
   }
 
 }

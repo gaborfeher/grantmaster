@@ -33,36 +33,13 @@ export class ProjectViewer {
         ({key: value.tagName, value: value.tagName})).toList();
   }
 
-  isChanged(chg, key, fun): boolean {
-    if (!(key in chg)) {
-      return false;
-    }
-    if (chg[key].firstChange) {
-      return true;
-    }
-    return !is(fun(chg[key].previousValue), fun(chg[key].currentValue));
-  }
 
   ngOnChanges(chg) {
     // Rebuild column lists because they depend on this component's
     // inputs.
-
-    // Only update a list object if its content is expected to change.
-    // This is important because angular will do reference checks on these
-    // lists, and destroy+rebuild the spreadsheet cells in case of a
-    // ref change. This, in turn would erase the focused state of cells,
-    // so we only want it to happen if there was a real change.
-    // TODO: achieve this with restructuring the column list?
-    if (this.isChanged(chg, 'project', (p: Project) => p.foreignCurrency) ||
-        this.isChanged(chg, 'database', (d: Database) => d.localCurrency)) {
-      this.makeIncomeColumns();
-      this.makeExpenseColumns();
-      this.makeCategoryColumns();
-    } else if (this.isChanged(chg, 'project', (p: Project) => p.categories)) {
-      this.makeExpenseColumns();
-    } else if (this.isChanged(chg, 'database', (d: Database) => d.getExpenseBudgetCategories())) {
-      this.makeCategoryColumns();
-    }
+    this.makeIncomeColumns();
+    this.makeExpenseColumns();
+    this.makeCategoryColumns();
   }
 
   makeIncomeColumns() {

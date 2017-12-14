@@ -1,6 +1,7 @@
 import {List} from 'immutable';
 import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {CellEntry} from 'app/components/CellEntry';
+import {ListItem} from 'app/state/core/ListItem';
 import {GenericTable} from 'app/state/ui/GenericTable';
 import {TableColumn} from 'app/state/ui/TableColumn';
 import {StateService} from 'app/components/StateService';
@@ -11,7 +12,7 @@ import {StateService} from 'app/components/StateService';
   templateUrl: 'app/components/Spreadsheet.html',
   styleUrls: ['app/components/Spreadsheet.css'],
 })
-export class Spreadsheet<T> {
+export class Spreadsheet<T extends ListItem> {
   @Input() path: Array<any>;
   @Input() table: GenericTable<T>;
   @Input() rowStyleClasses: { [id:string]: string };
@@ -32,6 +33,14 @@ export class Spreadsheet<T> {
       }
     }
     return resultClasses;
+  }
+
+  trackById(index: number, item: T): number {
+    return item.id;
+  }
+
+  trackByKey(index: number, column: TableColumn): string {
+    return column.key;
   }
 
 }

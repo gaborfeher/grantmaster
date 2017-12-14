@@ -2,9 +2,11 @@ import {Record} from 'immutable';
 
 import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
+import {ListItem} from 'app/state/core/ListItem';
 import {Utils} from 'app/utils/Utils';
 
 class ExpenseRecord extends Record({
+  id: -1,
   date: undefined,
   localAmount: undefined,
   foreignAmount: undefined,
@@ -17,7 +19,8 @@ class ExpenseRecord extends Record({
   overshoot: false
 }) {}
 
-export class Expense extends ExpenseRecord {
+export class Expense extends ExpenseRecord implements ListItem {
+  id: number;
   date: string;
   localAmount: BigNumber;
   foreignAmount: BigNumber;

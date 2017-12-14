@@ -60,15 +60,19 @@ export class StateService {
     let newItemPath = table.myPath.concat(['newItem']);
     targetPath = this.flattenPath(targetPath);
 
-    let itemType = targetPath[2];
-
+    let newItem = table.newItem.set(
+        'id', this.state.database.nextUniqueId);
+    console.log('new id= ', newItem.id);
     let state = this.state
       .setIn(
-        newItemPath,
-        table.newItemTemplate);
+          newItemPath,
+          table.newItemTemplate)
+      .updateIn(
+          ['database'],
+          d => d.incrementNextUniqueId());
     this.updateByPath<any>(  // any should be Immutable.List
       targetPath,
-      list => list.push(table.newItem),
+      list => list.push(newItem),
       state);
   }
 

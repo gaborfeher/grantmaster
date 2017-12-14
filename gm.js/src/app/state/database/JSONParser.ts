@@ -27,7 +27,8 @@ export class JSONParser {
       currencies: that.parseList(
         jsonData.currencies,
         currency => that.parseCurrency(currency)),
-      localCurrency: jsonData.localCurrency
+      localCurrency: jsonData.localCurrency,
+      nextUniqueId: jsonData.nextUniqueId,
     });
   }
 
@@ -60,7 +61,8 @@ export class JSONParser {
       localAmount: new BigNumber(jsonData.localAmount),
       accountNo: jsonData.accountNo,
       partner: jsonData.partner,
-      category: jsonData.category
+      category: jsonData.category,
+      id: jsonData.is,
     });
   }
 
@@ -68,7 +70,8 @@ export class JSONParser {
     return new Income({
       date: jsonData.date,
       foreignAmount: new BigNumber(jsonData.foreignAmount),
-      exchangeRate: new BigNumber(jsonData.exchangeRate)
+      exchangeRate: new BigNumber(jsonData.exchangeRate),
+      id: jsonData.id,
     });
   }
 
@@ -77,7 +80,8 @@ export class JSONParser {
     return new ProjectCategory({
       tagName: jsonData.tagName,
       limitForeign: jsonData.limitForeign,
-      limitPercentageForeign: jsonData.limitPercentageForeign
+      limitPercentageForeign: jsonData.limitPercentageForeign,
+      id: jsonData.id,
     });
   }
 
@@ -91,7 +95,8 @@ export class JSONParser {
 
   parseCurrency(jsonData: any): Currency {
     return new Currency({
-      name: jsonData.name
+      name: jsonData.name,
+      id: jsonData.id,
     });
   }
 

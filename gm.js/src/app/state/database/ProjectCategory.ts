@@ -2,8 +2,10 @@ import {Record} from 'immutable';
 
 import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
+import {ListItem} from 'app/state/core/ListItem';
 
 class ProjectCategoryRecord extends Record({
+  id: -1,
   tagName: '',
   limitForeign: undefined,
   limitPercentageForeign: undefined,
@@ -12,7 +14,8 @@ class ProjectCategoryRecord extends Record({
   overshoot: false
 }) {}
 
-export class ProjectCategory extends ProjectCategoryRecord {
+export class ProjectCategory extends ProjectCategoryRecord implements ListItem {
+  id: number;
   tagName: string;
   limitForeign: BigNumber;
   limitPercentageForeign: BigNumber;
