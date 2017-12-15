@@ -61,7 +61,7 @@ export class JSONParser {
       accountNo: jsonData.accountNo,
       partner: jsonData.partner,
       category: jsonData.category,
-      id: jsonData.is,
+      id: jsonData.id,
     });
   }
 

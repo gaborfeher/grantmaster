@@ -21,13 +21,13 @@ export function ExampleData1() {
             "localAmount": "1480",
             "foreignAmount": "4.852459016393442622950819672131",
             "category": "cat1",
-            "id": "21",
+            "id": 21,
           },
           {
             "date": "2015-02-05",
             "localAmount": "990",
             "category": "cat2",
-            "id": "22",
+            "id": 22,
           }
         ],
         "categories": [
