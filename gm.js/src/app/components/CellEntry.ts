@@ -2,7 +2,7 @@
 import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
 
 import {StateService} from 'app/components/StateService';
-import {BigNumber, bigFormat} from 'app/state/core/BigNumber';
+import {BigNumber} from 'bignumber.js';
 import {TableColumn} from 'app/state/ui/TableColumn';
 import {Utils} from 'app/utils/Utils';
 
@@ -48,7 +48,7 @@ export class CellEntry {
       return '';
     } else {
       if (this.column.kind === 'number') {
-        return bigFormat(val);
+        return Utils.bigFormat(val);
       } else {
         return val;
       }

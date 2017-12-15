@@ -1,3 +1,4 @@
+import {BigNumber} from 'bignumber.js';
 
 import { NgModule, Injectable } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -114,6 +115,13 @@ export class AppComponent {
 })
 export class App {}
 
-
+BigNumber.config({
+  DECIMAL_PLACES: 30,
+  ROUNDING_MODE: BigNumber.ROUND_HALF_EVEN,
+  FORMAT: {
+    groupSeparator: '',
+    decimalSeparator: '.'
+  }
+});
 platformBrowserDynamic().bootstrapModule(App);
 

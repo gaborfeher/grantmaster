@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {List} from 'immutable';
+import {BigNumber} from 'bignumber.js';
 
 import {Currency} from 'app/state/database/Currency';
 import {Database} from 'app/state/database/Database';
@@ -8,8 +9,6 @@ import {Income} from 'app/state/database/Income';
 import {Project} from 'app/state/database/Project';
 import {ProjectCategory} from 'app/state/database/ProjectCategory';
 import {TagNode} from 'app/state/database/TagNode';
-
-import {BigNumber} from 'app/state/core/BigNumber';
 
 @Injectable()
 export class JSONParser {

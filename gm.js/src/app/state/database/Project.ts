@@ -1,10 +1,11 @@
 import {List, Record} from 'immutable';
+import {BigNumber} from 'bignumber.js';
 
-import {BigNumber, bigMin} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
 import {Expense, compareExpenses} from 'app/state/database/Expense';
 import {Income, compareIncomes} from 'app/state/database/Income';
 import {ProjectCategory} from 'app/state/database/ProjectCategory';
+import {Utils} from 'app/utils/Utils';
 
 class ProjectRecord extends Record({
   name: '',
@@ -124,7 +125,7 @@ export class Project extends ProjectRecord {
       if (pos < that.incomes.size - 1) {
         // If this is not the last possible income, then cap fulfillment amount
         // to this income.
-        valueToTake = bigMin(neededValue, availableValue);
+        valueToTake = Utils.bigMin(neededValue, availableValue);
       } else if (availableValue.lessThan(neededValue)) {
         expense = expense.set('overshoot', true);
       }

@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {List} from 'immutable';
+import {BigNumber} from 'bignumber.js';
 
 import {AppState} from 'app/state/AppState';
-import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
 import {Database} from 'app/state/database/Database';
 import {Expense} from 'app/state/database/Expense';

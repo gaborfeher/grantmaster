@@ -1,4 +1,4 @@
-
+import {BigNumber} from 'bignumber.js';
 
 export namespace Utils {
   export function validateDate(date: string): boolean {
@@ -27,5 +27,23 @@ export namespace Utils {
       return false;
     }
     return true;
+  }
+
+  export function bigMin(a: BigNumber, b: BigNumber): BigNumber {
+    return a.lessThan(b) ? a : b;
+  }
+
+  export function bigFormat(num: BigNumber): string {
+    let s = num.round(3, BigNumber.ROUND_HALF_UP).toFormat();
+    let dotPos = s.indexOf('.');
+    if (dotPos < 0) {
+      s += '.';
+      dotPos = s.length - 1;
+    }
+    let numDecimals = s.length - dotPos - 1;
+    for (let i = numDecimals; i < 3; ++i) {
+      s += '0';
+    }
+    return s;
   }
 }

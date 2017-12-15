@@ -1,6 +1,6 @@
 import {Record} from 'immutable';
+import {BigNumber} from 'bignumber.js';
 
-import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
 import {ListItem} from 'app/state/core/ListItem';
 

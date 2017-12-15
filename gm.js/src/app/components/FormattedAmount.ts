@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 
-import {BigNumber, bigFormat} from 'app/state/core/BigNumber';
+import {BigNumber} from 'bignumber.js';
+import {Utils} from 'app/utils/Utils';
 
 @Component({
   selector: 'FormattedAmount',
@@ -12,7 +13,7 @@ export class FormattedAmount {
   @Input() currency: string;
 
   formatted(): string {
-    let s: string = bigFormat(this.amount);
+    let s: string = Utils.bigFormat(this.amount);
     if (this.amount.greaterThan(0.0)) {
       s = '+' + s;
     }

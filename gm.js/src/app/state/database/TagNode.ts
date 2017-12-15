@@ -1,5 +1,6 @@
 import {List, OrderedMap, Record} from 'immutable';
-import {BigNumber} from 'app/state/core/BigNumber';
+import {BigNumber} from 'bignumber.js';
+
 import {Changes} from 'app/state/core/Changes';
 
 class TagNodeRecord extends Record({

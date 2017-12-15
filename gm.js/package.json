@@ -18,7 +18,7 @@
     "@angular/forms": "5.0.5",
     "@angular/platform-browser": "5.0.5",
     "@angular/platform-browser-dynamic": "5.0.5",
-    "bignumber.js": "2.1.4",
+    "bignumber.js": "5.0.0",
     "crypto-js": "3.1.5",
     "electron-debug": "1.4.0",
     "es6-promise": "^3.0.2",

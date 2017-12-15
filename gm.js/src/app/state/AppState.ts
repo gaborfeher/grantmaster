@@ -1,6 +1,6 @@
 import {List, OrderedMap, Record} from 'immutable';
+import {BigNumber} from 'bignumber.js';
 
-import {BigNumber} from 'app/state/core/BigNumber';
 import {Changes} from 'app/state/core/Changes';
 import {Currency} from 'app/state/database/Currency';
 import {Database} from 'app/state/database/Database';
