@@ -24,10 +24,16 @@ export function ExampleData1() {
             "id": 21,
           },
           {
-            "date": "2015-02-05",
+            "date": "2014-02-05",
             "localAmount": "990",
             "category": "cat2",
             "id": 22,
+          },
+          {
+            "date": "2013-02-05",
+            "localAmount": "1990",
+            "category": "cat1",
+            "id": 23,
           }
         ],
         "categories": [
