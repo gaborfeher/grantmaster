@@ -145,10 +145,17 @@ export class CellEntry {
       if (this.validate(val, errors)) {
         let val2 = this.column.kind === 'number' ? new BigNumber(val) : val;
         this.stateService.setByPath(this.path, val2);
-        // Stay in edit mode unless this commit was triggered by a
-        // a blur event. In that case, leave edit mode:
-        if (!focused) {
-          this.editMode = false;
+
+        // Leave edit mode. (If this edit change triggers a reordering of spreadsheet rows
+        // then Angular sometimes sends an onBlur event. If editMode == true then it would
+        // cause a mess.)
+        this.editMode = false;
+        if (focused) {
+          // Return to edit mode if this commit was triggered by an enter key.
+          setTimeout(() => {
+            ref.focus();  // in case focus was lost
+            this.editMode = true;  // in case focus was not lost
+          }, 0);
         }
       } else {
         if (focused) {
