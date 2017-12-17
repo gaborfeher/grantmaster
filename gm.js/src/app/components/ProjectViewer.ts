@@ -153,7 +153,7 @@ export class ProjectViewer {
         key: 'localAmount',
         value: 'Amount (' + this.database.localCurrency + ')',
         kind: 'number',
-        constraints: List(['positive'])
+        constraints: List(['not_null', 'positive'])
       }),
       new TableColumn({
         key: 'foreignAmount',

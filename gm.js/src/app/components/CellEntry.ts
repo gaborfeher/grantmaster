@@ -81,6 +81,10 @@ export class CellEntry {
     }
 
     if (this.column.kind === 'number') {
+      if (value === '' || value === undefined) {
+        return true;  // null values are accepted (see 'not_null' constraint above)
+      }
+
       if (value.indexOf('.') !== value.lastIndexOf('.')) {
         errors.push('Invalid number');
         return false;
@@ -143,7 +147,14 @@ export class CellEntry {
       let val = this.value;
       let errors = [];
       if (this.validate(val, errors)) {
-        let val2 = this.column.kind === 'number' ? new BigNumber(val) : val;
+        let val2: BigNumber | string = val;
+        if (this.column.kind === 'number') {
+          if (val !== '' && val !== undefined) {
+            val2 = new BigNumber(val);
+          } else {
+            val2 = undefined;
+          }
+        }
         this.stateService.setByPath(this.path, val2);
 
         // Leave edit mode. (If this edit change triggers a reordering of spreadsheet rows
