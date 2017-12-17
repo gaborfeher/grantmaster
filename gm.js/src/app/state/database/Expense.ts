@@ -48,6 +48,9 @@ export class Expense extends ExpenseRecord implements ListItem {
     if (!this.localAmount || this.localAmount.lessThanOrEqualTo(0.0)) {
       errors.push('non-positive local amount');
     }
+    if (!this.category) {
+      errors.push('missing category');
+    }
     return errors;
   }
 }
