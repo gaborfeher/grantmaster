@@ -34,8 +34,9 @@ export class Project extends ProjectRecord {
     if (property === 'expenses') {
       return that.recomputeExpenses();
     } else if (property === 'categories') {
-      // The only reason we recompute here is because limits may have changed.
-      return that.recomputeBudgetCategories();
+      // The only reason we recompute here is because limits may have changed,
+      // so we need to update overshoot statuses.
+      return that.recomputeExpenses();
     } else if (property === 'incomes') {
       return that.recomputeIncomes();
     } else {
