@@ -89,24 +89,29 @@ export class StateService {
   }
 
   updateByPath<T>(path: Array<string>, updater: (object: T) => T, state?: AppState) {
+
+    function setObjectProp<U extends any>(
+        object: U,
+        prop: string,
+        value: any,
+        changes: Changes): U {
+      object = object.set(prop, value);
+      if ('onChange' in object) {
+        object = object.onChange(prop, changes);
+      }
+      return object;
+    }
+
     function recursiveUpdate(object, path: Array<string>, updater, changes: Changes) {
       let pathHead = path[0];
       let pathTail = path.slice(1);
       if (pathTail.length === 0) {
         let updatedProperty = updater(object.get(pathHead));
-        object = object.set(pathHead, updatedProperty);
-        if ('onChange' in object) {
-          object = object.onChange(pathHead, changes);
-        }
-        return object;
+        return setObjectProp(object, pathHead, updatedProperty, changes);
       } else {
         let subObject = object.get(pathHead);
         subObject = recursiveUpdate(subObject, pathTail, updater, changes);
-        object = object.set(pathHead, subObject);
-        if ('onChange' in object) {
-          object = object.onChange(pathHead, changes);
-        }
-        return object;
+        return setObjectProp(object, pathHead, subObject, changes);
       }
     }
 
