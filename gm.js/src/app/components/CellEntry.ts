@@ -68,26 +68,29 @@ export class CellEntry {
     this.value = this.masterValue;
   }
 
-  validate(value: string, errors: Array<string>): boolean {
+  validate(): Array<string> {
+    let value: string = this.value;
+    let errors: Array<string> = [];
+
     if (!this.column.constraints) {
-      return true;
+      return [];
     }
 
     if (this.column.constraints.indexOf('not_null') >= 0) {
       if (value === '' || value === undefined) {
         errors.push('must not be empty');
-        return false;
+        return errors;
       }
     }
 
     if (this.column.kind === 'number') {
       if (value === '' || value === undefined) {
-        return true;  // null values are accepted (see 'not_null' constraint above)
+        return [];  // null values are accepted (see 'not_null' constraint above)
       }
 
       if (value.indexOf('.') !== value.lastIndexOf('.')) {
         errors.push('Invalid number');
-        return false;
+        return errors;
       }
       var i = 0;
       if (value.length > 0 && value[i] === '-') {
@@ -96,7 +99,7 @@ export class CellEntry {
       while (i < value.length) {
         if (value[i] != '.' && (value[i] < '0' || value[i] > '9')) {
           errors.push('Invalid number');
-          return false;
+          return errors;
         }
         i += 1;
       }
@@ -133,10 +136,32 @@ export class CellEntry {
         errors.push('Invalid date format, use ISO format: YYYY-MM-DD');
       }
     }
-    return errors.length === 0;
+    return errors;
   }
 
   valueAtLastStart: string = undefined;
+
+  validateAndApplyEdit(): Array<string> {
+    let that: CellEntry = this;
+    function parseValue(value: string): BigNumber | string {
+      if (that.column.kind === 'number') {
+        if (value !== '' && value !== undefined) {
+          return new BigNumber(value);
+        } else {
+          return undefined;
+        }
+      } else {
+        return value;
+      }
+    }
+    let errors = this.validate();
+    if (errors.length === 0) {
+      let val: BigNumber | string = parseValue(this.value);
+      errors = errors.concat(
+          this.stateService.setByPath(this.path, val));
+    }
+    return errors;
+  }
 
   commitEdit(ref, focused: boolean) {
     if (!this.editMode) {
@@ -145,18 +170,8 @@ export class CellEntry {
 
     if (this.value !== this.masterValue) {
       let val = this.value;
-      let errors = [];
-      if (this.validate(val, errors)) {
-        let val2: BigNumber | string = val;
-        if (this.column.kind === 'number') {
-          if (val !== '' && val !== undefined) {
-            val2 = new BigNumber(val);
-          } else {
-            val2 = undefined;
-          }
-        }
-        this.stateService.setByPath(this.path, val2);
-
+      let errors = this.validateAndApplyEdit();
+      if (errors.length === 0) {  // Edit applied.
         // Leave edit mode. (If this edit change triggers a reordering of spreadsheet rows
         // then Angular sometimes sends an onBlur event. If editMode == true then it would
         // cause a mess.)
@@ -168,7 +183,7 @@ export class CellEntry {
             this.editMode = true;  // in case focus was not lost
           }, 0);
         }
-      } else {
+      } else {  // Edit apply failed.
         if (focused) {
           ref.blur();  // this will trigger commitEdit again
           return;

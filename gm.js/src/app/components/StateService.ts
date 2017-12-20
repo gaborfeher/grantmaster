@@ -88,7 +88,8 @@ export class StateService {
       this.state.updateIn(['database', 'projects'], projects => projects.push(project)));
   }
 
-  updateByPath<T>(path: Array<string>, updater: (object: T) => T, state?: AppState) {
+  updateByPath<T>(path: Array<string>, updater: (object: T) => T, state?: AppState): Array<string> {
+    let errors: Array<string> = [];
 
     function setObjectProp<U extends any>(
         object: U,
@@ -96,6 +97,14 @@ export class StateService {
         value: any,
         changes: Changes): U {
       object = object.set(prop, value);
+      if ('validate' in object) {
+        if (object.id >= 0) {  // avoid validating not yet added objects (TODO: nicer way?)
+          errors = errors.concat(object.validate());
+        }
+      }
+      if (errors.length > 0) {
+        return undefined;  // Don't apply changes in case of errors.
+      }
       if ('onChange' in object) {
         object = object.onChange(prop, changes);
       }
@@ -111,18 +120,25 @@ export class StateService {
       } else {
         let subObject = object.get(pathHead);
         subObject = recursiveUpdate(subObject, pathTail, updater, changes);
-        return setObjectProp(object, pathHead, subObject, changes);
+        if (subObject === undefined) {
+          return undefined;
+        } else {
+          return setObjectProp(object, pathHead, subObject, changes);
+        }
       }
     }
 
     state = state || this.state;
     let changes: Changes = new Changes();
     state = recursiveUpdate(state, path, updater, changes);
-    this.updateState(state);
+    if (state !== undefined) {
+      this.updateState(state);
+    }
+    return errors;
   }
 
-  setByPath(path: Array<any>, value: any) {
-    this.updateByPath(this.flattenPath(path), (_1) => value);
+  setByPath(path: Array<any>, value: any): Array<string> {
+    return this.updateByPath(this.flattenPath(path), (_1) => value);
   }
 
   setProjectName(projectPath: Array<any>, name: string) {
