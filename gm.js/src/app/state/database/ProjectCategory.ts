@@ -25,6 +25,17 @@ export class ProjectCategory extends ProjectCategoryRecord implements ListItem {
 
   overshoot: boolean;
 
+  refresh(totalIncomeForeign: BigNumber): ProjectCategory {
+    if (this.limitPercentageForeign !== undefined) {
+      let limitForeign = totalIncomeForeign
+          .times(this.limitPercentageForeign)
+          .times(0.01);
+      return this.set('limitForeign', limitForeign);
+    } else {
+      return this;
+    }
+  }
+
   reset(): ProjectCategory {
     var that: ProjectCategory = this;
     return that.merge({
@@ -35,18 +46,11 @@ export class ProjectCategory extends ProjectCategoryRecord implements ListItem {
   }
 
   addSpentAmounts(local: BigNumber, foreign: BigNumber) {
-    var that: ProjectCategory = this;
-    that = that.merge({
-      spentLocal: that.spentLocal.plus(local),
-      spentForeign: that.spentForeign.plus(foreign)
+    let that: ProjectCategory = this.merge({
+      spentLocal: this.spentLocal.plus(local),
+      spentForeign: this.spentForeign.plus(foreign)
     });
-    let overshoot = false;
-    if (that.limitForeign !== undefined) {
-      overshoot = overshoot || that.limitForeign.lessThan(that.spentForeign);
-    }
-    if (that.limitPercentageForeign !== undefined) {
-      // TODO
-    }
+    let overshoot = this.limitForeign.lessThan(that.spentForeign);
     return that.merge({
       overshoot: overshoot
     });
@@ -54,6 +58,10 @@ export class ProjectCategory extends ProjectCategoryRecord implements ListItem {
 
   validate(): String[] {
     let errors = [];
+    if (this.limitForeign === undefined &&
+        this.limitPercentageForeign === undefined) {
+      errors.push('you must specify a limit (either absolute or percentage)');
+    }
     // TODO: what to validate?
     return errors;
   }

@@ -44,12 +44,21 @@ export class Project extends ProjectRecord {
     }
   }
 
+  totalIncomeForeignAmount(): BigNumber {
+    return this.incomes
+        .map((i: Income) => i.foreignAmount)
+        .reduce(
+            (a: BigNumber, b: BigNumber) => a.plus(b),
+            new BigNumber(0));
+  }
+
   recomputeBudgetCategories(): Project {
     let that: Project = this;
     let map = {};
+    let totalIncomeForeign = this.totalIncomeForeignAmount();
     that.categories.forEach(
       category => {
-        map[category.tagName] = category.reset();
+        map[category.tagName] = category.reset().refresh(totalIncomeForeign);
         return true;
       }
     );

@@ -39,6 +39,14 @@ export class JSONParser {
     return List(list2);
   }
 
+  parseOptionalBigNumber(a: string): BigNumber {
+    if (a === undefined) {
+      return undefined;
+    } else {
+      return new BigNumber(a);
+    }
+  }
+
   parseProject(jsonData: any): Project {
     let that = this;
     let project = new Project({
@@ -78,8 +86,8 @@ export class JSONParser {
     var that = this;
     return new ProjectCategory({
       tagName: jsonData.tagName,
-      limitForeign: jsonData.limitForeign,
-      limitPercentageForeign: jsonData.limitPercentageForeign,
+      limitForeign: this.parseOptionalBigNumber(jsonData.limitForeign),
+      limitPercentageForeign: this.parseOptionalBigNumber(jsonData.limitPercentageForeign),
       id: jsonData.id,
     });
   }

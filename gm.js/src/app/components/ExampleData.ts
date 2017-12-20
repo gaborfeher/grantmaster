@@ -39,11 +39,13 @@ export function ExampleData1() {
         "categories": [
           {
             "tagName": "cat1",
-            "id": 31
+            "id": 31,
+            "limitForeign": "1000"
           },
           {
             "tagName": "cat2",
-            "id": 32
+            "id": 32,
+            "limitPercentageForeign": "4"
           }
         ],
         "foreignCurrency":"USD"
