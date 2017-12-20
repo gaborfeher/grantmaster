@@ -1,5 +1,8 @@
 import {Component, ChangeDetectionStrategy, Input} from '@angular/core';
+import {List} from 'immutable';
+
 import {StateService} from 'app/components/StateService';
+import {Currency} from 'app/state/database/Currency';
 
 @Component({
   selector: 'CurrencySelector',
@@ -8,9 +11,9 @@ import {StateService} from 'app/components/StateService';
   styleUrls: ['app/components/CurrencySelector.css'],
 })
 export class CurrencySelector {
-  @Input() value: any;  // TODO
+  @Input() value: string;
   @Input() path: any;  // TODO
-  @Input() currencies: any;  // TODO
+  @Input() currencies: List<Currency>;
 
   stateService: StateService;
 

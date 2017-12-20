@@ -20,7 +20,7 @@ export class CellEntry {
   @Input() item;
   @Input() column: TableColumn;
   @Input() path: Array<string>;
-  @Input() creationMode: any;  // TODO
+  @Input() creationMode: boolean;
 
   editMode: boolean;
   masterValue: string;
