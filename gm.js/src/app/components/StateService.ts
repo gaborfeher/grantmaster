@@ -111,7 +111,11 @@ export class StateService {
       return object;
     }
 
-    function recursiveUpdate(object, path: Array<string>, updater, changes: Changes) {
+    function recursiveUpdate(
+        object: any,
+        path: Array<string>,
+        updater: (a: any) => any,
+        changes: Changes) {
       let pathHead = path[0];
       let pathTail = path.slice(1);
       if (pathTail.length === 0) {

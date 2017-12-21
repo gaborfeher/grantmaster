@@ -24,7 +24,7 @@ export class TagNode extends TagNodeRecord {
   getSubTreeAsUIList(): List<{key: string, value: string}> {
     let root: TagNode = this;
     function toNames(prefix: string) {
-      return function(node: TagNode) {
+      return function(node: TagNode): List<{key: string, value: string}>  {
         let x = {key: node.name, value: prefix + node.name};
         return List([x]).concat(
           node.subTags.flatMap(node => toNames(prefix + '  ')(node)));

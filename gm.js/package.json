@@ -32,8 +32,9 @@
   },
   "devDependencies": {
     "@types/core-js": "^0.9.43",
-    "electron-packager": "10.1.0",
+    "@types/systemjs": "^0.20.6",
     "electron": "1.6.15",
+    "electron-packager": "10.1.0",
     "typescript": "2.6.2"
   },
   "keywords": [],

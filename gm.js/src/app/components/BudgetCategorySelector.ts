@@ -1,5 +1,5 @@
 import {List} from 'immutable';
-import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
+import {Input, Component, ChangeDetectionStrategy, SimpleChanges} from '@angular/core';
 import {StateService} from 'app/components/StateService';
 import {TagNode} from 'app/state/database/TagNode';
 
@@ -20,7 +20,7 @@ export class BudgetCategorySelector {
     this.stateService = stateService;
   }
 
-  ngOnChanges(chg) {
+  ngOnChanges(chg: SimpleChanges) {
     if (chg['root']) {
       this.list = this.root.getSubTreeAsUIList();
     }

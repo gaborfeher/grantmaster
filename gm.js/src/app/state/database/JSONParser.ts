@@ -16,7 +16,7 @@ export class JSONParser {
   constructor() {
   }
 
-  parseDatabase(jsonData) {
+  parseDatabase(jsonData: any): Database {
     var that = this;
     return new Database({
       projects: that.parseList(
@@ -31,7 +31,7 @@ export class JSONParser {
     });
   }
 
-  parseList<F, T>(jsonData: Array<F>, mapper: (F) => T ): List<T> {
+  parseList<F, T>(jsonData: Array<F>, mapper: (a: F) => T ): List<T> {
     let list2 = [];
     for (var i = 0; i < jsonData.length; ++i) {
       list2.push(mapper(jsonData[i]));

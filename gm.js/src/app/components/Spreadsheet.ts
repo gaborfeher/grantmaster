@@ -26,7 +26,7 @@ export class Spreadsheet<T extends ListItem> {
   }
 
   getCssClassForItem(item: T): { [id: string]: boolean } {
-    let resultClasses = {};
+    let resultClasses: { [id: string]: boolean }  = {};
     for (let cssClass in this.rowStyleClasses) {
       if (this.rowStyleClasses.hasOwnProperty(cssClass)) {
         resultClasses[this.rowStyleClasses[cssClass]] = item[cssClass];

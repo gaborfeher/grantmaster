@@ -50,6 +50,8 @@ class AppStateRecord extends Record({
   })
 }) {}
 
+type MapType = { [id: string]: {[id: string]: BigNumber} } 
+
 export class AppState extends AppStateRecord {
   database: Database;
   budgetCategoryTable: TagTreeTable;
@@ -61,7 +63,7 @@ export class AppState extends AppStateRecord {
   updateBudgetCategories(): AppState {
     let that: AppState = this;
 
-    var map = {};  // map[category name][year] = sum
+    var map: MapType = {};  // map[category name][year] = sum
     that.database.projects.forEach(
       project => {
         project.expenses.forEach(
@@ -145,11 +147,12 @@ export class AppState extends AppStateRecord {
 }
 
 function sumBudgetCategories(
-    node: TagNode, map: Object, rootNode: boolean): TagNode {
+    node: TagNode, map: MapType, rootNode: boolean): TagNode {
   node = node.set(
     'subTags',
     node.subTags.map(subTag => sumBudgetCategories(subTag, map, false)));
-  let items = {};  // year -> value (sum for this node)
+  // year -> value (sum for this node)
+  let items: {[id: string]: BigNumber} = {};  
 
   // Take out income/expense values directly assigned to this node 
   // from map.

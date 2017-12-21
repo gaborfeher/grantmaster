@@ -1,6 +1,6 @@
 import {List, is} from 'immutable';
 
-import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy, SimpleChange} from '@angular/core';
 import {BudgetCategorySelector} from 'app/components/BudgetCategorySelector';
 import {CurrencySelector} from 'app/components/CurrencySelector';
 import {Spreadsheet} from 'app/components/Spreadsheet';
@@ -34,7 +34,7 @@ export class ProjectViewer {
   }
 
 
-  ngOnChanges(chg) {
+  ngOnChanges(chg: SimpleChange) {
     // Rebuild column lists because they depend on this component's
     // inputs.
     this.makeIncomeColumns();

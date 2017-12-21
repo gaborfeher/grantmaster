@@ -22,7 +22,7 @@ import {AppState} from 'app/state/AppState';
 import {Project} from 'app/state/database/Project';
 import {JSONParser} from 'app/state/database/JSONParser';
 
-declare var System;
+import {System} from 'systemjs';
 let fs = System._nodeRequire('fs');
 let dialog = System._nodeRequire('electron').remote.dialog;
 

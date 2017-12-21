@@ -1,13 +1,11 @@
-
-import {Input, Component, ChangeDetectionStrategy} from '@angular/core';
+import {Input, Component, ChangeDetectionStrategy, SimpleChange} from '@angular/core';
 
 import {StateService} from 'app/components/StateService';
 import {BigNumber} from 'bignumber.js';
 import {TableColumn} from 'app/state/ui/TableColumn';
 import {Utils} from 'app/utils/Utils';
 
-declare var System;
-let fs = System._nodeRequire('fs');
+import {System} from 'systemjs';
 let dialog = System._nodeRequire('electron').remote.dialog;
 
 @Component({
@@ -17,7 +15,7 @@ let dialog = System._nodeRequire('electron').remote.dialog;
   styleUrls: ['app/components/CellEntry.css'],
 })
 export class CellEntry {
-  @Input() item;
+  @Input() item: any;
   @Input() column: TableColumn;
   @Input() path: Array<string>;
   @Input() creationMode: boolean;
@@ -33,7 +31,7 @@ export class CellEntry {
     this.stateService = stateService;
   }
 
-  ngOnChanges(chg) {
+  ngOnChanges(chg: SimpleChange) {
     this.masterValue = this.getFormattedValue();
     this.value = this.masterValue;
   }
@@ -163,7 +161,7 @@ export class CellEntry {
     return errors;
   }
 
-  commitEdit(ref, focused: boolean) {
+  commitEdit(ref: HTMLElement, focused: boolean) {
     if (!this.editMode) {
       return;
     }
@@ -206,7 +204,7 @@ export class CellEntry {
     }
   }
 
-  onBlur(ref) {
+  onBlur(ref: HTMLElement) {
     this.commitEdit(ref, false);
   }
 
@@ -214,7 +212,7 @@ export class CellEntry {
     this.startEdit();
   }
 
-  onEnter(ref) {
+  onEnter(ref: HTMLElement) {
     this.commitEdit(ref, true);
   }
 

@@ -54,7 +54,7 @@ export class Project extends ProjectRecord {
 
   recomputeBudgetCategories(): Project {
     let that: Project = this;
-    let map = {};
+    let map: { [id: string]: ProjectCategory } = {};
     let totalIncomeForeign = this.totalIncomeForeignAmount();
     that.categories.forEach(
       category => {
