@@ -27,13 +27,21 @@ export class TagName {
     this.editedName = this.node.name;
   }
 
-  commitEdit() {
+  saveEdit() {
     this.editing = false;
     this.stateService.setTagName(this.path, this.editedName);
   }
 
+  cancelEdit() {
+    this.editing = false;
+  }
+
   add() {
     this.stateService.addSubTag(this.path);
+  }
+
+  remove() {
+    this.stateService.removeTag(this.path);
   }
 
 }

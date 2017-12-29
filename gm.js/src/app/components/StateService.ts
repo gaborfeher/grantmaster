@@ -168,4 +168,9 @@ export class StateService {
       list => list.push(new TagNode({name: 'new node'})));
   }
 
+  removeTag(path: Array<any>) {
+    path = this.flattenPath(path);
+    this.removeItem(path.slice(0, -1), path[path.length - 1]);
+  }
+
 }

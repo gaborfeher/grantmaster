@@ -9,7 +9,8 @@
   </div>
   <div *ngIf="editing">
     <input type="text" [(ngModel)]="editedProjectName" />
-    <button (click)="commitEdit()">Commit</button>
+    <button (click)="saveEdit()">Save</button>
+    <button (click)="cancelEdit()">Cancel</button>
   </div>
 </div>
 

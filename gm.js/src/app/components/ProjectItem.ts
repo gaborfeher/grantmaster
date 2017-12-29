@@ -27,10 +27,13 @@ export class ProjectItemComponent {
     this.editedProjectName = this.project.name;
   }
 
-  commitEdit() {
+  saveEdit() {
     this.editing = false;
     this.stateService.setProjectName(this.path, this.editedProjectName);
   }
 
+  cancelEdit() {
+    this.editing = false;
+  }
 }
 

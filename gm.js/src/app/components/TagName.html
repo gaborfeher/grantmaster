@@ -3,10 +3,12 @@
   <span *ngIf="!editing">
     {{node.name}}
     <button (click)="startEdit()">Edit</button>
-    <button (click)="add()">Add</button>
+    <button (click)="add()">+</button>
+    <button (click)="remove()">X</button>
   </span>
   <span *ngIf="editing">
     <input type="text" [(ngModel)]="editedName" />
-    <button (click)="commitEdit()">Commit</button>
+    <button (click)="saveEdit()">Save</button>
+    <button (click)="cancelEdit()">Cancel</button>
   </span>
 </div>
