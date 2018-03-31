@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "main": "js/index.js",
   "productName": "GrantMaster2",
-  "electronVersion": "0.36.0",
   "scripts": {
     "tsc": "tsc -p src -w",
     "start": "electron .",
@@ -20,7 +19,7 @@
     "@angular/platform-browser-dynamic": "5.0.5",
     "bignumber.js": "5.0.0",
     "crypto-js": "3.1.5",
-    "electron-debug": "1.4.0",
+    "electron-debug": "1.5.0",
     "es6-promise": "^3.0.2",
     "es6-shim": "0.35.0",
     "es7-reflect-metadata": "^1.2.0",
@@ -33,7 +32,7 @@
   "devDependencies": {
     "@types/core-js": "^0.9.43",
     "@types/systemjs": "^0.20.6",
-    "electron": "1.6.15",
+    "electron": "1.6.17",
     "electron-packager": "10.1.0",
     "typescript": "2.6.2"
   },
